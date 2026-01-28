@@ -141,6 +141,20 @@ async fn main() -> Result<()> {
             to,
             head,
         } => {
+            // Parse human-readable dates
+            let from = from.and_then(|s| {
+                parse_human_date(&s).or_else(|| {
+                    eprintln!("Warning: could not parse --from date: {}", s);
+                    None
+                })
+            });
+            let to = to.and_then(|s| {
+                parse_human_date(&s).or_else(|| {
+                    eprintln!("Warning: could not parse --to date: {}", s);
+                    None
+                })
+            });
+
             let query = NoteQuery {
                 tags: tags.map(|t| parse_tags(&t)),
                 from,
