@@ -1,62 +1,62 @@
-===
+=====
 reinitialize database for validation tests
-===
+=====
 veta init --reinitialize
----
+-----
 Reinitialized veta database in .veta/db.sqlite
 
-===
+=====
 reject empty title
-===
+=====
 veta add --title "  " --tags "test" --body "body" 2>&1 ; echo "exit: $?"
----
+-----
 Error: validation error: title cannot be empty
 exit: 1
 
-===
+=====
 reject whitespace-only title
-===
+=====
 veta add --title "   	  " --tags "test" --body "body" 2>&1 ; echo "exit: $?"
----
+-----
 Error: validation error: title cannot be empty
 exit: 1
 
-===
+=====
 show non-existent note fails
-===
+=====
 veta show 999 2>&1 ; echo "exit: $?"
----
+-----
 Note 999 not found
 exit: 1
 
-===
+=====
 delete non-existent note fails
-===
+=====
 veta delete 999 2>&1 ; echo "exit: $?"
----
+-----
 Note 999 not found
 exit: 1
 
-===
+=====
 edit non-existent note fails
-===
+=====
 veta edit 999 --title "new" --body "" 2>&1 ; echo "exit: $?"
----
+-----
 Note 999 not found
 exit: 1
 
-===
+=====
 tags are normalized to lowercase
-===
+=====
 veta add --title "Lowercase test" --tags "UPPER,Mixed,lower" --body "body"
----
+-----
 Added note 1
 
-====
+=====
 verify tags are lowercase
-====
+=====
 veta show 1
-----
+-----
 # Lowercase test
 
 body
@@ -66,18 +66,18 @@ body
 Last modified: {{ modified }}
 Tags: lower,mixed,upper
 
-===
+=====
 duplicate tags are removed
-===
+=====
 veta add --title "Dedup test" --tags "dup,dup,DUP,Dup" --body "body"
----
+-----
 Added note 2
 
-====
+=====
 verify duplicate tags are removed
-====
+=====
 veta show 2
-----
+-----
 # Dedup test
 
 body
@@ -87,18 +87,18 @@ body
 Last modified: {{ modified }}
 Tags: dup
 
-===
+=====
 empty tags are filtered out
-===
+=====
 veta add --title "Empty tag test" --tags "valid,,also-valid,  " --body "body"
----
+-----
 Added note 3
 
-====
+=====
 verify empty tags are filtered
-====
+=====
 veta show 3
-----
+-----
 # Empty tag test
 
 body
@@ -108,18 +108,18 @@ body
 Last modified: {{ modified }}
 Tags: also-valid,valid
 
-===
+=====
 tags are trimmed of whitespace
-===
+=====
 veta add --title "Whitespace tag test" --tags "  spaced  ,  padded  " --body "body"
----
+-----
 Added note 4
 
-====
+=====
 verify tags are trimmed
-====
+=====
 veta show 4
-----
+-----
 # Whitespace tag test
 
 body
@@ -129,19 +129,19 @@ body
 Last modified: {{ modified }}
 Tags: padded,spaced
 
-===
+=====
 edit with empty title fails
-===
+=====
 veta edit 1 --title "  " --body "body" 2>&1 ; echo "exit: $?"
----
+-----
 Error: validation error: title cannot be empty
 exit: 1
 
-====
+=====
 verify note unchanged after failed edit
-====
+=====
 veta show 1
-----
+-----
 # Lowercase test
 
 body
@@ -151,39 +151,39 @@ body
 Last modified: {{ modified }}
 Tags: lower,mixed,upper
 
-===
+=====
 grep with invalid regex fails gracefully
-===
+=====
 veta grep "[invalid" 2>&1 ; echo "exit: $?"
----
+-----
 Error: validation error: invalid regex: regex parse error:
     (?i)[invalid
         ^
 error: unclosed character class
 exit: 1
 
-===
+=====
 veta init fails if already initialized
-===
+=====
 veta init 2>&1 ; echo "exit: $?"
----
+-----
 Error: Veta is already initialized in this directory. Use --reinitialize to delete and recreate.
 exit: 1
 
-===
+=====
 veta init --reinitialize deletes and recreates database
-===
+=====
 veta add --title "Before reinit" --tags "test" --body "This note will be deleted"
 veta init --reinitialize
 veta ls
----
+-----
 Added note 5
 Reinitialized veta database in .veta/db.sqlite
 
-===
+=====
 veta commands fail without init
-===
+=====
 cd /tmp && rm -rf veta-no-init-test && mkdir veta-no-init-test && cd veta-no-init-test && veta ls 2>&1 ; echo "exit: $?"
----
+-----
 Error: No .veta directory found. Run 'veta init' to initialize a new database.
 exit: 1
