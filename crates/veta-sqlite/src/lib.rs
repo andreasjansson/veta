@@ -66,10 +66,12 @@ impl Database for SqliteDatabase {
     async fn add_note(&self, note: CreateNote) -> Result<i64, Error> {
         let conn = self.conn.lock().unwrap();
 
+        let refs_json = Self::serialize_references(&note.references);
+
         // Insert the note
         conn.execute(
-            "INSERT INTO notes (title, body) VALUES (?1, ?2)",
-            params![note.title, note.body],
+            "INSERT INTO notes (title, body, \"references\") VALUES (?1, ?2, ?3)",
+            params![note.title, note.body, refs_json],
         )
         .map_err(|e| Error::Database(e.to_string()))?;
 
