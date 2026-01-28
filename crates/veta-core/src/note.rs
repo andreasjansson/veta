@@ -7,6 +7,9 @@ pub struct Note {
     pub title: String,
     pub body: String,
     pub tags: Vec<String>,
+    /// References to external resources (source code paths, URLs, documentation links, etc.)
+    #[serde(default)]
+    pub references: Vec<String>,
     pub updated_at: String,
 }
 
