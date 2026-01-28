@@ -256,13 +256,14 @@ async fn main() -> Result<()> {
     match cli.command {
         Commands::Init => unreachable!(),
         
-        Commands::Add { title, tags, body } => {
+        Commands::Add { title, tags, body, references } => {
             let body = match body {
                 Some(b) => b,
                 None => read_stdin()?,
             };
             let tags = parse_tags(&tags);
-            let id = service.add_note(title, body, tags).await?;
+            let references = references.map(|r| parse_tags(&r)).unwrap_or_default();
+            let id = service.add_note(title, body, tags, references).await?;
             println!("Added note {}", id);
         }
 
