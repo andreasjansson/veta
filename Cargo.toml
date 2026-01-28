@@ -17,9 +17,9 @@ homepage = "https://github.com/andreasjansson/veta"
 repository = "https://github.com/andreasjansson/veta"
 
 [workspace.dependencies]
-veta-core = { path = "crates/veta-core" }
-veta-sqlite = { path = "crates/veta-sqlite" }
-veta-d1 = { path = "crates/veta-d1" }
+veta-core = { version = "0.2.0", path = "crates/veta-core" }
+veta-sqlite = { version = "0.2.0", path = "crates/veta-sqlite" }
+veta-d1 = { version = "0.2.0", path = "crates/veta-d1" }
 
 async-trait = "0.1"
 serde = { version = "1", features = ["derive"] }
