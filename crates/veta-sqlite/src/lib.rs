@@ -150,7 +150,7 @@ impl Database for SqliteDatabase {
             sql.push_str(&conditions.join(" AND "));
         }
 
-        sql.push_str(" GROUP BY n.id ORDER BY n.updated_at DESC");
+        sql.push_str(" GROUP BY n.id ORDER BY n.updated_at DESC, n.id DESC");
 
         if let Some(limit) = query.limit {
             sql.push_str(&format!(" LIMIT {}", limit));
@@ -320,7 +320,7 @@ impl Database for SqliteDatabase {
             }
         }
 
-        sql.push_str(" GROUP BY n.id ORDER BY n.updated_at DESC");
+        sql.push_str(" GROUP BY n.id ORDER BY n.updated_at DESC, n.id DESC");
 
         let params_refs: Vec<&dyn rusqlite::ToSql> =
             params_vec.iter().map(|p| p as &dyn rusqlite::ToSql).collect();
