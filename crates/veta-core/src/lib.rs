@@ -2,12 +2,14 @@
 //!
 //! This crate contains no I/O and can be compiled for any target.
 
+mod dateparse;
+mod db;
 mod error;
 mod note;
-mod db;
 mod service;
 
-pub use error::Error;
-pub use note::{Note, NoteSummary, TagCount, NoteQuery, CreateNote, UpdateNote};
+pub use dateparse::parse_human_date;
 pub use db::Database;
+pub use error::Error;
+pub use note::{CreateNote, Note, NoteQuery, NoteSummary, TagCount, UpdateNote};
 pub use service::VetaService;
