@@ -54,11 +54,10 @@ $ veta ls --tags testing
 # List all notes
 $ veta ls
 
-# List notes within a time range
-$ veta ls --from "2026-01-01 00:00 UTC" --to "2026-01-20 UTC"
+# List notes within a time range (SQLite datetime format)
+$ veta ls --from "2026-01-01 00:00:00" --to "2026-01-20 00:00:00"
 
-# `--from` and `--to` can be used together or individually,
-# and they accept strings like `--from "2 days ago"`, `--to "Feb 2026", etc.
+# `--from` and `--to` can be used together or individually
 ```
 
 To avoid token explosions, we only show the latest 20 notes in the tag by default. To see more notes, use `--head/-n`, where the argument `0` lists all notes in the tag
