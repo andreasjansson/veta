@@ -172,7 +172,7 @@ veta init fails if already initialized
 ===
 veta init 2>&1 ; echo "exit: $?"
 ---
-Error: Veta is already initialized in this directory.
+Error: Veta is already initialized in this directory. Use --reinitialize to delete and recreate.
 exit: 1
 
 ===
