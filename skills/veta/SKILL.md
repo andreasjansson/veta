@@ -113,6 +113,13 @@ veta ls --tags gotchas,debugging
 # Read a specific note
 veta show 42
 
+# Read multiple notes at once
+veta show 1 2 3
+
+# Show only first n lines of body (useful for long notes)
+veta show 42 -n 10
+veta show 1 2 3 -n 5
+
 # Search notes
 veta grep "authentication"
 veta grep "postgres" --tags debugging
