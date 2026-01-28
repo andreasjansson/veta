@@ -5,10 +5,7 @@ veta init --reinitialize
 echo "Content from stdin" | veta add --title "Stdin note" --tags "stdin,test"
 ---
 Reinitialized veta database in .veta/db.sqlite
-Added note {{ id }}
----
-where
-* id > 0
+Added note 1
 
 ====
 verify stdin content was saved
@@ -30,15 +27,12 @@ add note with multiline body from stdin
 ===
 printf "Line one\nLine two\nLine three" | veta add --title "Multiline note" --tags "multiline"
 ---
-Added note {{ id }}
----
-where
-* id > 0
+Added note 2
 
 ====
 verify multiline content was saved
 ====
-veta show 5
+veta show 2
 ----
 # Multiline note
 
@@ -54,14 +48,14 @@ Tags: multiline
 ===
 edit note body from stdin
 ===
-echo "Updated via stdin" | veta edit 4
+echo "Updated via stdin" | veta edit 1
 ---
-Edited note 4: Updated body
+Edited note 1: Updated body
 
 ====
 verify stdin edit was saved
 ====
-veta show 4
+veta show 1
 ----
 # Stdin note
 
@@ -76,14 +70,14 @@ Tags: stdin,test
 ===
 edit note with multiline stdin
 ===
-printf "New line one\nNew line two" | veta edit 5
+printf "New line one\nNew line two" | veta edit 2
 ---
-Edited note 5: Updated body
+Edited note 2: Updated body
 
 ====
 verify multiline edit was saved
 ====
-veta show 5
+veta show 2
 ----
 # Multiline note
 
