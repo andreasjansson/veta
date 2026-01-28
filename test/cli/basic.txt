@@ -1,28 +1,35 @@
 ===
+initialize veta
+===
+cd "$CCTR_WORK_DIR" && veta init
+---
+Initialized veta database in .veta/db.sqlite
+
+===
 add a note with body flag
 ===
-veta --db "$CCTR_WORK_DIR/test.db" add --title "First note" --tags "test,basic" --body "Hello world"
+cd "$CCTR_WORK_DIR" && veta add --title "First note" --tags "test,basic" --body "Hello world"
 ---
 Added note 1
 
 ===
 add a second note
 ===
-veta --db "$CCTR_WORK_DIR/test.db" add --title "Second note" --tags "test,another" --body "Goodbye world"
+cd "$CCTR_WORK_DIR" && veta add --title "Second note" --tags "test,another" --body "Goodbye world"
 ---
 Added note 2
 
 ===
 add a third note with different tags
 ===
-veta --db "$CCTR_WORK_DIR/test.db" add --title "Third note" --tags "other" --body "Other content"
+cd "$CCTR_WORK_DIR" && veta add --title "Third note" --tags "other" --body "Other content"
 ---
 Added note 3
 
 ====
 show first note
 ====
-veta --db "$CCTR_WORK_DIR/test.db" show 1
+cd "$CCTR_WORK_DIR" && veta show 1
 ----
 # First note
 
@@ -36,7 +43,7 @@ Tags: basic,test
 ====
 show second note
 ====
-veta --db "$CCTR_WORK_DIR/test.db" show 2
+cd "$CCTR_WORK_DIR" && veta show 2
 ----
 # Second note
 
@@ -50,7 +57,7 @@ Tags: another,test
 ===
 list all notes
 ===
-veta --db "$CCTR_WORK_DIR/test.db" ls
+cd "$CCTR_WORK_DIR" && veta ls
 ---
 3: Third note ({{ modified3 }}) -- Other content
 2: Second note ({{ modified2 }}) -- Goodbye world
@@ -59,14 +66,14 @@ veta --db "$CCTR_WORK_DIR/test.db" ls
 ===
 list notes with tag filter - single tag
 ===
-veta --db "$CCTR_WORK_DIR/test.db" ls --tags basic
+cd "$CCTR_WORK_DIR" && veta ls --tags basic
 ---
 1: First note ({{ modified }}) -- Hello world
 
 ===
 list notes with tag filter - shared tag
 ===
-veta --db "$CCTR_WORK_DIR/test.db" ls --tags test
+cd "$CCTR_WORK_DIR" && veta ls --tags test
 ---
 2: Second note ({{ modified2 }}) -- Goodbye world
 1: First note ({{ modified1 }}) -- Hello world
@@ -74,7 +81,7 @@ veta --db "$CCTR_WORK_DIR/test.db" ls --tags test
 ===
 list notes with multiple tag filter
 ===
-veta --db "$CCTR_WORK_DIR/test.db" ls --tags test,another
+cd "$CCTR_WORK_DIR" && veta ls --tags test,another
 ---
 2: Second note ({{ modified2 }}) -- Goodbye world
 1: First note ({{ modified1 }}) -- Hello world
@@ -82,7 +89,7 @@ veta --db "$CCTR_WORK_DIR/test.db" ls --tags test,another
 ===
 list notes with limit
 ===
-veta --db "$CCTR_WORK_DIR/test.db" ls -n 2
+cd "$CCTR_WORK_DIR" && veta ls -n 2
 ---
 3: Third note ({{ modified3 }}) -- Other content
 2: Second note ({{ modified2 }}) -- Goodbye world
@@ -90,7 +97,7 @@ veta --db "$CCTR_WORK_DIR/test.db" ls -n 2
 ===
 list notes with limit 0 shows all
 ===
-veta --db "$CCTR_WORK_DIR/test.db" ls -n 0
+cd "$CCTR_WORK_DIR" && veta ls -n 0
 ---
 3: Third note ({{ modified3 }}) -- Other content
 2: Second note ({{ modified2 }}) -- Goodbye world
@@ -99,7 +106,7 @@ veta --db "$CCTR_WORK_DIR/test.db" ls -n 0
 ===
 list tags
 ===
-veta --db "$CCTR_WORK_DIR/test.db" tags
+cd "$CCTR_WORK_DIR" && veta tags
 ---
 test (2 notes)
 another (1 note)
@@ -109,34 +116,34 @@ other (1 note)
 ===
 grep for notes - matches body
 ===
-veta --db "$CCTR_WORK_DIR/test.db" grep "Hello"
+cd "$CCTR_WORK_DIR" && veta grep "Hello"
 ---
 1: First note ({{ modified }}) -- Hello world
 
 ===
 grep for notes - matches title
 ===
-veta --db "$CCTR_WORK_DIR/test.db" grep "Second"
+cd "$CCTR_WORK_DIR" && veta grep "Second"
 ---
 2: Second note ({{ modified }}) -- Goodbye world
 
 ===
 grep case insensitive by default
 ===
-veta --db "$CCTR_WORK_DIR/test.db" grep "hello"
+cd "$CCTR_WORK_DIR" && veta grep "hello"
 ---
 1: First note ({{ modified }}) -- Hello world
 
 ===
 grep case sensitive with -C flag
 ===
-veta --db "$CCTR_WORK_DIR/test.db" grep -C "hello"
+cd "$CCTR_WORK_DIR" && veta grep -C "hello"
 ---
 
 ===
 grep with regex pattern
 ===
-veta --db "$CCTR_WORK_DIR/test.db" grep "First|Second"
+cd "$CCTR_WORK_DIR" && veta grep "First|Second"
 ---
 2: Second note ({{ modified2 }}) -- Goodbye world
 1: First note ({{ modified1 }}) -- Hello world
@@ -144,21 +151,21 @@ veta --db "$CCTR_WORK_DIR/test.db" grep "First|Second"
 ===
 grep with tag filter
 ===
-veta --db "$CCTR_WORK_DIR/test.db" grep "world" --tags basic
+cd "$CCTR_WORK_DIR" && veta grep "world" --tags basic
 ---
 1: First note ({{ modified }}) -- Hello world
 
 ===
 edit note title
 ===
-veta --db "$CCTR_WORK_DIR/test.db" edit 1 --title "Updated title" --body "Hello world"
+cd "$CCTR_WORK_DIR" && veta edit 1 --title "Updated title" --body "Hello world"
 ---
 Edited note 1: Updated title, body
 
 ====
 verify title was updated
 ====
-veta --db "$CCTR_WORK_DIR/test.db" show 1
+cd "$CCTR_WORK_DIR" && veta show 1
 ----
 # Updated title
 
@@ -172,14 +179,14 @@ Tags: basic,test
 ===
 edit note body
 ===
-veta --db "$CCTR_WORK_DIR/test.db" edit 1 --body "New body content"
+cd "$CCTR_WORK_DIR" && veta edit 1 --body "New body content"
 ---
 Edited note 1: Updated body
 
 ====
 verify body was updated
 ====
-veta --db "$CCTR_WORK_DIR/test.db" show 1
+cd "$CCTR_WORK_DIR" && veta show 1
 ----
 # Updated title
 
@@ -193,14 +200,14 @@ Tags: basic,test
 ===
 edit note tags
 ===
-veta --db "$CCTR_WORK_DIR/test.db" edit 1 --tags "updated,newtag" --body "New body content"
+cd "$CCTR_WORK_DIR" && veta edit 1 --tags "updated,newtag" --body "New body content"
 ---
 Edited note 1: Updated body, tags
 
 ====
 verify tags were updated
 ====
-veta --db "$CCTR_WORK_DIR/test.db" show 1
+cd "$CCTR_WORK_DIR" && veta show 1
 ----
 # Updated title
 
@@ -214,14 +221,14 @@ Tags: newtag,updated
 ===
 delete a note
 ===
-veta --db "$CCTR_WORK_DIR/test.db" delete 3
+cd "$CCTR_WORK_DIR" && veta delete 3
 ---
 Deleted note 3
 
 ===
 verify note was deleted from list
 ===
-veta --db "$CCTR_WORK_DIR/test.db" ls
+cd "$CCTR_WORK_DIR" && veta ls
 ---
 2: Second note ({{ modified2 }}) -- Goodbye world
 1: Updated title ({{ modified1 }}) -- New body content
@@ -229,9 +236,17 @@ veta --db "$CCTR_WORK_DIR/test.db" ls
 ===
 verify tags updated after deletion
 ===
-veta --db "$CCTR_WORK_DIR/test.db" tags
+cd "$CCTR_WORK_DIR" && veta tags
 ---
 another (1 note)
 newtag (1 note)
 test (1 note)
 updated (1 note)
+
+===
+veta works from subdirectory
+===
+mkdir -p "$CCTR_WORK_DIR/subdir/nested" && cd "$CCTR_WORK_DIR/subdir/nested" && veta ls
+---
+2: Second note ({{ modified2 }}) -- Goodbye world
+1: Updated title ({{ modified1 }}) -- New body content
