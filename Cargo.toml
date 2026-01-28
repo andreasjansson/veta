@@ -24,6 +24,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
 chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
+parse_datetime = "0.13"
 
 # CLI dependencies
 clap = { version = "4", features = ["derive", "env"] }
