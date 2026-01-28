@@ -1,0 +1,17 @@
+[package]
+name = "veta-d1"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+veta-core.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+worker.workspace = true
+wasm-bindgen.workspace = true
+regex = "1"
