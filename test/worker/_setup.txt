@@ -1,0 +1,6 @@
+===
+start veta worker server
+===
+$CCTR_FIXTURE_DIR/start-server
+---
+ready
