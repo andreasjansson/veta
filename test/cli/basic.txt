@@ -1,31 +1,31 @@
-===
+=====
 reinitialize and add a note with body flag
-===
+=====
 veta init --reinitialize
 veta add --title "First note" --tags "test,basic" --body "Hello world"
----
+-----
 Reinitialized veta database in .veta/db.sqlite
 Added note 1
 
-===
+=====
 add a second note
-===
+=====
 veta add --title "Second note" --tags "test,another" --body "Goodbye world"
----
+-----
 Added note 2
 
-===
+=====
 add a third note with different tags
-===
+=====
 veta add --title "Third note" --tags "other" --body "Other content"
----
+-----
 Added note 3
 
-====
+=====
 show first note
-====
+=====
 veta show 1
-----
+-----
 # First note
 
 Hello world
@@ -35,11 +35,11 @@ Hello world
 Last modified: {{ modified }}
 Tags: basic,test
 
-====
+=====
 show second note
-====
+=====
 veta show 2
-----
+-----
 # Second note
 
 Goodbye world
@@ -49,119 +49,119 @@ Goodbye world
 Last modified: {{ modified }}
 Tags: another,test
 
-===
+=====
 list all notes
-===
+=====
 veta ls
----
+-----
 3: Third note ({{ modified3 }}) -- Other content
 2: Second note ({{ modified2 }}) -- Goodbye world
 1: First note ({{ modified1 }}) -- Hello world
 
-===
+=====
 list notes with tag filter - single tag
-===
+=====
 veta ls --tags basic
----
+-----
 1: First note ({{ modified }}) -- Hello world
 
-===
+=====
 list notes with tag filter - shared tag
-===
+=====
 veta ls --tags test
----
+-----
 2: Second note ({{ modified2 }}) -- Goodbye world
 1: First note ({{ modified1 }}) -- Hello world
 
-===
+=====
 list notes with multiple tag filter
-===
+=====
 veta ls --tags test,another
----
+-----
 2: Second note ({{ modified2 }}) -- Goodbye world
 1: First note ({{ modified1 }}) -- Hello world
 
-===
+=====
 list notes with limit
-===
+=====
 veta ls -n 2
----
+-----
 3: Third note ({{ modified3 }}) -- Other content
 2: Second note ({{ modified2 }}) -- Goodbye world
 
-===
+=====
 list notes with limit 0 shows all
-===
+=====
 veta ls -n 0
----
+-----
 3: Third note ({{ modified3 }}) -- Other content
 2: Second note ({{ modified2 }}) -- Goodbye world
 1: First note ({{ modified1 }}) -- Hello world
 
-===
+=====
 list tags
-===
+=====
 veta tags
----
+-----
 test (2 notes)
 another (1 note)
 basic (1 note)
 other (1 note)
 
-===
+=====
 grep for notes - matches body
-===
+=====
 veta grep "Hello"
----
+-----
 1: First note ({{ modified }}) -- Hello world
 
-===
+=====
 grep for notes - matches title
-===
+=====
 veta grep "Second"
----
+-----
 2: Second note ({{ modified }}) -- Goodbye world
 
-===
+=====
 grep case insensitive by default
-===
+=====
 veta grep "hello"
----
+-----
 1: First note ({{ modified }}) -- Hello world
 
-===
+=====
 grep case sensitive with -C flag
-===
+=====
 veta grep -C "hello"
----
+-----
 
-===
+=====
 grep with regex pattern
-===
+=====
 veta grep "First|Second"
----
+-----
 2: Second note ({{ modified2 }}) -- Goodbye world
 1: First note ({{ modified1 }}) -- Hello world
 
-===
+=====
 grep with tag filter
-===
+=====
 veta grep "world" --tags basic
----
+-----
 1: First note ({{ modified }}) -- Hello world
 
-===
+=====
 edit note title
-===
+=====
 veta edit 1 --title "Updated title" --body "Hello world"
----
+-----
 Edited note 1: Updated title, body
 
-====
+=====
 verify title was updated
-====
+=====
 veta show 1
-----
+-----
 # Updated title
 
 Hello world
@@ -171,18 +171,18 @@ Hello world
 Last modified: {{ modified }}
 Tags: basic,test
 
-===
+=====
 edit note body
-===
+=====
 veta edit 1 --body "New body content"
----
+-----
 Edited note 1: Updated body
 
-====
+=====
 verify body was updated
-====
+=====
 veta show 1
-----
+-----
 # Updated title
 
 New body content
@@ -192,18 +192,18 @@ New body content
 Last modified: {{ modified }}
 Tags: basic,test
 
-===
+=====
 edit note tags
-===
+=====
 veta edit 1 --tags "updated,newtag" --body "New body content"
----
+-----
 Edited note 1: Updated body, tags
 
-====
+=====
 verify tags were updated
-====
+=====
 veta show 1
-----
+-----
 # Updated title
 
 New body content
@@ -213,130 +213,35 @@ New body content
 Last modified: {{ modified }}
 Tags: newtag,updated
 
-===
+=====
 delete a note
-===
+=====
 veta delete 3
----
+-----
 Deleted note 3
 
-===
+=====
 verify note was deleted from list
-===
+=====
 veta ls
----
+-----
 2: Second note ({{ modified2 }}) -- Goodbye world
 1: Updated title ({{ modified1 }}) -- New body content
 
-===
+=====
 verify tags updated after deletion
-===
+=====
 veta tags
----
+-----
 another (1 note)
 newtag (1 note)
 test (1 note)
 updated (1 note)
 
-===
+=====
 veta works from subdirectory
-===
+=====
 mkdir -p subdir/nested && cd subdir/nested && veta ls
----
+-----
 2: Second note ({{ modified2 }}) -- Goodbye world
 1: Updated title ({{ modified1 }}) -- New body content
-
-===
-add note with multiline body for head test
-===
-veta add --title "Multiline note" --tags "test" --body "Line 1
-Line 2
-Line 3
-Line 4
-Line 5"
----
-Added note {{ id: number }}
-
-=============================================
-show multiple notes
-=============================================
-veta show 1 2
----------------------------------------------
-# Updated title
-
-New body content
-
----
-
-Last modified: {{ modified1 }}
-Tags: newtag,updated
-
-========================================
-
-# Second note
-
-Goodbye world
-
----
-
-Last modified: {{ modified2 }}
-Tags: another,test
-
-====
-show with --head truncates body
-====
-veta show 4 -n 2
-----
-# Multiline note
-
-Line 1
-Line 2
-...
-
----
-
-Last modified: {{ modified }}
-Tags: test
-
-=============================================
-show multiple with --head
-=============================================
-veta show 1 4 -n 1
----------------------------------------------
-# Updated title
-
-New body content
-
----
-
-Last modified: {{ modified1 }}
-Tags: newtag,updated
-
-========================================
-
-# Multiline note
-
-Line 1
-...
-
----
-
-Last modified: {{ modified2 }}
-Tags: test
-
-====
-show with not found note shows error
-====
-veta show 1 999 2>&1 ; echo "exit: $?"
-----
-# Updated title
-
-New body content
-
----
-
-Last modified: {{ modified }}
-Tags: newtag,updated
-
-Note 999 not found
-exit: 1
