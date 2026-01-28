@@ -128,7 +128,7 @@ impl Database for SqliteDatabase {
         let conn = self.conn.lock().unwrap();
 
         let mut sql = String::from(
-            "SELECT n.id, n.title, n.body, n.updated_at, GROUP_CONCAT(t.name) as tags
+            "SELECT n.id, n.title, n.body, n.updated_at, n.\"references\", GROUP_CONCAT(t.name) as tags
              FROM notes n
              LEFT JOIN note_tags nt ON n.id = nt.note_id
              LEFT JOIN tags t ON nt.tag_id = t.id",
