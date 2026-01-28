@@ -41,9 +41,11 @@ impl SqliteDatabase {
     }
 
     fn parse_tags(tags_str: Option<String>) -> Vec<String> {
-        tags_str
-            .map(|s| s.split(',').map(String::from).collect())
-            .unwrap_or_default()
+        let mut tags: Vec<String> = tags_str
+            .map(|s| s.split(',').map(String::from).filter(|s| !s.is_empty()).collect())
+            .unwrap_or_default();
+        tags.sort();
+        tags
     }
 }
 
