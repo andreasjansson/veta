@@ -32,10 +32,11 @@ rusqlite = { version = "0.32", features = ["bundled"] }
 anyhow = "1"
 
 # Worker dependencies
-worker = { version = "0.5", features = ["d1", "http"] }
-worker-macros = { version = "0.5", features = ["http"] }
+worker = { version = "0.7", features = ["d1", "http"] }
+worker-macros = { version = "0.7", features = ["http"] }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
+http = "1"
 
 [profile.release]
 opt-level = "z"
