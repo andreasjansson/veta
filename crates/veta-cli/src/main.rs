@@ -32,6 +32,9 @@ enum Commands {
         /// Note body (reads from stdin if not provided)
         #[arg(long)]
         body: Option<String>,
+        /// Comma-separated references (source code paths, URLs, documentation links, etc.)
+        #[arg(long)]
+        references: Option<String>,
     },
     /// List notes
     Ls {
