@@ -59,6 +59,7 @@ veta --db "$CCTR_WORK_DIR/stdin-test.db" show 1
 
 Updated via stdin
 
+
 ---
 
 Last modified: {{ modified }}
