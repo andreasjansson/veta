@@ -1,0 +1,9 @@
+#!/bin/bash
+# Stop the wrangler dev server
+pkill -f "server.mjs.*veta" 2>/dev/null || true
+pkill -f "wrangler.*veta-test" 2>/dev/null || true
+if [ -f /tmp/veta-test.pid ]; then
+    kill $(cat /tmp/veta-test.pid) 2>/dev/null || true
+    rm -f /tmp/veta-test.pid
+fi
+rm -f /tmp/veta-test.log
