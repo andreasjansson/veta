@@ -1,0 +1,14 @@
+name = "veta"
+main = "build/worker/shim.mjs"
+compatibility_date = "2025-01-01"
+
+[build]
+command = "cargo install -q worker-build && worker-build --release"
+
+[[d1_databases]]
+binding = "VETA_DB"
+database_name = "veta-db"
+database_id = "LOCAL_DEV_PLACEHOLDER"
+
+[vars]
+ENVIRONMENT = "development"
