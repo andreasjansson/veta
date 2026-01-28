@@ -1,7 +1,7 @@
 ===
 reject empty title
 ===
-veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "  " --tags "test" --body "body" 2>&1 ; echo "exit: $?"
+veta add --title "  " --tags "test" --body "body" 2>&1 ; echo "exit: $?"
 ---
 Error: validation error: title cannot be empty
 exit: 1
@@ -9,7 +9,7 @@ exit: 1
 ===
 reject whitespace-only title
 ===
-veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "   	  " --tags "test" --body "body" 2>&1 ; echo "exit: $?"
+veta add --title "   	  " --tags "test" --body "body" 2>&1 ; echo "exit: $?"
 ---
 Error: validation error: title cannot be empty
 exit: 1
@@ -17,7 +17,7 @@ exit: 1
 ===
 show non-existent note fails
 ===
-veta --db "$CCTR_WORK_DIR/validation-test.db" show 999 2>&1 ; echo "exit: $?"
+veta show 999 2>&1 ; echo "exit: $?"
 ---
 Note 999 not found
 exit: 1
@@ -25,7 +25,7 @@ exit: 1
 ===
 delete non-existent note fails
 ===
-veta --db "$CCTR_WORK_DIR/validation-test.db" delete 999 2>&1 ; echo "exit: $?"
+veta delete 999 2>&1 ; echo "exit: $?"
 ---
 Note 999 not found
 exit: 1
@@ -33,7 +33,7 @@ exit: 1
 ===
 edit non-existent note fails
 ===
-veta --db "$CCTR_WORK_DIR/validation-test.db" edit 999 --title "new" --body "" 2>&1 ; echo "exit: $?"
+veta edit 999 --title "new" --body "" 2>&1 ; echo "exit: $?"
 ---
 Note 999 not found
 exit: 1
@@ -41,14 +41,17 @@ exit: 1
 ===
 tags are normalized to lowercase
 ===
-veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "Lowercase test" --tags "UPPER,Mixed,lower" --body "body"
+veta add --title "Lowercase test" --tags "UPPER,Mixed,lower" --body "body"
 ---
-Added note 1
+Added note {{ id }}
+---
+where
+* id > 0
 
 ====
 verify tags are lowercase
 ====
-veta --db "$CCTR_WORK_DIR/validation-test.db" show 1
+veta show 6
 ----
 # Lowercase test
 
@@ -62,14 +65,17 @@ Tags: lower,mixed,upper
 ===
 duplicate tags are removed
 ===
-veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "Dedup test" --tags "dup,dup,DUP,Dup" --body "body"
+veta add --title "Dedup test" --tags "dup,dup,DUP,Dup" --body "body"
 ---
-Added note 2
+Added note {{ id }}
+---
+where
+* id > 0
 
 ====
 verify duplicate tags are removed
 ====
-veta --db "$CCTR_WORK_DIR/validation-test.db" show 2
+veta show 7
 ----
 # Dedup test
 
@@ -83,14 +89,17 @@ Tags: dup
 ===
 empty tags are filtered out
 ===
-veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "Empty tag test" --tags "valid,,also-valid,  " --body "body"
+veta add --title "Empty tag test" --tags "valid,,also-valid,  " --body "body"
 ---
-Added note 3
+Added note {{ id }}
+---
+where
+* id > 0
 
 ====
 verify empty tags are filtered
 ====
-veta --db "$CCTR_WORK_DIR/validation-test.db" show 3
+veta show 8
 ----
 # Empty tag test
 
@@ -104,14 +113,17 @@ Tags: also-valid,valid
 ===
 tags are trimmed of whitespace
 ===
-veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "Whitespace tag test" --tags "  spaced  ,  padded  " --body "body"
+veta add --title "Whitespace tag test" --tags "  spaced  ,  padded  " --body "body"
 ---
-Added note 4
+Added note {{ id }}
+---
+where
+* id > 0
 
 ====
 verify tags are trimmed
 ====
-veta --db "$CCTR_WORK_DIR/validation-test.db" show 4
+veta show 9
 ----
 # Whitespace tag test
 
@@ -125,7 +137,7 @@ Tags: padded,spaced
 ===
 edit with empty title fails
 ===
-veta --db "$CCTR_WORK_DIR/validation-test.db" edit 1 --title "  " --body "body" 2>&1 ; echo "exit: $?"
+veta edit 6 --title "  " --body "body" 2>&1 ; echo "exit: $?"
 ---
 Error: validation error: title cannot be empty
 exit: 1
@@ -133,7 +145,7 @@ exit: 1
 ====
 verify note unchanged after failed edit
 ====
-veta --db "$CCTR_WORK_DIR/validation-test.db" show 1
+veta show 6
 ----
 # Lowercase test
 
@@ -147,7 +159,7 @@ Tags: lower,mixed,upper
 ===
 grep with invalid regex fails gracefully
 ===
-veta --db "$CCTR_WORK_DIR/validation-test.db" grep "[invalid" 2>&1 ; echo "exit: $?"
+veta grep "[invalid" 2>&1 ; echo "exit: $?"
 ---
 Error: validation error: invalid regex: regex parse error:
     (?i)[invalid
@@ -156,19 +168,17 @@ error: unclosed character class
 exit: 1
 
 ===
-list empty database shows nothing
+veta init fails if already initialized
 ===
-veta --db "$CCTR_WORK_DIR/empty.db" ls
+veta init 2>&1 ; echo "exit: $?"
 ---
+Error: Veta is already initialized in this directory.
+exit: 1
 
 ===
-tags on empty database shows nothing
+veta commands fail without init
 ===
-veta --db "$CCTR_WORK_DIR/empty.db" tags
+cd /tmp && rm -rf veta-no-init-test && mkdir veta-no-init-test && cd veta-no-init-test && veta ls 2>&1 ; echo "exit: $?"
 ---
-
-===
-grep on empty database shows nothing
-===
-veta --db "$CCTR_WORK_DIR/empty.db" grep "anything"
----
+Error: No .veta directory found. Run 'veta init' to initialize a new database.
+exit: 1
