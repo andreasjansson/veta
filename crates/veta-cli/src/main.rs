@@ -358,6 +358,9 @@ async fn main() -> Result<()> {
             }
 
             if !not_found.is_empty() {
+                if !first {
+                    eprintln!();  // Add spacing after last note
+                }
                 for id in &not_found {
                     eprintln!("Note {} not found", id);
                 }
