@@ -55,7 +55,14 @@ Added note 1
 # For short notes, use `--body`
 $ veta add --title "My title" --tags "comma,separated,tags" --body "Short body"
 Added note 2
+
+# Add references to source code, URLs, documentation, etc.
+$ veta add --title "Auth bug fix" --tags "debugging" --body "Fixed JWT expiry" \
+    --references "src/auth.rs:42,https://jwt.io/introduction"
+Added note 3
 ```
+
+References are optional pointers to external resources like source code locations, URLs, or documentation links that provide context for the note.
 
 ### List tags
 
