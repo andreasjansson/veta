@@ -1,1 +1,24 @@
 *.greger
+
+# Rust
+/target
+Cargo.lock
+
+# Worker build artifacts
+/crates/veta-worker/build
+/crates/veta-worker/node_modules
+/crates/veta-worker/.wrangler
+
+# Test artifacts
+/test/**/fixture/.wrangler
+/test/**/fixture/node_modules
+*.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
