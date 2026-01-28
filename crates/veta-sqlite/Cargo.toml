@@ -1,8 +1,12 @@
 [package]
 name = "veta-sqlite"
+description = "SQLite backend for veta - memory and knowledge base for agents"
 version.workspace = true
 edition.workspace = true
+authors.workspace = true
 license.workspace = true
+homepage.workspace = true
+repository.workspace = true
 
 [dependencies]
 veta-core.workspace = true
