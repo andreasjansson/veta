@@ -223,8 +223,8 @@ verify note was deleted from list
 ===
 veta ls
 ---
-1: Updated title ({{ modified1 }}) -- New body content
 2: Second note ({{ modified2 }}) -- Goodbye world
+1: Updated title ({{ modified1 }}) -- New body content
 
 ===
 verify tags updated after deletion
@@ -241,5 +241,5 @@ veta works from subdirectory
 ===
 mkdir -p subdir/nested && cd subdir/nested && veta ls
 ---
-1: Updated title ({{ modified1 }}) -- New body content
 2: Second note ({{ modified2 }}) -- Goodbye world
+1: Updated title ({{ modified1 }}) -- New body content
