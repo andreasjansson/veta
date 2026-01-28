@@ -228,13 +228,18 @@ async fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Init => {
+        Commands::Init { reinitialize } => {
             let veta_dir = PathBuf::from(VETA_DIR);
             let db_path = veta_dir.join(DB_FILE);
             
             if veta_dir.exists() {
                 if db_path.exists() {
-                    bail!("Veta is already initialized in this directory.");
+                    if reinitialize {
+                        std::fs::remove_file(&db_path)
+                            .context("Failed to remove existing database")?;
+                    } else {
+                        bail!("Veta is already initialized in this directory. Use --reinitialize to delete and recreate.");
+                    }
                 }
             } else {
                 std::fs::create_dir_all(&veta_dir)
@@ -246,7 +251,11 @@ async fn main() -> Result<()> {
             db.run_migrations()
                 .context("Failed to initialize database schema")?;
             
-            println!("Initialized veta database in {}", db_path.display());
+            if reinitialize {
+                println!("Reinitialized veta database in {}", db_path.display());
+            } else {
+                println!("Initialized veta database in {}", db_path.display());
+            }
             return Ok(());
         }
         _ => {}
