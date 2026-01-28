@@ -316,7 +316,10 @@ async fn main() -> Result<()> {
                 println!("Last modified: {}", note.updated_at);
                 println!("Tags: {}", note.tags.join(","));
                 if !note.references.is_empty() {
-                    println!("References: {}", note.references.join(", "));
+                    println!("References:");
+                    for reference in &note.references {
+                        println!("  - {}", reference);
+                    }
                 }
             }
             None => {
