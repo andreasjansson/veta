@@ -88,6 +88,15 @@ impl<D: Database> VetaService<D> {
                 tags.dedup();
                 tags
             }),
+            references: update.references.map(|refs| {
+                let mut refs: Vec<String> = refs
+                    .into_iter()
+                    .map(|r| r.trim().to_string())
+                    .filter(|r| !r.is_empty())
+                    .collect();
+                refs.dedup();
+                refs
+            }),
         };
 
         self.db.update_note(id, update).await
