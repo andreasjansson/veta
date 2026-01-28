@@ -76,11 +76,11 @@ veta --db "$CCTR_WORK_DIR/test.db" grep -C "hello" | wc -l | tr -d ' '
 0
 
 ===
-edit a note title
+edit a note title only
 ===
-veta --db "$CCTR_WORK_DIR/test.db" edit 1 --title "Updated title"
+echo "" | veta --db "$CCTR_WORK_DIR/test.db" edit 1 --title "Updated title" --body "Hello world"
 ---
-Edited note 1: Updated title
+Edited note 1: Updated title, body
 
 ===
 verify title was updated
@@ -90,7 +90,7 @@ veta --db "$CCTR_WORK_DIR/test.db" show 1 | head -1
 # Updated title
 
 ===
-edit a note body
+edit a note body only
 ===
 veta --db "$CCTR_WORK_DIR/test.db" edit 1 --body "New body content"
 ---
