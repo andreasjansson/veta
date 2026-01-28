@@ -50,15 +50,12 @@ tags are normalized to lowercase
 ===
 veta add --title "Lowercase test" --tags "UPPER,Mixed,lower" --body "body"
 ---
-Added note {{ id }}
----
-where
-* id > 0
+Added note 1
 
 ====
 verify tags are lowercase
 ====
-veta show 6
+veta show 1
 ----
 # Lowercase test
 
@@ -74,15 +71,12 @@ duplicate tags are removed
 ===
 veta add --title "Dedup test" --tags "dup,dup,DUP,Dup" --body "body"
 ---
-Added note {{ id }}
----
-where
-* id > 0
+Added note 2
 
 ====
 verify duplicate tags are removed
 ====
-veta show 7
+veta show 2
 ----
 # Dedup test
 
@@ -98,15 +92,12 @@ empty tags are filtered out
 ===
 veta add --title "Empty tag test" --tags "valid,,also-valid,  " --body "body"
 ---
-Added note {{ id }}
----
-where
-* id > 0
+Added note 3
 
 ====
 verify empty tags are filtered
 ====
-veta show 8
+veta show 3
 ----
 # Empty tag test
 
@@ -122,15 +113,12 @@ tags are trimmed of whitespace
 ===
 veta add --title "Whitespace tag test" --tags "  spaced  ,  padded  " --body "body"
 ---
-Added note {{ id }}
----
-where
-* id > 0
+Added note 4
 
 ====
 verify tags are trimmed
 ====
-veta show 9
+veta show 4
 ----
 # Whitespace tag test
 
@@ -144,7 +132,7 @@ Tags: padded,spaced
 ===
 edit with empty title fails
 ===
-veta edit 6 --title "  " --body "body" 2>&1 ; echo "exit: $?"
+veta edit 1 --title "  " --body "body" 2>&1 ; echo "exit: $?"
 ---
 Error: validation error: title cannot be empty
 exit: 1
@@ -152,7 +140,7 @@ exit: 1
 ====
 verify note unchanged after failed edit
 ====
-veta show 6
+veta show 1
 ----
 # Lowercase test
 
@@ -189,7 +177,7 @@ veta add --title "Before reinit" --tags "test" --body "This note will be deleted
 veta init --reinitialize
 veta ls
 ---
-Added note {{ id: number }}
+Added note 5
 Reinitialized veta database in .veta/db.sqlite
 
 ===
