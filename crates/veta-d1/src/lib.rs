@@ -52,14 +52,16 @@ impl D1DatabaseWrapper {
     }
 
     fn parse_tags(tags_str: Option<String>) -> Vec<String> {
-        tags_str
+        let mut tags: Vec<String> = tags_str
             .map(|s| {
                 s.split(',')
                     .map(String::from)
                     .filter(|s| !s.is_empty())
                     .collect()
             })
-            .unwrap_or_default()
+            .unwrap_or_default();
+        tags.sort();
+        tags
     }
 }
 
