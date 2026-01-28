@@ -14,7 +14,7 @@ description: >
 
 # Veta - Persistent Memory for Agents
 
-Veta is a note database that survives conversation compaction. Notes have titles, bodies, and tags for organization. **Write notes proactively** - if something is worth remembering, write it NOW.
+Veta is a note database that survives conversation compaction. Notes have titles, bodies, tags for organization, and optional references to external resources (source code paths, URLs, documentation links). **Write notes proactively** - if something is worth remembering, write it NOW.
 
 ## ⚠️ CRITICAL: Write Memory Proactively
 
