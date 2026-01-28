@@ -14,6 +14,7 @@ veta --db "$CCTR_WORK_DIR/stdin-test.db" show 1
 
 Content from stdin
 
+
 ---
 
 Last modified: {{ modified }}
