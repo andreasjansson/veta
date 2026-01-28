@@ -1,0 +1,184 @@
+===
+health check
+===
+curl -s http://localhost:8787/
+---
+Veta API
+
+===
+create a note
+===
+curl -s -X POST http://localhost:8787/notes \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Test note", "body": "Hello world", "tags": ["test", "api"]}' \
+  | jq -r '.id'
+---
+1
+
+===
+create second note
+===
+curl -s -X POST http://localhost:8787/notes \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Second note", "body": "Goodbye world", "tags": ["test", "another"]}' \
+  | jq -r '.id'
+---
+2
+
+===
+get a note
+===
+curl -s http://localhost:8787/notes/1 | jq -r '.title'
+---
+Test note
+
+===
+get note body
+===
+curl -s http://localhost:8787/notes/1 | jq -r '.body'
+---
+Hello world
+
+===
+get note tags
+===
+curl -s http://localhost:8787/notes/1 | jq -r '.tags | join(",")'
+---
+api,test
+
+===
+list all notes
+===
+curl -s http://localhost:8787/notes | jq 'length'
+---
+2
+
+===
+list notes with tag filter
+===
+curl -s "http://localhost:8787/notes?tags=api" | jq 'length'
+---
+1
+
+===
+list notes with limit
+===
+curl -s "http://localhost:8787/notes?limit=1" | jq 'length'
+---
+1
+
+===
+get non-existent note returns 404
+===
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8787/notes/999
+---
+404
+
+===
+list tags
+===
+curl -s http://localhost:8787/tags | jq 'length'
+---
+3
+
+===
+grep notes
+===
+curl -s "http://localhost:8787/grep?q=Hello" | jq 'length'
+---
+1
+
+===
+grep case insensitive
+===
+curl -s "http://localhost:8787/grep?q=hello" | jq 'length'
+---
+1
+
+===
+grep case sensitive
+===
+curl -s "http://localhost:8787/grep?q=hello&case_sensitive=true" | jq 'length'
+---
+0
+
+===
+update note title
+===
+curl -s -X PATCH http://localhost:8787/notes/1 \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Updated title"}' \
+  | jq -r '.ok'
+---
+true
+
+===
+verify title update
+===
+curl -s http://localhost:8787/notes/1 | jq -r '.title'
+---
+Updated title
+
+===
+update note body
+===
+curl -s -X PATCH http://localhost:8787/notes/1 \
+  -H "Content-Type: application/json" \
+  -d '{"body": "New body"}' \
+  | jq -r '.ok'
+---
+true
+
+===
+verify body update
+===
+curl -s http://localhost:8787/notes/1 | jq -r '.body'
+---
+New body
+
+===
+update note tags
+===
+curl -s -X PATCH http://localhost:8787/notes/1 \
+  -H "Content-Type: application/json" \
+  -d '{"tags": ["updated", "newtag"]}' \
+  | jq -r '.ok'
+---
+true
+
+===
+verify tags update
+===
+curl -s http://localhost:8787/notes/1 | jq -r '.tags | join(",")'
+---
+newtag,updated
+
+===
+update non-existent note returns 404
+===
+curl -s -o /dev/null -w "%{http_code}" -X PATCH http://localhost:8787/notes/999 \
+  -H "Content-Type: application/json" \
+  -d '{"title": "nope"}'
+---
+404
+
+===
+delete a note
+===
+curl -s -X DELETE http://localhost:8787/notes/2 | jq -r '.ok'
+---
+true
+
+===
+verify deletion
+===
+curl -s http://localhost:8787/notes | jq 'length'
+---
+1
+
+===
+delete non-existent note returns 404
+===
+curl -s -o /dev/null -w "%{http_code}" -X DELETE http://localhost:8787/notes/999
+---
+404
