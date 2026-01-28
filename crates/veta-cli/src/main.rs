@@ -267,10 +267,10 @@ async fn main() -> Result<()> {
             head,
         } => {
             let from = from
-                .map(|s| dateparse::parse_datetime_to_sqlite(&s))
+                .map(|s| parse_human_date(&s))
                 .transpose()?;
             let to = to
-                .map(|s| dateparse::parse_datetime_to_sqlite(&s))
+                .map(|s| parse_human_date(&s))
                 .transpose()?;
             
             let query = NoteQuery {
