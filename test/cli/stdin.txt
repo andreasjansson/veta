@@ -1,27 +1,27 @@
 ===
 add note from stdin
 ===
-echo "Content from stdin" | veta --db "$CCTR_WORK_DIR/test.db" add --title "Stdin note" --tags "stdin"
+echo "Content from stdin" | veta --db "$CCTR_WORK_DIR/stdin-test.db" add --title "Stdin note" --tags "stdin"
 ---
 Added note 1
 
 ===
 verify stdin content
 ===
-veta --db "$CCTR_WORK_DIR/test.db" show 1 | grep "Content from stdin"
+veta --db "$CCTR_WORK_DIR/stdin-test.db" show 1 | grep "Content from stdin"
 ---
 Content from stdin
 
 ===
 edit note body from stdin
 ===
-echo "Updated via stdin" | veta --db "$CCTR_WORK_DIR/test.db" edit 1
+echo "Updated via stdin" | veta --db "$CCTR_WORK_DIR/stdin-test.db" edit 1
 ---
 Edited note 1: Updated body
 
 ===
 verify stdin edit
 ===
-veta --db "$CCTR_WORK_DIR/test.db" show 1 | grep "Updated via stdin"
+veta --db "$CCTR_WORK_DIR/stdin-test.db" show 1 | grep "Updated via stdin"
 ---
 Updated via stdin
