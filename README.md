@@ -80,7 +80,7 @@ debugging (9 notes)
 
 ```
 # List notes within one or more tags
-$ veta ls --tags testing
+$ veta ls testing
 78: Second issue note (2026-01-28 10:35) -- Second testing body truncated...
 41: First testing note (2026-01-26 22:30) -- First testing body truncated...
 
@@ -91,9 +91,9 @@ $ veta ls
 $ veta ls --from "2026-01-01 00:00:00" --to "2026-01-20 00:00:00"
 
 # Human-readable dates are supported
-$ veta ls --from "2 days ago"
+$ veta ls debugging --from "2 days ago"
 $ veta ls --from "yesterday" --to "today"
-$ veta ls --from "1 week ago" --to "now"
+$ veta ls gotchas --from "1 week ago" --to "now"
 
 # `--from` and `--to` can be used together or individually
 ```

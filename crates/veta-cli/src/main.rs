@@ -42,8 +42,7 @@ enum Commands {
     },
     /// List notes
     Ls {
-        /// Filter by comma-separated tags
-        #[arg(long)]
+        /// Filter by comma-separated tags (optional)
         tags: Option<String>,
         /// Filter notes updated after this time (e.g., "2 days ago", "2024-01-01")
         #[arg(long)]

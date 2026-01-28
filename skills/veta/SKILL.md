@@ -107,8 +107,8 @@ References are optional comma-separated pointers to source code locations (e.g.,
 veta tags
 
 # List notes in a tag
-veta ls --tags preferences
-veta ls --tags gotchas,debugging
+veta ls preferences
+veta ls gotchas,debugging
 
 # Read a specific note
 veta show 42
@@ -188,7 +188,7 @@ Fixed by adding select_related('author') to book queryset." \
 ```bash
 # Check what you remember about this project
 veta tags
-veta ls --tags "$(basename $PWD)"
+veta ls "$(basename $PWD)"
 veta ls --from "3 days ago"
 ```
 
@@ -220,7 +220,7 @@ veta tags
 veta grep "$(basename $PWD)"
 
 # What gotchas have I hit?
-veta ls --tags gotchas
+veta ls gotchas
 
 # Recent notes
 veta ls --from "1 week ago"

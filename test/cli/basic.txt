@@ -61,14 +61,14 @@ veta ls
 =====
 list notes with tag filter - single tag
 =====
-veta ls --tags basic
+veta ls basic
 -----
 1: First note ({{ modified }}) -- Hello world
 
 =====
 list notes with tag filter - shared tag
 =====
-veta ls --tags test
+veta ls test
 -----
 2: Second note ({{ modified2 }}) -- Goodbye world
 1: First note ({{ modified1 }}) -- Hello world
@@ -76,7 +76,7 @@ veta ls --tags test
 =====
 list notes with multiple tag filter
 =====
-veta ls --tags test,another
+veta ls test,another
 -----
 2: Second note ({{ modified2 }}) -- Goodbye world
 1: First note ({{ modified1 }}) -- Hello world
