@@ -18,10 +18,36 @@ impl D1DatabaseWrapper {
 
     /// Run database migrations.
     pub async fn run_migrations(&self) -> Result<(), Error> {
-        self.db
-            .exec(include_str!("../../../schema/migrations/0001_initial.sql"))
-            .await
-            .map_err(|e| Error::Database(e.to_string()))?;
+        // Run each statement separately since exec() has issues with multiple statements
+        let statements = [
+            "CREATE TABLE IF NOT EXISTS notes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                body TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+            )",
+            "CREATE TABLE IF NOT EXISTS tags (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE
+            )",
+            "CREATE TABLE IF NOT EXISTS note_tags (
+                note_id INTEGER NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
+                tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+                PRIMARY KEY (note_id, tag_id)
+            )",
+            "CREATE INDEX IF NOT EXISTS idx_notes_updated_at ON notes(updated_at)",
+            "CREATE INDEX IF NOT EXISTS idx_note_tags_tag_id ON note_tags(tag_id)",
+            "CREATE INDEX IF NOT EXISTS idx_tags_name ON tags(name)",
+        ];
+
+        for sql in statements {
+            self.db
+                .prepare(sql)
+                .run()
+                .await
+                .map_err(|e| Error::Database(e.to_string()))?;
+        }
         Ok(())
     }
 
