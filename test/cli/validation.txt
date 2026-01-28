@@ -1,14 +1,14 @@
 ===
 reject empty title
 ===
-veta --db "$CCTR_WORK_DIR/test.db" add --title "  " --tags "test" --body "body" 2>&1 | grep -i "empty"
+veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "  " --tags "test" --body "body" 2>&1 | grep -i "empty"
 ---
 Error: validation error: title cannot be empty
 
 ===
 show non-existent note fails
 ===
-veta --db "$CCTR_WORK_DIR/test.db" show 999 2>&1 ; echo "exit: $?"
+veta --db "$CCTR_WORK_DIR/validation-test.db" show 999 2>&1 ; echo "exit: $?"
 ---
 Note 999 not found
 exit: 1
@@ -16,7 +16,7 @@ exit: 1
 ===
 delete non-existent note fails
 ===
-veta --db "$CCTR_WORK_DIR/test.db" delete 999 2>&1 ; echo "exit: $?"
+veta --db "$CCTR_WORK_DIR/validation-test.db" delete 999 2>&1 ; echo "exit: $?"
 ---
 Note 999 not found
 exit: 1
@@ -24,7 +24,7 @@ exit: 1
 ===
 edit non-existent note fails
 ===
-veta --db "$CCTR_WORK_DIR/test.db" edit 999 --title "new" 2>&1 ; echo "exit: $?"
+veta --db "$CCTR_WORK_DIR/validation-test.db" edit 999 --title "new" --body "" 2>&1 ; echo "exit: $?"
 ---
 Note 999 not found
 exit: 1
@@ -32,8 +32,8 @@ exit: 1
 ===
 tags are normalized to lowercase
 ===
-veta --db "$CCTR_WORK_DIR/test.db" add --title "Test" --tags "UPPER,Mixed" --body "body"
-veta --db "$CCTR_WORK_DIR/test.db" show 1 | grep "Tags:"
+veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "Test" --tags "UPPER,Mixed" --body "body"
+veta --db "$CCTR_WORK_DIR/validation-test.db" show 1 | grep "Tags:"
 ---
 Added note 1
 Tags: mixed,upper
@@ -41,8 +41,8 @@ Tags: mixed,upper
 ===
 duplicate tags are removed
 ===
-veta --db "$CCTR_WORK_DIR/test.db" add --title "Test2" --tags "dup,dup,DUP" --body "body"
-veta --db "$CCTR_WORK_DIR/test.db" show 2 | grep "Tags:"
+veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "Test2" --tags "dup,dup,DUP" --body "body"
+veta --db "$CCTR_WORK_DIR/validation-test.db" show 2 | grep "Tags:"
 ---
 Added note 2
 Tags: dup
