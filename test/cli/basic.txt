@@ -255,11 +255,11 @@ Line 5"
 ---
 Added note {{ id: number }}
 
-===
+=====
 show multiple notes
-===
+=====
 veta show 1 2
----
+-----
 # Updated title
 
 New body content
@@ -280,11 +280,11 @@ Goodbye world
 Last modified: {{ modified2 }}
 Tags: another,test
 
-===
+=====
 show with --head truncates body
-===
+=====
 veta show 4 -n 2
----
+-----
 # Multiline note
 
 Line 1
@@ -296,11 +296,11 @@ Line 2
 Last modified: {{ modified }}
 Tags: test
 
-===
+=====
 show multiple with --head
-===
+=====
 veta show 1 4 -n 1
----
+-----
 # Updated title
 
 New body content
@@ -322,11 +322,11 @@ Line 1
 Last modified: {{ modified2 }}
 Tags: test
 
-===
+=====
 show with not found note shows error
-===
+=====
 veta show 1 999 2>&1 ; echo "exit: $?"
----
+-----
 # Updated title
 
 New body content
