@@ -3,7 +3,8 @@
 use regex::Regex;
 use serde::Deserialize;
 use veta_core::{CreateNote, Database, Error, Note, NoteQuery, TagCount, UpdateNote};
-use worker::d1::{D1Database, D1Type};
+use wasm_bindgen::JsValue;
+use worker::d1::D1Database;
 
 /// D1-backed database implementation.
 pub struct D1DatabaseWrapper {
@@ -77,11 +78,16 @@ struct CountRow {
 impl Database for D1DatabaseWrapper {
     async fn add_note(&self, note: CreateNote) -> Result<i64, Error> {
         // Insert the note
-        let result = self
+        let stmt = self
             .db
             .prepare("INSERT INTO notes (title, body) VALUES (?1, ?2) RETURNING id")
-            .bind_refs(&[&D1Type::Text(&note.title), &D1Type::Text(&note.body)])
-            .map_err(|e| Error::Database(e.to_string()))?
+            .bind(&[
+                JsValue::from_str(&note.title),
+                JsValue::from_str(&note.body),
+            ])
+            .map_err(|e| Error::Database(e.to_string()))?;
+
+        let result = stmt
             .first::<NoteIdRow>(None)
             .await
             .map_err(|e| Error::Database(e.to_string()))?
@@ -94,22 +100,23 @@ impl Database for D1DatabaseWrapper {
             let mut statements = Vec::new();
 
             for tag in &note.tags {
-                statements.push(
-                    self.db
-                        .prepare(
-                            "INSERT INTO tags (name) VALUES (?1) ON CONFLICT (name) DO NOTHING",
-                        )
-                        .bind_refs(&[&D1Type::Text(tag)])
-                        .map_err(|e| Error::Database(e.to_string()))?,
-                );
-                statements.push(
-                    self.db
-                        .prepare(
-                            "INSERT INTO note_tags (note_id, tag_id) SELECT ?1, id FROM tags WHERE name = ?2",
-                        )
-                        .bind_refs(&[&D1Type::Integer(note_id as i32), &D1Type::Text(tag)])
-                        .map_err(|e| Error::Database(e.to_string()))?,
-                );
+                let tag_stmt = self
+                    .db
+                    .prepare(
+                        "INSERT INTO tags (name) VALUES (?1) ON CONFLICT (name) DO NOTHING",
+                    )
+                    .bind(&[JsValue::from_str(tag)])
+                    .map_err(|e| Error::Database(e.to_string()))?;
+                statements.push(tag_stmt);
+
+                let link_stmt = self
+                    .db
+                    .prepare(
+                        "INSERT INTO note_tags (note_id, tag_id) SELECT ?1, id FROM tags WHERE name = ?2",
+                    )
+                    .bind(&[JsValue::from_f64(note_id as f64), JsValue::from_str(tag)])
+                    .map_err(|e| Error::Database(e.to_string()))?;
+                statements.push(link_stmt);
             }
 
             self.db
@@ -122,7 +129,7 @@ impl Database for D1DatabaseWrapper {
     }
 
     async fn get_note(&self, id: i64) -> Result<Option<Note>, Error> {
-        let row = self
+        let stmt = self
             .db
             .prepare(
                 "SELECT n.id, n.title, n.body, n.updated_at, GROUP_CONCAT(t.name) as tags
@@ -132,8 +139,10 @@ impl Database for D1DatabaseWrapper {
                  WHERE n.id = ?1
                  GROUP BY n.id",
             )
-            .bind_refs(&[&D1Type::Integer(id as i32)])
-            .map_err(|e| Error::Database(e.to_string()))?
+            .bind(&[JsValue::from_f64(id as f64)])
+            .map_err(|e| Error::Database(e.to_string()))?;
+
+        let row = stmt
             .first::<NoteRow>(None)
             .await
             .map_err(|e| Error::Database(e.to_string()))?;
@@ -216,11 +225,13 @@ impl Database for D1DatabaseWrapper {
 
     async fn update_note(&self, id: i64, update: UpdateNote) -> Result<bool, Error> {
         // Check if note exists
-        let exists = self
+        let count_stmt = self
             .db
             .prepare("SELECT COUNT(*) as count FROM notes WHERE id = ?1")
-            .bind_refs(&[&D1Type::Integer(id as i32)])
-            .map_err(|e| Error::Database(e.to_string()))?
+            .bind(&[JsValue::from_f64(id as f64)])
+            .map_err(|e| Error::Database(e.to_string()))?;
+
+        let exists = count_stmt
             .first::<CountRow>(None)
             .await
             .map_err(|e| Error::Database(e.to_string()))?
@@ -235,7 +246,7 @@ impl Database for D1DatabaseWrapper {
         if let Some(ref title) = update.title {
             self.db
                 .prepare("UPDATE notes SET title = ?1, updated_at = datetime('now') WHERE id = ?2")
-                .bind_refs(&[&D1Type::Text(title), &D1Type::Integer(id as i32)])
+                .bind(&[JsValue::from_str(title), JsValue::from_f64(id as f64)])
                 .map_err(|e| Error::Database(e.to_string()))?
                 .run()
                 .await
@@ -246,7 +257,7 @@ impl Database for D1DatabaseWrapper {
         if let Some(ref body) = update.body {
             self.db
                 .prepare("UPDATE notes SET body = ?1, updated_at = datetime('now') WHERE id = ?2")
-                .bind_refs(&[&D1Type::Text(body), &D1Type::Integer(id as i32)])
+                .bind(&[JsValue::from_str(body), JsValue::from_f64(id as f64)])
                 .map_err(|e| Error::Database(e.to_string()))?
                 .run()
                 .await
@@ -258,7 +269,7 @@ impl Database for D1DatabaseWrapper {
             // Delete existing tags
             self.db
                 .prepare("DELETE FROM note_tags WHERE note_id = ?1")
-                .bind_refs(&[&D1Type::Integer(id as i32)])
+                .bind(&[JsValue::from_f64(id as f64)])
                 .map_err(|e| Error::Database(e.to_string()))?
                 .run()
                 .await
@@ -269,22 +280,23 @@ impl Database for D1DatabaseWrapper {
                 let mut statements = Vec::new();
 
                 for tag in tags {
-                    statements.push(
-                        self.db
-                            .prepare(
-                                "INSERT INTO tags (name) VALUES (?1) ON CONFLICT (name) DO NOTHING",
-                            )
-                            .bind_refs(&[&D1Type::Text(tag)])
-                            .map_err(|e| Error::Database(e.to_string()))?,
-                    );
-                    statements.push(
-                        self.db
-                            .prepare(
-                                "INSERT INTO note_tags (note_id, tag_id) SELECT ?1, id FROM tags WHERE name = ?2",
-                            )
-                            .bind_refs(&[&D1Type::Integer(id as i32), &D1Type::Text(tag)])
-                            .map_err(|e| Error::Database(e.to_string()))?,
-                    );
+                    let tag_stmt = self
+                        .db
+                        .prepare(
+                            "INSERT INTO tags (name) VALUES (?1) ON CONFLICT (name) DO NOTHING",
+                        )
+                        .bind(&[JsValue::from_str(tag)])
+                        .map_err(|e| Error::Database(e.to_string()))?;
+                    statements.push(tag_stmt);
+
+                    let link_stmt = self
+                        .db
+                        .prepare(
+                            "INSERT INTO note_tags (note_id, tag_id) SELECT ?1, id FROM tags WHERE name = ?2",
+                        )
+                        .bind(&[JsValue::from_f64(id as f64), JsValue::from_str(tag)])
+                        .map_err(|e| Error::Database(e.to_string()))?;
+                    statements.push(link_stmt);
                 }
 
                 self.db
@@ -296,7 +308,7 @@ impl Database for D1DatabaseWrapper {
             // Update timestamp
             self.db
                 .prepare("UPDATE notes SET updated_at = datetime('now') WHERE id = ?1")
-                .bind_refs(&[&D1Type::Integer(id as i32)])
+                .bind(&[JsValue::from_f64(id as f64)])
                 .map_err(|e| Error::Database(e.to_string()))?
                 .run()
                 .await
@@ -308,11 +320,13 @@ impl Database for D1DatabaseWrapper {
 
     async fn delete_note(&self, id: i64) -> Result<bool, Error> {
         // Check if note exists first
-        let exists = self
+        let count_stmt = self
             .db
             .prepare("SELECT COUNT(*) as count FROM notes WHERE id = ?1")
-            .bind_refs(&[&D1Type::Integer(id as i32)])
-            .map_err(|e| Error::Database(e.to_string()))?
+            .bind(&[JsValue::from_f64(id as f64)])
+            .map_err(|e| Error::Database(e.to_string()))?;
+
+        let exists = count_stmt
             .first::<CountRow>(None)
             .await
             .map_err(|e| Error::Database(e.to_string()))?
@@ -326,7 +340,7 @@ impl Database for D1DatabaseWrapper {
         // Delete note_tags first (foreign key)
         self.db
             .prepare("DELETE FROM note_tags WHERE note_id = ?1")
-            .bind_refs(&[&D1Type::Integer(id as i32)])
+            .bind(&[JsValue::from_f64(id as f64)])
             .map_err(|e| Error::Database(e.to_string()))?
             .run()
             .await
@@ -335,7 +349,7 @@ impl Database for D1DatabaseWrapper {
         // Delete note
         self.db
             .prepare("DELETE FROM notes WHERE id = ?1")
-            .bind_refs(&[&D1Type::Integer(id as i32)])
+            .bind(&[JsValue::from_f64(id as f64)])
             .map_err(|e| Error::Database(e.to_string()))?
             .run()
             .await
