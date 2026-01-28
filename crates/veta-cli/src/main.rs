@@ -56,8 +56,8 @@ enum Commands {
     },
     /// Show one or more notes
     Show {
-        /// Note IDs
-        ids: Vec<i64>,
+        /// Comma-separated note IDs
+        ids: String,
         /// Only show the first n lines of each note body
         #[arg(short = 'n', long)]
         head: Option<usize>,
@@ -213,6 +213,14 @@ fn parse_tags(tags: &str) -> Vec<String> {
         .collect()
 }
 
+fn parse_ids(ids: &str) -> Result<Vec<i64>> {
+    ids.split(',')
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+        .map(|s| s.parse::<i64>().context(format!("Invalid note ID: {}", s)))
+        .collect()
+}
+
 fn read_stdin() -> Result<String> {
     let mut buf = String::new();
     io::stdin()
@@ -311,6 +319,7 @@ async fn main() -> Result<()> {
         }
 
         Commands::Show { ids, head } => {
+            let ids = parse_ids(&ids)?;
             if ids.is_empty() {
                 eprintln!("No note IDs provided");
                 std::process::exit(1);

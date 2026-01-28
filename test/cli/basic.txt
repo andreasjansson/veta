@@ -195,7 +195,7 @@ Tags: basic,test
 =====
 edit note tags
 =====
-veta edit 1 --tags "updated,newtag" --body "New body content"
+sleep 1 && veta edit 1 --tags "updated,newtag" --body "New body content"
 -----
 Edited note 1: Updated body, tags
 
@@ -225,8 +225,8 @@ verify note was deleted from list
 =====
 veta ls
 -----
-2: Second note ({{ modified2 }}) -- Goodbye world
 1: Updated title ({{ modified1 }}) -- New body content
+2: Second note ({{ modified2 }}) -- Goodbye world
 
 =====
 verify tags updated after deletion
@@ -243,5 +243,5 @@ veta works from subdirectory
 =====
 mkdir -p subdir/nested && cd subdir/nested && veta ls
 -----
-2: Second note ({{ modified2 }}) -- Goodbye world
 1: Updated title ({{ modified1 }}) -- New body content
+2: Second note ({{ modified2 }}) -- Goodbye world

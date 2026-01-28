@@ -124,7 +124,7 @@ References are only shown if the note has any.
 Show multiple notes at once:
 
 ```
-$ veta show 1 2 3
+$ veta show 1,2,3
 ```
 
 Use `--head/-n` to show only the first n lines of each note body:
