@@ -50,7 +50,8 @@ impl D1DatabaseWrapper {
         }
 
         // Migration 0002: Add references column (ignore error if column already exists)
-        let _ = self.db
+        let _ = self
+            .db
             .prepare("ALTER TABLE notes ADD COLUMN \"references\" TEXT NOT NULL DEFAULT '[]'")
             .run()
             .await;
@@ -116,62 +117,6 @@ struct TagCountRow {
     count: i64,
 }
 
-#[derive(Deserialize)
-            self.db
-                .prepare(sql)
-                .run()
-                .await
-                .map_err(|e| Error::Database(e.to_string()))?;
-        }
-        Ok(())
-    }
-
-    fn parse_tags(tags_str: Option<String>) -> Vec<String> {
-        let mut tags: Vec<String> = tags_str
-            .map(|s| {
-                s.split(',')
-                    .map(String::from)
-                    .filter(|s| !s.is_empty())
-                    .collect()
-            })
-            .unwrap_or_default();
-        tags.sort();
-        tags
-    }
-}
-
-#[derive(Deserialize)]
-struct NoteIdRow {
-    id: i64,
-}
-
-#[derive(Deserialize)]
-struct NoteRow {
-    id: i64,
-    title: String,
-    body: String,
-    updated_at: String,
-    tags: Option<String>,
-}
-
-impl NoteRow {
-    fn into_note(self) -> Note {
-        Note {
-            id: self.id,
-            title: self.title,
-            body: self.body,
-            updated_at: self.updated_at,
-            tags: D1DatabaseWrapper::parse_tags(self.tags),
-        }
-    }
-}
-
-#[derive(Deserialize)]
-struct TagCountRow {
-    name: String,
-    count: i64,
-}
-
 #[derive(Deserialize)]
 struct CountRow {
     count: i64,
@@ -180,13 +125,16 @@ struct CountRow {
 #[async_trait::async_trait(?Send)]
 impl Database for D1DatabaseWrapper {
     async fn add_note(&self, note: CreateNote) -> Result<i64, Error> {
+        let refs_json = Self::serialize_references(&note.references);
+
         // Insert the note
         let stmt = self
             .db
-            .prepare("INSERT INTO notes (title, body) VALUES (?1, ?2) RETURNING id")
+            .prepare("INSERT INTO notes (title, body, \"references\") VALUES (?1, ?2, ?3) RETURNING id")
             .bind(&[
                 JsValue::from_str(&note.title),
                 JsValue::from_str(&note.body),
+                JsValue::from_str(&refs_json),
             ])
             .map_err(|e| Error::Database(e.to_string()))?;
 
@@ -235,7 +183,7 @@ impl Database for D1DatabaseWrapper {
         let stmt = self
             .db
             .prepare(
-                "SELECT n.id, n.title, n.body, n.updated_at, GROUP_CONCAT(t.name) as tags
+                "SELECT n.id, n.title, n.body, n.updated_at, n.\"references\", GROUP_CONCAT(t.name) as tags
                  FROM notes n
                  LEFT JOIN note_tags nt ON n.id = nt.note_id
                  LEFT JOIN tags t ON nt.tag_id = t.id
@@ -268,7 +216,7 @@ impl Database for D1DatabaseWrapper {
                     .join(",");
 
                 let sql = format!(
-                    "SELECT n.id, n.title, n.body, n.updated_at, GROUP_CONCAT(t.name) as tags
+                    "SELECT n.id, n.title, n.body, n.updated_at, n.\"references\", GROUP_CONCAT(t.name) as tags
                      FROM notes n
                      LEFT JOIN note_tags nt ON n.id = nt.note_id
                      LEFT JOIN tags t ON nt.tag_id = t.id
@@ -291,7 +239,7 @@ impl Database for D1DatabaseWrapper {
             } else {
                 self.db
                     .prepare(&format!(
-                        "SELECT n.id, n.title, n.body, n.updated_at, GROUP_CONCAT(t.name) as tags
+                        "SELECT n.id, n.title, n.body, n.updated_at, n.\"references\", GROUP_CONCAT(t.name) as tags
                          FROM notes n
                          LEFT JOIN note_tags nt ON n.id = nt.note_id
                          LEFT JOIN tags t ON nt.tag_id = t.id
@@ -307,7 +255,7 @@ impl Database for D1DatabaseWrapper {
         } else {
             self.db
                 .prepare(&format!(
-                    "SELECT n.id, n.title, n.body, n.updated_at, GROUP_CONCAT(t.name) as tags
+                    "SELECT n.id, n.title, n.body, n.updated_at, n.\"references\", GROUP_CONCAT(t.name) as tags
                      FROM notes n
                      LEFT JOIN note_tags nt ON n.id = nt.note_id
                      LEFT JOIN tags t ON nt.tag_id = t.id
@@ -418,6 +366,18 @@ impl Database for D1DatabaseWrapper {
                 .map_err(|e| Error::Database(e.to_string()))?;
         }
 
+        // Update references if provided
+        if let Some(ref references) = update.references {
+            let refs_json = Self::serialize_references(references);
+            self.db
+                .prepare("UPDATE notes SET \"references\" = ?1, updated_at = datetime('now') WHERE id = ?2")
+                .bind(&[JsValue::from_str(&refs_json), JsValue::from_f64(id as f64)])
+                .map_err(|e| Error::Database(e.to_string()))?
+                .run()
+                .await
+                .map_err(|e| Error::Database(e.to_string()))?;
+        }
+
         Ok(true)
     }
 
@@ -512,7 +472,7 @@ impl Database for D1DatabaseWrapper {
                     .join(",");
 
                 let sql = format!(
-                    "SELECT n.id, n.title, n.body, n.updated_at, GROUP_CONCAT(t.name) as tags
+                    "SELECT n.id, n.title, n.body, n.updated_at, n.\"references\", GROUP_CONCAT(t.name) as tags
                      FROM notes n
                      LEFT JOIN note_tags nt ON n.id = nt.note_id
                      LEFT JOIN tags t ON nt.tag_id = t.id
@@ -532,7 +492,7 @@ impl Database for D1DatabaseWrapper {
             } else {
                 self.db
                     .prepare(
-                        "SELECT n.id, n.title, n.body, n.updated_at, GROUP_CONCAT(t.name) as tags
+                        "SELECT n.id, n.title, n.body, n.updated_at, n.\"references\", GROUP_CONCAT(t.name) as tags
                          FROM notes n
                          LEFT JOIN note_tags nt ON n.id = nt.note_id
                          LEFT JOIN tags t ON nt.tag_id = t.id
@@ -546,7 +506,7 @@ impl Database for D1DatabaseWrapper {
         } else {
             self.db
                 .prepare(
-                    "SELECT n.id, n.title, n.body, n.updated_at, GROUP_CONCAT(t.name) as tags
+                    "SELECT n.id, n.title, n.body, n.updated_at, n.\"references\", GROUP_CONCAT(t.name) as tags
                      FROM notes n
                      LEFT JOIN note_tags nt ON n.id = nt.note_id
                      LEFT JOIN tags t ON nt.tag_id = t.id
