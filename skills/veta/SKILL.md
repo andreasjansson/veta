@@ -31,6 +31,34 @@ Veta is a note database that survives conversation compaction. Notes have titles
 
 **The test:** "Will this be useful context in 2 weeks?" → YES = write it now.
 
+## ⚠️ ALWAYS Include References
+
+**References are how future-you finds the code again.** When writing notes about code, bugs, or technical decisions, ALWAYS include `--references` pointing to:
+
+- **Source code locations:** `src/auth/token.rs:142` - the exact file and line
+- **URLs:** `https://docs.rs/jsonwebtoken` - documentation you consulted
+- **Related files:** `tests/auth_test.rs,src/config.rs` - other relevant code
+
+Without references, notes become "I fixed a bug somewhere" instead of "I fixed a bug HERE."
+
+```bash
+# ❌ BAD: No references - where was this bug?
+veta add --title "Fixed auth bug" --tags "debugging" \
+  --body "Token wasn't refreshing properly"
+
+# ✅ GOOD: References point exactly where to look
+veta add --title "Fixed auth bug" --tags "debugging" \
+  --body "Token wasn't refreshing properly" \
+  --references "src/auth/token.rs:142,src/middleware/auth.rs:58"
+```
+
+**When to add references:**
+- Bug fixes → file:line where the fix was made
+- Gotchas → file:line where the gotcha manifests  
+- Architecture decisions → files affected by the decision
+- API behaviors → URL to the documentation
+- Stack Overflow solutions → URL to the answer
+
 ## When to Use Veta
 
 **Use veta when:**
