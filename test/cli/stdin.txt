@@ -1,19 +1,25 @@
 ===
+initialize veta for stdin tests
+===
+cd "$CCTR_WORK_DIR" && veta init
+---
+Initialized veta database in .veta/db.sqlite
+
+===
 add note with body from stdin
 ===
-echo "Content from stdin" | veta --db "$CCTR_WORK_DIR/stdin-test.db" add --title "Stdin note" --tags "stdin,test"
+cd "$CCTR_WORK_DIR" && echo "Content from stdin" | veta add --title "Stdin note" --tags "stdin,test"
 ---
 Added note 1
 
 ====
 verify stdin content was saved
 ====
-veta --db "$CCTR_WORK_DIR/stdin-test.db" show 1
+cd "$CCTR_WORK_DIR" && veta show 1
 ----
 # Stdin note
 
 Content from stdin
-
 
 ---
 
@@ -23,14 +29,14 @@ Tags: stdin,test
 ===
 add note with multiline body from stdin
 ===
-printf "Line one\nLine two\nLine three" | veta --db "$CCTR_WORK_DIR/stdin-test.db" add --title "Multiline note" --tags "multiline"
+cd "$CCTR_WORK_DIR" && printf "Line one\nLine two\nLine three" | veta add --title "Multiline note" --tags "multiline"
 ---
 Added note 2
 
 ====
 verify multiline content was saved
 ====
-veta --db "$CCTR_WORK_DIR/stdin-test.db" show 2
+cd "$CCTR_WORK_DIR" && veta show 2
 ----
 # Multiline note
 
@@ -46,19 +52,18 @@ Tags: multiline
 ===
 edit note body from stdin
 ===
-echo "Updated via stdin" | veta --db "$CCTR_WORK_DIR/stdin-test.db" edit 1
+cd "$CCTR_WORK_DIR" && echo "Updated via stdin" | veta edit 1
 ---
 Edited note 1: Updated body
 
 ====
 verify stdin edit was saved
 ====
-veta --db "$CCTR_WORK_DIR/stdin-test.db" show 1
+cd "$CCTR_WORK_DIR" && veta show 1
 ----
 # Stdin note
 
 Updated via stdin
-
 
 ---
 
@@ -68,14 +73,14 @@ Tags: stdin,test
 ===
 edit note with multiline stdin
 ===
-printf "New line one\nNew line two" | veta --db "$CCTR_WORK_DIR/stdin-test.db" edit 2
+cd "$CCTR_WORK_DIR" && printf "New line one\nNew line two" | veta edit 2
 ---
 Edited note 2: Updated body
 
 ====
 verify multiline edit was saved
 ====
-veta --db "$CCTR_WORK_DIR/stdin-test.db" show 2
+cd "$CCTR_WORK_DIR" && veta show 2
 ----
 # Multiline note
 
