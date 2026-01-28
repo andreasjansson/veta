@@ -1,3 +1,5 @@
+%skip(Unix-only tests) if: test "$OS" = "Windows_NT"
+
 =====
 reinitialize and add a note first
 =====

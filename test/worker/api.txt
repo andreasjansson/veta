@@ -42,6 +42,7 @@ curl -s http://localhost:8787/notes/1 | jq .
     "api",
     "test"
   ],
+  "references": [],
   "updated_at": "{{ updated_at }}"
 }
 
@@ -58,6 +59,7 @@ curl -s http://localhost:8787/notes/2 | jq .
     "another",
     "test"
   ],
+  "references": [],
   "updated_at": "{{ updated_at }}"
 }
 
@@ -197,6 +199,7 @@ curl -s http://localhost:8787/notes/1 | jq .
     "api",
     "test"
   ],
+  "references": [],
   "updated_at": "{{ updated_at }}"
 }
 
@@ -225,6 +228,7 @@ curl -s http://localhost:8787/notes/1 | jq .
     "api",
     "test"
   ],
+  "references": [],
   "updated_at": "{{ updated_at }}"
 }
 
@@ -253,6 +257,7 @@ curl -s http://localhost:8787/notes/1 | jq .
     "newtag",
     "updated"
   ],
+  "references": [],
   "updated_at": "{{ updated_at }}"
 }
 

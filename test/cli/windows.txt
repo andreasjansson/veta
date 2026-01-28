@@ -1,0 +1,70 @@
+%skip(Windows-only tests) if: test "$OS" != "Windows_NT"
+
+=====
+initialize veta database on Windows
+=====
+veta init --reinitialize
+-----
+Reinitialized veta database in .veta/db.sqlite
+
+=====
+add and list notes on Windows
+=====
+veta add --title "Windows test" --tags "windows,test" --body "Testing on Windows"
+veta ls
+-----
+Added note 1
+1: Windows test ({{ modified }}) -- Testing on Windows
+
+=====
+show note on Windows
+=====
+veta show 1
+-----
+# Windows test
+
+Testing on Windows
+
+---
+
+Last modified: {{ modified }}
+Tags: test,windows
+
+=====
+grep on Windows
+=====
+veta grep "Windows"
+-----
+1: Windows test ({{ modified }}) -- Testing on Windows
+
+=====
+edit note on Windows
+=====
+veta edit 1 --title "Updated Windows test" --body "Testing on Windows"
+veta show 1
+-----
+Edited note 1: Updated title, body
+# Updated Windows test
+
+Testing on Windows
+
+---
+
+Last modified: {{ modified }}
+Tags: test,windows
+
+=====
+veta works from subdirectory on Windows
+=====
+cmd /C "mkdir subdir\nested & cd subdir\nested & veta ls"
+-----
+1: Updated Windows test ({{ modified }}) -- Testing on Windows
+
+=====
+delete note on Windows
+=====
+veta delete 1
+veta ls
+-----
+Deleted note 1
+

@@ -241,6 +241,7 @@ updated (1 note)
 
 =====
 veta works from subdirectory
+%skip(Unix shell commands) if: test "$OS" = "Windows_NT"
 =====
 mkdir -p subdir/nested && cd subdir/nested && veta ls
 -----

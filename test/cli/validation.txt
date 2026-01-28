@@ -182,6 +182,7 @@ Reinitialized veta database in .veta/db.sqlite
 
 =====
 veta commands fail without init
+%skip(Unix shell commands) if: test "$OS" = "Windows_NT"
 =====
 cd /tmp && rm -rf veta-no-init-test && mkdir veta-no-init-test && cd veta-no-init-test && veta ls 2>&1 ; echo "exit: $?"
 -----
