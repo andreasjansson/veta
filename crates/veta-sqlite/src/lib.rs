@@ -255,6 +255,16 @@ impl Database for SqliteDatabase {
             .map_err(|e| Error::Database(e.to_string()))?;
         }
 
+        // Update references if provided
+        if let Some(ref references) = update.references {
+            let refs_json = Self::serialize_references(references);
+            conn.execute(
+                "UPDATE notes SET \"references\" = ?1, updated_at = datetime('now') WHERE id = ?2",
+                params![refs_json, id],
+            )
+            .map_err(|e| Error::Database(e.to_string()))?;
+        }
+
         Ok(true)
     }
 
