@@ -203,7 +203,7 @@ impl Database for D1DatabaseWrapper {
                          WHERE t2.name IN ({})
                      )
                      GROUP BY n.id
-                     ORDER BY n.updated_at DESC
+                     ORDER BY n.updated_at DESC, n.id DESC
                      LIMIT {}",
                     tags_list, limit
                 );
