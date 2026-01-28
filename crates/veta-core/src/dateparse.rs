@@ -3,7 +3,7 @@
 //! Parses strings like "2 days ago", "yesterday", "in 1 week" into
 //! SQLite-compatible datetime strings.
 
-use chrono::{NaiveDateTime, Utc};
+use chrono::NaiveDateTime;
 
 /// Parse a human-readable date string into a SQLite datetime string.
 ///
@@ -32,9 +32,8 @@ pub fn parse_human_date(input: &str) -> Option<String> {
     // Use parse_datetime for everything else
     match parse_datetime::parse_datetime(input) {
         Ok(zoned) => {
-            // Convert to UTC and format as SQLite datetime
-            let utc = zoned.to_zoned(jiff::tz::TimeZone::UTC).ok()?;
-            let dt = utc.datetime();
+            // Get the datetime and format as SQLite datetime
+            let dt = zoned.datetime();
             Some(format!(
                 "{:04}-{:02}-{:02} {:02}:{:02}:{:02}",
                 dt.year(),
