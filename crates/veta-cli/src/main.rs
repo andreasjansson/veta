@@ -55,10 +55,13 @@ enum Commands {
         #[arg(short = 'n', long, default_value = "20")]
         head: i64,
     },
-    /// Show a note
+    /// Show one or more notes
     Show {
-        /// Note ID
-        id: i64,
+        /// Note IDs
+        ids: Vec<i64>,
+        /// Only show the first n lines of each note body
+        #[arg(short = 'n', long)]
+        head: Option<usize>,
     },
     /// Edit a note
     Edit {
