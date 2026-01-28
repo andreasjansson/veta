@@ -10,6 +10,9 @@ struct CreateNoteRequest {
     title: String,
     body: String,
     tags: Vec<String>,
+    /// References to external resources (source code paths, URLs, documentation links, etc.)
+    #[serde(default)]
+    references: Vec<String>,
 }
 
 #[derive(Deserialize)]
@@ -17,6 +20,8 @@ struct UpdateNoteRequest {
     title: Option<String>,
     body: Option<String>,
     tags: Option<Vec<String>>,
+    /// References to external resources (source code paths, URLs, documentation links, etc.)
+    references: Option<Vec<String>>,
 }
 
 #[derive(Serialize)]
