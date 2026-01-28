@@ -57,6 +57,11 @@ $ veta ls
 # List notes within a time range (SQLite datetime format)
 $ veta ls --from "2026-01-01 00:00:00" --to "2026-01-20 00:00:00"
 
+# Human-readable dates are supported
+$ veta ls --from "2 days ago"
+$ veta ls --from "yesterday" --to "today"
+$ veta ls --from "1 week ago" --to "now"
+
 # `--from` and `--to` can be used together or individually
 ```
 
