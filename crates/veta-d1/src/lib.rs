@@ -130,7 +130,9 @@ impl Database for D1DatabaseWrapper {
         // Insert the note
         let stmt = self
             .db
-            .prepare("INSERT INTO notes (title, body, \"references\") VALUES (?1, ?2, ?3) RETURNING id")
+            .prepare(
+                "INSERT INTO notes (title, body, \"references\") VALUES (?1, ?2, ?3) RETURNING id",
+            )
             .bind(&[
                 JsValue::from_str(&note.title),
                 JsValue::from_str(&note.body),
@@ -153,9 +155,7 @@ impl Database for D1DatabaseWrapper {
             for tag in &note.tags {
                 let tag_stmt = self
                     .db
-                    .prepare(
-                        "INSERT INTO tags (name) VALUES (?1) ON CONFLICT (name) DO NOTHING",
-                    )
+                    .prepare("INSERT INTO tags (name) VALUES (?1) ON CONFLICT (name) DO NOTHING")
                     .bind(&[JsValue::from_str(tag)])
                     .map_err(|e| Error::Database(e.to_string()))?;
                 statements.push(tag_stmt);
@@ -269,7 +269,9 @@ impl Database for D1DatabaseWrapper {
                 .map_err(|e| Error::Database(e.to_string()))?
         };
 
-        let rows: Vec<NoteRow> = result.results().map_err(|e| Error::Database(e.to_string()))?;
+        let rows: Vec<NoteRow> = result
+            .results()
+            .map_err(|e| Error::Database(e.to_string()))?;
 
         Ok(rows.into_iter().map(|r| r.into_note()).collect())
     }
@@ -478,8 +480,9 @@ impl Database for D1DatabaseWrapper {
             .await
             .map_err(|e| Error::Database(e.to_string()))?;
 
-        let rows: Vec<TagCountRow> =
-            result.results().map_err(|e| Error::Database(e.to_string()))?;
+        let rows: Vec<TagCountRow> = result
+            .results()
+            .map_err(|e| Error::Database(e.to_string()))?;
 
         Ok(rows
             .into_iter()
@@ -560,7 +563,9 @@ impl Database for D1DatabaseWrapper {
                 .map_err(|e| Error::Database(e.to_string()))?
         };
 
-        let rows: Vec<NoteRow> = result.results().map_err(|e| Error::Database(e.to_string()))?;
+        let rows: Vec<NoteRow> = result
+            .results()
+            .map_err(|e| Error::Database(e.to_string()))?;
 
         // Filter by regex client-side
         let matching: Vec<Note> = rows

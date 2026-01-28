@@ -38,13 +38,20 @@ impl SqliteDatabase {
         conn.execute_batch(include_str!("../../../schema/migrations/0001_initial.sql"))
             .map_err(|e| Error::Database(e.to_string()))?;
         // Migration 0002: Add references column (ignore error if column already exists)
-        let _ = conn.execute_batch(include_str!("../../../schema/migrations/0002_add_references.sql"));
+        let _ = conn.execute_batch(include_str!(
+            "../../../schema/migrations/0002_add_references.sql"
+        ));
         Ok(())
     }
 
     fn parse_tags(tags_str: Option<String>) -> Vec<String> {
         let mut tags: Vec<String> = tags_str
-            .map(|s| s.split(',').map(String::from).filter(|s| !s.is_empty()).collect())
+            .map(|s| {
+                s.split(',')
+                    .map(String::from)
+                    .filter(|s| !s.is_empty())
+                    .collect()
+            })
             .unwrap_or_default();
         tags.sort();
         tags
@@ -171,10 +178,14 @@ impl Database for SqliteDatabase {
             sql.push_str(&format!(" LIMIT {}", limit));
         }
 
-        let params_refs: Vec<&dyn rusqlite::ToSql> =
-            params_vec.iter().map(|p| p as &dyn rusqlite::ToSql).collect();
+        let params_refs: Vec<&dyn rusqlite::ToSql> = params_vec
+            .iter()
+            .map(|p| p as &dyn rusqlite::ToSql)
+            .collect();
 
-        let mut stmt = conn.prepare(&sql).map_err(|e| Error::Database(e.to_string()))?;
+        let mut stmt = conn
+            .prepare(&sql)
+            .map_err(|e| Error::Database(e.to_string()))?;
 
         let notes = stmt
             .query_map(params_refs.as_slice(), |row| {
@@ -230,8 +241,10 @@ impl Database for SqliteDatabase {
             sql.push_str(&conditions.join(" AND "));
         }
 
-        let params_refs: Vec<&dyn rusqlite::ToSql> =
-            params_vec.iter().map(|p| p as &dyn rusqlite::ToSql).collect();
+        let params_refs: Vec<&dyn rusqlite::ToSql> = params_vec
+            .iter()
+            .map(|p| p as &dyn rusqlite::ToSql)
+            .collect();
 
         let count: i64 = conn
             .query_row(&sql, params_refs.as_slice(), |row| row.get(0))
@@ -245,7 +258,9 @@ impl Database for SqliteDatabase {
 
         // Check if note exists
         let exists: bool = conn
-            .query_row("SELECT 1 FROM notes WHERE id = ?1", params![id], |_| Ok(true))
+            .query_row("SELECT 1 FROM notes WHERE id = ?1", params![id], |_| {
+                Ok(true)
+            })
             .optional()
             .map_err(|e| Error::Database(e.to_string()))?
             .unwrap_or(false);
@@ -394,10 +409,14 @@ impl Database for SqliteDatabase {
 
         sql.push_str(" GROUP BY n.id ORDER BY n.updated_at DESC, n.id DESC");
 
-        let params_refs: Vec<&dyn rusqlite::ToSql> =
-            params_vec.iter().map(|p| p as &dyn rusqlite::ToSql).collect();
+        let params_refs: Vec<&dyn rusqlite::ToSql> = params_vec
+            .iter()
+            .map(|p| p as &dyn rusqlite::ToSql)
+            .collect();
 
-        let mut stmt = conn.prepare(&sql).map_err(|e| Error::Database(e.to_string()))?;
+        let mut stmt = conn
+            .prepare(&sql)
+            .map_err(|e| Error::Database(e.to_string()))?;
 
         let all_notes: Vec<Note> = stmt
             .query_map(params_refs.as_slice(), |row| {

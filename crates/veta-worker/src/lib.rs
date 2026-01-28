@@ -49,7 +49,12 @@ fn json_response<T: Serialize>(data: &T, status: u16) -> Result<Response> {
 }
 
 fn json_error(msg: &str, status: u16) -> Result<Response> {
-    json_response(&ErrorResponse { error: msg.to_string() }, status)
+    json_response(
+        &ErrorResponse {
+            error: msg.to_string(),
+        },
+        status,
+    )
 }
 
 fn get_service(env: &Env) -> Result<VetaService<D1DatabaseWrapper>> {
@@ -58,14 +63,12 @@ fn get_service(env: &Env) -> Result<VetaService<D1DatabaseWrapper>> {
 }
 
 fn parse_query_tags(url: &Url) -> Option<Vec<String>> {
-    url.query_pairs()
-        .find(|(k, _)| k == "tags")
-        .map(|(_, v)| {
-            v.split(',')
-                .map(String::from)
-                .filter(|s| !s.is_empty())
-                .collect()
-        })
+    url.query_pairs().find(|(k, _)| k == "tags").map(|(_, v)| {
+        v.split(',')
+            .map(String::from)
+            .filter(|s| !s.is_empty())
+            .collect()
+    })
 }
 
 fn parse_query_limit(url: &Url) -> Option<i64> {
@@ -99,7 +102,10 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
                 Err(e) => return json_error(&format!("Invalid JSON: {}", e), 400),
             };
 
-            match service.add_note(body.title, body.body, body.tags, body.references).await {
+            match service
+                .add_note(body.title, body.body, body.tags, body.references)
+                .await
+            {
                 Ok(id) => json_response(&IdResponse { id }, 201),
                 Err(e) => json_error(&e.to_string(), 400),
             }
@@ -125,10 +131,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         .get_async("/notes/:id", |_, ctx| async move {
             let service = get_service(&ctx.env)?;
 
-            let id: i64 = ctx
-                .param("id")
-                .and_then(|s| s.parse().ok())
-                .unwrap_or(0);
+            let id: i64 = ctx.param("id").and_then(|s| s.parse().ok()).unwrap_or(0);
 
             match service.get_note(id).await {
                 Ok(Some(note)) => json_response(&note, 200),
@@ -140,10 +143,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         .patch_async("/notes/:id", |mut req, ctx| async move {
             let service = get_service(&ctx.env)?;
 
-            let id: i64 = ctx
-                .param("id")
-                .and_then(|s| s.parse().ok())
-                .unwrap_or(0);
+            let id: i64 = ctx.param("id").and_then(|s| s.parse().ok()).unwrap_or(0);
 
             let body: UpdateNoteRequest = match req.json().await {
                 Ok(b) => b,
@@ -167,10 +167,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         .delete_async("/notes/:id", |_, ctx| async move {
             let service = get_service(&ctx.env)?;
 
-            let id: i64 = ctx
-                .param("id")
-                .and_then(|s| s.parse().ok())
-                .unwrap_or(0);
+            let id: i64 = ctx.param("id").and_then(|s| s.parse().ok()).unwrap_or(0);
 
             match service.delete_note(id).await {
                 Ok(true) => json_response(&OkResponse { ok: true }, 200),

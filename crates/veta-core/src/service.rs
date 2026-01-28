@@ -42,7 +42,14 @@ impl<D: Database> VetaService<D> {
             .collect();
         references.dedup();
 
-        self.db.add_note(CreateNote { title, body, tags, references }).await
+        self.db
+            .add_note(CreateNote {
+                title,
+                body,
+                tags,
+                references,
+            })
+            .await
     }
 
     /// Get a note by ID.
@@ -124,7 +131,10 @@ impl<D: Database> VetaService<D> {
         tags: Option<Vec<String>>,
         case_sensitive: bool,
     ) -> Result<Vec<NoteSummary>, Error> {
-        let notes = self.db.grep(pattern, tags.as_deref(), case_sensitive).await?;
+        let notes = self
+            .db
+            .grep(pattern, tags.as_deref(), case_sensitive)
+            .await?;
         Ok(notes.into_iter().map(|n| n.to_summary(60)).collect())
     }
 }

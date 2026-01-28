@@ -117,24 +117,22 @@ fn find_veta_dir() -> Option<PathBuf> {
 fn get_db_path() -> Result<PathBuf> {
     match find_veta_dir() {
         Some(veta_dir) => Ok(veta_dir.join(DB_FILE)),
-        None => bail!(
-            "No .veta directory found. Run 'veta init' to initialize a new database."
-        ),
+        None => bail!("No .veta directory found. Run 'veta init' to initialize a new database."),
     }
 }
 
 /// Check if the database is valid/uncorrupted
 fn check_database_integrity(path: &Path) -> Result<bool> {
     use rusqlite::Connection;
-    
+
     let conn = match Connection::open(path) {
         Ok(c) => c,
         Err(_) => return Ok(false),
     };
-    
+
     // Run SQLite integrity check
     let result: Result<String, _> = conn.query_row("PRAGMA integrity_check", [], |row| row.get(0));
-    
+
     match result {
         Ok(status) => Ok(status == "ok"),
         Err(_) => Ok(false),
@@ -144,24 +142,25 @@ fn check_database_integrity(path: &Path) -> Result<bool> {
 /// Attempt to recover a corrupted database
 fn attempt_recovery(path: &Path) -> Result<bool> {
     use rusqlite::Connection;
-    
+
     // Try to open and run recovery
     let conn = match Connection::open(path) {
         Ok(c) => c,
         Err(_) => return Ok(false),
     };
-    
+
     // Try to recover using VACUUM (can fix some issues)
     if conn.execute("VACUUM", []).is_ok() {
         // Re-check integrity
-        let result: Result<String, _> = conn.query_row("PRAGMA integrity_check", [], |row| row.get(0));
+        let result: Result<String, _> =
+            conn.query_row("PRAGMA integrity_check", [], |row| row.get(0));
         if let Ok(status) = result {
             if status == "ok" {
                 return Ok(true);
             }
         }
     }
-    
+
     Ok(false)
 }
 
@@ -174,11 +173,11 @@ fn open_database(path: &Path) -> Result<SqliteDatabase> {
             path.display()
         );
     }
-    
+
     // Check integrity
     if !check_database_integrity(path)? {
         eprintln!("Warning: Database corruption detected. Attempting recovery...");
-        
+
         if attempt_recovery(path)? {
             eprintln!("Recovery successful!");
         } else {
@@ -200,7 +199,7 @@ fn open_database(path: &Path) -> Result<SqliteDatabase> {
             }
         }
     }
-    
+
     let db = SqliteDatabase::open(path).context("Failed to open database")?;
     db.run_migrations().context("Failed to run migrations")?;
     Ok(db)
@@ -237,38 +236,32 @@ fn is_stdin_tty() -> bool {
 async fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    match cli.command {
-        Commands::Init { reinitialize } => {
-            let veta_dir = PathBuf::from(VETA_DIR);
-            let db_path = veta_dir.join(DB_FILE);
-            
-            if veta_dir.exists() {
-                if db_path.exists() {
-                    if reinitialize {
-                        std::fs::remove_file(&db_path)
-                            .context("Failed to remove existing database")?;
-                    } else {
-                        bail!("Veta is already initialized in this directory. Use --reinitialize to delete and recreate.");
-                    }
+    if let Commands::Init { reinitialize } = cli.command {
+        let veta_dir = PathBuf::from(VETA_DIR);
+        let db_path = veta_dir.join(DB_FILE);
+
+        if veta_dir.exists() {
+            if db_path.exists() {
+                if reinitialize {
+                    std::fs::remove_file(&db_path).context("Failed to remove existing database")?;
+                } else {
+                    bail!("Veta is already initialized in this directory. Use --reinitialize to delete and recreate.");
                 }
-            } else {
-                std::fs::create_dir_all(&veta_dir)
-                    .context("Failed to create .veta directory")?;
             }
-            
-            let db = SqliteDatabase::open(&db_path)
-                .context("Failed to create database")?;
-            db.run_migrations()
-                .context("Failed to initialize database schema")?;
-            
-            if reinitialize {
-                println!("Reinitialized veta database in {}", db_path.display());
-            } else {
-                println!("Initialized veta database in {}", db_path.display());
-            }
-            return Ok(());
+        } else {
+            std::fs::create_dir_all(&veta_dir).context("Failed to create .veta directory")?;
         }
-        _ => {}
+
+        let db = SqliteDatabase::open(&db_path).context("Failed to create database")?;
+        db.run_migrations()
+            .context("Failed to initialize database schema")?;
+
+        if reinitialize {
+            println!("Reinitialized veta database in {}", db_path.display());
+        } else {
+            println!("Initialized veta database in {}", db_path.display());
+        }
+        return Ok(());
     }
 
     // All other commands need the database
@@ -278,8 +271,13 @@ async fn main() -> Result<()> {
 
     match cli.command {
         Commands::Init { .. } => unreachable!(),
-        
-        Commands::Add { title, tags, body, references } => {
+
+        Commands::Add {
+            title,
+            tags,
+            body,
+            references,
+        } => {
             let body = match body {
                 Some(b) => b,
                 None => read_stdin()?,
@@ -296,14 +294,10 @@ async fn main() -> Result<()> {
             to,
             head,
         } => {
-            let from = from
-                .map(|s| parse_human_date(&s))
-                .transpose()?;
-            let to = to
-                .map(|s| parse_human_date(&s))
-                .transpose()?;
+            let from = from.map(|s| parse_human_date(&s)).transpose()?;
+            let to = to.map(|s| parse_human_date(&s)).transpose()?;
             let tags = tags.map(|t| parse_tags(&t));
-            
+
             let query = NoteQuery {
                 tags: tags.clone(),
                 from: from.clone(),
@@ -312,14 +306,14 @@ async fn main() -> Result<()> {
             };
             let notes = service.list_notes(query).await?;
             let num_notes = notes.len() as i64;
-            
+
             for note in notes {
                 println!(
                     "{}: {} ({}) -- {}",
                     note.id, note.title, note.updated_at, note.body_preview
                 );
             }
-            
+
             // Show truncation message if there are more notes
             if head > 0 && num_notes >= head {
                 let count_query = NoteQuery {
@@ -354,7 +348,7 @@ async fn main() -> Result<()> {
                         first = false;
 
                         println!("# {}\n", note.title);
-                        
+
                         // Apply --head if specified
                         if let Some(n) = head {
                             let lines: Vec<&str> = note.body.lines().take(n).collect();
@@ -365,7 +359,7 @@ async fn main() -> Result<()> {
                         } else {
                             println!("{}", note.body);
                         }
-                        
+
                         println!("\n---\n");
                         println!("Last modified: {}", note.updated_at);
                         println!("Tags: {}", note.tags.join(","));
@@ -384,7 +378,7 @@ async fn main() -> Result<()> {
 
             if !not_found.is_empty() {
                 if !first {
-                    eprintln!();  // Add spacing after last note
+                    eprintln!(); // Add spacing after last note
                 }
                 for id in &not_found {
                     eprintln!("Note {} not found", id);
