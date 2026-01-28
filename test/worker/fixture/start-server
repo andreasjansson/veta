@@ -1,0 +1,42 @@
+#!/bin/bash
+# Start wrangler dev server for testing
+# This script is run from the fixture directory
+
+set -e
+
+# Kill any existing server
+pkill -f "wrangler.*veta-test" 2>/dev/null || true
+sleep 0.5
+
+# Build the worker from the main project
+cd ~/projects/veta/crates/veta-worker
+cargo install -q worker-build 2>/dev/null || true
+worker-build --release 2>/dev/null
+
+# Copy build artifacts to fixture
+cp -r build "$CCTR_FIXTURE_DIR/"
+
+# Install wrangler if needed
+cd "$CCTR_FIXTURE_DIR"
+if [ ! -d node_modules ]; then
+    npm install --silent 2>/dev/null
+fi
+
+# Start the server via node (handles SIGHUP properly)
+node "$CCTR_FIXTURE_DIR/server.mjs" > /tmp/veta-test.log 2>&1 &
+echo $! > /tmp/veta-test.pid
+
+# Wait for server to be ready
+for i in {1..60}; do
+    if curl -s -o /dev/null http://localhost:8787/ 2>/dev/null; then
+        # Run migrations
+        curl -s -X POST http://localhost:8787/migrate > /dev/null
+        echo "ready"
+        exit 0
+    fi
+    sleep 0.5
+done
+
+echo "timeout"
+cat /tmp/veta-test.log
+exit 1
