@@ -228,7 +228,8 @@ veta add --title "Chose SQLite over Postgres for local dev" \
 - Tests run faster (in-memory option)
 - Good enough for expected data size (<100k rows)
 
-Tradeoff: Some Postgres-specific features unavailable locally"
+Tradeoff: Some Postgres-specific features unavailable locally" \
+  --references "docker-compose.yml,src/db/connection.rs,docs/local-setup.md"
 ```
 
 ### Remember User Preferences
