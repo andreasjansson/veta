@@ -154,6 +154,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
                 title: body.title,
                 body: body.body,
                 tags: body.tags,
+                references: body.references,
             };
 
             match service.update_note(id, update).await {
