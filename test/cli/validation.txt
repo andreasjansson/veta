@@ -176,6 +176,16 @@ Error: Veta is already initialized in this directory. Use --reinitialize to dele
 exit: 1
 
 ===
+veta init --reinitialize deletes and recreates database
+===
+veta add --title "Before reinit" --tags "test" --body "This note will be deleted"
+veta init --reinitialize
+veta ls
+---
+Added note {{ id: number }}
+Reinitialized veta database in .veta/db.sqlite
+
+===
 veta commands fail without init
 ===
 cd /tmp && rm -rf veta-no-init-test && mkdir veta-no-init-test && cd veta-no-init-test && veta ls 2>&1 ; echo "exit: $?"
