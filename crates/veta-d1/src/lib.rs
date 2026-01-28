@@ -48,6 +48,81 @@ impl D1DatabaseWrapper {
                 .await
                 .map_err(|e| Error::Database(e.to_string()))?;
         }
+
+        // Migration 0002: Add references column (ignore error if column already exists)
+        let _ = self.db
+            .prepare("ALTER TABLE notes ADD COLUMN \"references\" TEXT NOT NULL DEFAULT '[]'")
+            .run()
+            .await;
+
+        Ok(())
+    }
+
+    fn parse_tags(tags_str: Option<String>) -> Vec<String> {
+        let mut tags: Vec<String> = tags_str
+            .map(|s| {
+                s.split(',')
+                    .map(String::from)
+                    .filter(|s| !s.is_empty())
+                    .collect()
+            })
+            .unwrap_or_default();
+        tags.sort();
+        tags
+    }
+
+    fn parse_references(refs_str: Option<String>) -> Vec<String> {
+        refs_str
+            .and_then(|s| serde_json::from_str(&s).ok())
+            .unwrap_or_default()
+    }
+
+    fn serialize_references(refs: &[String]) -> String {
+        serde_json::to_string(refs).unwrap_or_else(|_| "[]".to_string())
+    }
+}
+
+#[derive(Deserialize)]
+struct NoteIdRow {
+    id: i64,
+}
+
+#[derive(Deserialize)]
+struct NoteRow {
+    id: i64,
+    title: String,
+    body: String,
+    updated_at: String,
+    references: Option<String>,
+    tags: Option<String>,
+}
+
+impl NoteRow {
+    fn into_note(self) -> Note {
+        Note {
+            id: self.id,
+            title: self.title,
+            body: self.body,
+            updated_at: self.updated_at,
+            references: D1DatabaseWrapper::parse_references(self.references),
+            tags: D1DatabaseWrapper::parse_tags(self.tags),
+        }
+    }
+}
+
+#[derive(Deserialize)]
+struct TagCountRow {
+    name: String,
+    count: i64,
+}
+
+#[derive(Deserialize)
+            self.db
+                .prepare(sql)
+                .run()
+                .await
+                .map_err(|e| Error::Database(e.to_string()))?;
+        }
         Ok(())
     }
 
