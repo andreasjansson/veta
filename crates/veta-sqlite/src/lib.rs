@@ -100,7 +100,7 @@ impl Database for SqliteDatabase {
 
         let note = conn
             .query_row(
-                "SELECT n.id, n.title, n.body, n.updated_at, GROUP_CONCAT(t.name) as tags
+                "SELECT n.id, n.title, n.body, n.updated_at, n.\"references\", GROUP_CONCAT(t.name) as tags
                  FROM notes n
                  LEFT JOIN note_tags nt ON n.id = nt.note_id
                  LEFT JOIN tags t ON nt.tag_id = t.id
@@ -113,7 +113,8 @@ impl Database for SqliteDatabase {
                         title: row.get(1)?,
                         body: row.get(2)?,
                         updated_at: row.get(3)?,
-                        tags: Self::parse_tags(row.get(4)?),
+                        references: Self::parse_references(row.get(4)?),
+                        tags: Self::parse_tags(row.get(5)?),
                     })
                 },
             )
