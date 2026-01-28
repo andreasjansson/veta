@@ -311,25 +311,59 @@ async fn main() -> Result<()> {
             }
         }
 
-        Commands::Show { id } => match service.get_note(id).await? {
-            Some(note) => {
-                println!("# {}\n", note.title);
-                println!("{}", note.body);
-                println!("\n---\n");
-                println!("Last modified: {}", note.updated_at);
-                println!("Tags: {}", note.tags.join(","));
-                if !note.references.is_empty() {
-                    println!("References:");
-                    for reference in &note.references {
-                        println!("  - {}", reference);
+        Commands::Show { ids, head } => {
+            if ids.is_empty() {
+                eprintln!("No note IDs provided");
+                std::process::exit(1);
+            }
+
+            let mut not_found = Vec::new();
+            let mut first = true;
+
+            for id in &ids {
+                match service.get_note(*id).await? {
+                    Some(note) => {
+                        if !first {
+                            println!("\n{}\n", "=".repeat(40));
+                        }
+                        first = false;
+
+                        println!("# {}\n", note.title);
+                        
+                        // Apply --head if specified
+                        if let Some(n) = head {
+                            let lines: Vec<&str> = note.body.lines().take(n).collect();
+                            println!("{}", lines.join("\n"));
+                            if note.body.lines().count() > n {
+                                println!("...");
+                            }
+                        } else {
+                            println!("{}", note.body);
+                        }
+                        
+                        println!("\n---\n");
+                        println!("Last modified: {}", note.updated_at);
+                        println!("Tags: {}", note.tags.join(","));
+                        if !note.references.is_empty() {
+                            println!("References:");
+                            for reference in &note.references {
+                                println!("  - {}", reference);
+                            }
+                        }
+                    }
+                    None => {
+                        not_found.push(*id);
                     }
                 }
             }
-            None => {
-                eprintln!("Note {} not found", id);
+
+            if !not_found.is_empty() {
+                for id in &not_found {
+                    eprintln!("Note {} not found", id);
+                }
                 std::process::exit(1);
             }
-        },
+        }
 
         Commands::Tags => {
             let tags = service.list_tags().await?;
