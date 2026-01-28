@@ -231,7 +231,7 @@ verify tags updated after deletion
 ===
 veta --db "$CCTR_WORK_DIR/test.db" tags
 ---
-test (1 note)
 another (1 note)
 newtag (1 note)
+test (1 note)
 updated (1 note)
