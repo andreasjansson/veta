@@ -199,7 +199,8 @@ veta ls --from "today"
 veta add --title "Session summary: auth refactor" --tags "sessions,auth" \
   --body "Completed JWT -> session cookie migration. 
 Still TODO: rate limiting on login endpoint.
-Key decision: 15-min session timeout based on security audit."
+Key decision: 15-min session timeout based on security audit." \
+  --references "src/auth/session.rs,src/middleware/auth.rs,docs/security-audit.md"
 ```
 
 ## Common Workflows
