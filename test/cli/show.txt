@@ -1,6 +1,7 @@
 =============================================
-add notes for show tests
+reinitialize and add notes for show tests
 =============================================
+veta init --reinitialize
 veta add --title "First note" --tags "test" --body "Hello world"
 veta add --title "Second note" --tags "test" --body "Goodbye world" --references "src/main.rs,https://example.com"
 veta add --title "Multiline note" --tags "test" --body "Line 1
@@ -9,6 +10,7 @@ Line 3
 Line 4
 Line 5"
 ---------------------------------------------
+Reinitialized veta database in .veta/db.sqlite
 Added note 1
 Added note 2
 Added note 3
