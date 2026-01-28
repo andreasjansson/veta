@@ -12,6 +12,8 @@ Cargo.lock
 # Test artifacts
 /test/**/fixture/.wrangler
 /test/**/fixture/node_modules
+/test/**/fixture/build
+/test/**/fixture/package-lock.json
 *.db
 
 # IDE
