@@ -10,12 +10,40 @@ Veta runs both as a **CLI** (using local SQLite) and as a **Cloudflare Worker** 
 
 ## Table of Contents
 
+- [Claude Code Skill](#claude-code-skill)
 - [CLI Usage](#cli-usage)
 - [Worker Deployment](#worker-deployment)
   - [Standalone Worker](#standalone-worker)
   - [Multi-Worker Architecture](#multi-worker-architecture-service-bindings)
 - [HTTP API](#http-api)
 - [Architecture](#architecture)
+
+## Claude Code Skill
+
+Veta includes a [Claude Code skill](./skills/veta/) that teaches Claude to use Veta as persistent memory. The skill encourages proactive memory writes - documenting decisions, gotchas, and preferences before they're forgotten.
+
+### Installation
+
+```bash
+# Global installation (available in all projects)
+mkdir -p ~/.claude/skills
+ln -s /path/to/veta/skills/veta ~/.claude/skills/veta
+
+# Or project-local installation
+mkdir -p .claude/skills
+cp -r /path/to/veta/skills/veta .claude/skills/
+```
+
+### What the Skill Does
+
+The skill activates when:
+- User says "remember this" or asks Claude to note something
+- Claude learns important project conventions or user preferences
+- Decisions are made that should survive conversation compaction
+- Technical gotchas or workarounds are discovered
+- Work spans multiple sessions
+
+See [skills/veta/SKILL.md](./skills/veta/SKILL.md) for the full skill definition.
 
 ## CLI Usage
 
