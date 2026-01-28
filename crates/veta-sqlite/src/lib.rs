@@ -183,7 +183,8 @@ impl Database for SqliteDatabase {
                     title: row.get(1)?,
                     body: row.get(2)?,
                     updated_at: row.get(3)?,
-                    tags: Self::parse_tags(row.get(4)?),
+                    references: Self::parse_references(row.get(4)?),
+                    tags: Self::parse_tags(row.get(5)?),
                 })
             })
             .map_err(|e| Error::Database(e.to_string()))?
