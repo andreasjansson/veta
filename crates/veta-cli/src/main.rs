@@ -340,6 +340,7 @@ async fn main() -> Result<()> {
             title,
             tags,
             body,
+            references,
         } => {
             let body = if body.is_none() && !is_stdin_tty() {
                 Some(read_stdin()?)
@@ -351,6 +352,7 @@ async fn main() -> Result<()> {
                 title,
                 body,
                 tags: tags.map(|t| parse_tags(&t)),
+                references: references.map(|r| parse_tags(&r)),
             };
 
             let mut updated_fields = Vec::new();
@@ -362,6 +364,9 @@ async fn main() -> Result<()> {
             }
             if update.tags.is_some() {
                 updated_fields.push("tags");
+            }
+            if update.references.is_some() {
+                updated_fields.push("references");
             }
 
             if updated_fields.is_empty() {
