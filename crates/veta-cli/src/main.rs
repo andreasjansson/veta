@@ -3,7 +3,7 @@
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use std::io::{self, Read};
-use veta_core::{NoteQuery, UpdateNote, VetaService};
+use veta_core::{parse_human_date, NoteQuery, UpdateNote, VetaService};
 use veta_sqlite::SqliteDatabase;
 
 #[derive(Parser)]
