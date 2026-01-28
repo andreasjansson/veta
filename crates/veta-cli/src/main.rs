@@ -4,7 +4,7 @@ use anyhow::{bail, Context, Result};
 use clap::{Parser, Subcommand};
 use std::io::{self, Read};
 use std::path::{Path, PathBuf};
-use veta_core::{dateparse, NoteQuery, UpdateNote, VetaService};
+use veta_core::{parse_human_date, NoteQuery, UpdateNote, VetaService};
 use veta_sqlite::SqliteDatabase;
 
 const VETA_DIR: &str = ".veta";
