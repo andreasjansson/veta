@@ -98,6 +98,9 @@ echo "Updated content..." | veta edit 42
 
 # Update metadata
 veta edit 42 --title "New title" --tags "new,tags"
+
+# Update references
+veta edit 42 --references "src/new_location.rs:100,https://new-docs.example.com"
 ```
 
 ### Delete outdated notes
