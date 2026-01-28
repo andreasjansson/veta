@@ -1,24 +1,28 @@
 //! Veta CLI - memory and knowledge base for agents.
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use clap::{Parser, Subcommand};
 use std::io::{self, Read};
-use veta_core::{parse_human_date, NoteQuery, UpdateNote, VetaService};
+use std::path::{Path, PathBuf};
+use veta_core::{NoteQuery, UpdateNote, VetaService};
 use veta_sqlite::SqliteDatabase;
+
+mod dateparse;
+
+const VETA_DIR: &str = ".veta";
+const DB_FILE: &str = "db.sqlite";
 
 #[derive(Parser)]
 #[command(name = "veta", about = "Memory and knowledge base for agents")]
 struct Cli {
-    /// Database path (default: ~/.veta/notes.db)
-    #[arg(long, env = "VETA_DB_PATH")]
-    db: Option<String>,
-
     #[command(subcommand)]
     command: Commands,
 }
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Initialize a new veta database in the current directory
+    Init,
     /// Add a new note
     Add {
         /// Note title
@@ -36,7 +40,7 @@ enum Commands {
         /// Filter by comma-separated tags
         #[arg(long)]
         tags: Option<String>,
-        /// Filter notes updated after this time
+        /// Filter notes updated after this time (e.g., "2 days ago", "2024-01-01")
         #[arg(long)]
         from: Option<String>,
         /// Filter notes updated before this time
@@ -85,9 +89,111 @@ enum Commands {
     },
 }
 
-fn get_default_db_path() -> String {
-    let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
-    format!("{}/.veta/notes.db", home)
+/// Find the .veta directory by searching up from current directory
+fn find_veta_dir() -> Option<PathBuf> {
+    let mut current = std::env::current_dir().ok()?;
+    loop {
+        let veta_path = current.join(VETA_DIR);
+        if veta_path.is_dir() {
+            return Some(veta_path);
+        }
+        if !current.pop() {
+            return None;
+        }
+    }
+}
+
+/// Get the database path, or error if not initialized
+fn get_db_path() -> Result<PathBuf> {
+    match find_veta_dir() {
+        Some(veta_dir) => Ok(veta_dir.join(DB_FILE)),
+        None => bail!(
+            "No .veta directory found. Run 'veta init' to initialize a new database."
+        ),
+    }
+}
+
+/// Check if the database is valid/uncorrupted
+fn check_database_integrity(path: &Path) -> Result<bool> {
+    use rusqlite::Connection;
+    
+    let conn = match Connection::open(path) {
+        Ok(c) => c,
+        Err(_) => return Ok(false),
+    };
+    
+    // Run SQLite integrity check
+    let result: Result<String, _> = conn.query_row("PRAGMA integrity_check", [], |row| row.get(0));
+    
+    match result {
+        Ok(status) => Ok(status == "ok"),
+        Err(_) => Ok(false),
+    }
+}
+
+/// Attempt to recover a corrupted database
+fn attempt_recovery(path: &Path) -> Result<bool> {
+    use rusqlite::Connection;
+    
+    // Try to open and run recovery
+    let conn = match Connection::open(path) {
+        Ok(c) => c,
+        Err(_) => return Ok(false),
+    };
+    
+    // Try to recover using VACUUM (can fix some issues)
+    if conn.execute("VACUUM", []).is_ok() {
+        // Re-check integrity
+        let result: Result<String, _> = conn.query_row("PRAGMA integrity_check", [], |row| row.get(0));
+        if let Ok(status) = result {
+            if status == "ok" {
+                return Ok(true);
+            }
+        }
+    }
+    
+    Ok(false)
+}
+
+/// Open the database, checking for corruption
+fn open_database(path: &Path) -> Result<SqliteDatabase> {
+    // Check if file exists
+    if !path.exists() {
+        bail!(
+            "Database file not found at {}. Run 'veta init' to create a new database.",
+            path.display()
+        );
+    }
+    
+    // Check integrity
+    if !check_database_integrity(path)? {
+        eprintln!("Warning: Database corruption detected. Attempting recovery...");
+        
+        if attempt_recovery(path)? {
+            eprintln!("Recovery successful!");
+        } else {
+            // Backup the corrupted file
+            let backup_path = path.with_extension("sqlite.corrupted");
+            if std::fs::rename(path, &backup_path).is_ok() {
+                bail!(
+                    "Database is corrupted and could not be recovered.\n\
+                     The corrupted file has been moved to: {}\n\
+                     Run 'veta init' to create a new database.",
+                    backup_path.display()
+                );
+            } else {
+                bail!(
+                    "Database is corrupted and could not be recovered.\n\
+                     Please remove {} and run 'veta init' to create a new database.",
+                    path.display()
+                );
+            }
+        }
+    }
+    
+    let db = SqliteDatabase::open(path).context("Failed to open database")?;
+    db.run_migrations().context("Failed to run migrations")?;
+    Ok(db)
 }
 
 fn parse_tags(tags: &str) -> Vec<String> {
@@ -113,18 +219,39 @@ fn is_stdin_tty() -> bool {
 async fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    let db_path = cli.db.unwrap_or_else(get_default_db_path);
-
-    // Ensure directory exists
-    if let Some(parent) = std::path::Path::new(&db_path).parent() {
-        std::fs::create_dir_all(parent).context("Failed to create database directory")?;
+    match cli.command {
+        Commands::Init => {
+            let veta_dir = PathBuf::from(VETA_DIR);
+            let db_path = veta_dir.join(DB_FILE);
+            
+            if veta_dir.exists() {
+                if db_path.exists() {
+                    bail!("Veta is already initialized in this directory.");
+                }
+            } else {
+                std::fs::create_dir_all(&veta_dir)
+                    .context("Failed to create .veta directory")?;
+            }
+            
+            let db = SqliteDatabase::open(&db_path)
+                .context("Failed to create database")?;
+            db.run_migrations()
+                .context("Failed to initialize database schema")?;
+            
+            println!("Initialized veta database in {}", db_path.display());
+            return Ok(());
+        }
+        _ => {}
     }
 
-    let db = SqliteDatabase::open(&db_path).context("Failed to open database")?;
-    db.run_migrations().context("Failed to run migrations")?;
+    // All other commands need the database
+    let db_path = get_db_path()?;
+    let db = open_database(&db_path)?;
     let service = VetaService::new(db);
 
     match cli.command {
+        Commands::Init => unreachable!(),
+        
         Commands::Add { title, tags, body } => {
             let body = match body {
                 Some(b) => b,
@@ -141,20 +268,13 @@ async fn main() -> Result<()> {
             to,
             head,
         } => {
-            // Parse human-readable dates
-            let from = from.and_then(|s| {
-                parse_human_date(&s).or_else(|| {
-                    eprintln!("Warning: could not parse --from date: {}", s);
-                    None
-                })
-            });
-            let to = to.and_then(|s| {
-                parse_human_date(&s).or_else(|| {
-                    eprintln!("Warning: could not parse --to date: {}", s);
-                    None
-                })
-            });
-
+            let from = from
+                .map(|s| dateparse::parse_datetime_to_sqlite(&s))
+                .transpose()?;
+            let to = to
+                .map(|s| dateparse::parse_datetime_to_sqlite(&s))
+                .transpose()?;
+            
             let query = NoteQuery {
                 tags: tags.map(|t| parse_tags(&t)),
                 from,
