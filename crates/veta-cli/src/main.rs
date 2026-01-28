@@ -20,7 +20,11 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     /// Initialize a new veta database in the current directory
-    Init,
+    Init {
+        /// Delete existing database and reinitialize
+        #[arg(long)]
+        reinitialize: bool,
+    },
     /// Add a new note
     Add {
         /// Note title
