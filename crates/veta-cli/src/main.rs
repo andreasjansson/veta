@@ -51,7 +51,7 @@ enum Commands {
         #[arg(long)]
         to: Option<String>,
         /// Number of notes to show (0 for all)
-        #[arg(short = 'n', long, default_value = "20")]
+        #[arg(short = 'n', long, default_value = "100")]
         head: i64,
     },
     /// Show one or more notes
@@ -302,19 +302,36 @@ async fn main() -> Result<()> {
             let to = to
                 .map(|s| parse_human_date(&s))
                 .transpose()?;
+            let tags = tags.map(|t| parse_tags(&t));
             
             let query = NoteQuery {
-                tags: tags.map(|t| parse_tags(&t)),
-                from,
-                to,
+                tags: tags.clone(),
+                from: from.clone(),
+                to: to.clone(),
                 limit: Some(head),
             };
             let notes = service.list_notes(query).await?;
+            let num_notes = notes.len() as i64;
+            
             for note in notes {
                 println!(
                     "{}: {} ({}) -- {}",
                     note.id, note.title, note.updated_at, note.body_preview
                 );
+            }
+            
+            // Show truncation message if there are more notes
+            if head > 0 && num_notes >= head {
+                let count_query = NoteQuery {
+                    tags,
+                    from,
+                    to,
+                    limit: None,
+                };
+                let total = service.count_notes(count_query).await?;
+                if total > head {
+                    println!("[Showing the latest {}/{} notes]", head, total);
+                }
             }
         }
 

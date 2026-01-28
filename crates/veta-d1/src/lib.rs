@@ -274,6 +274,48 @@ impl Database for D1DatabaseWrapper {
         Ok(rows.into_iter().map(|r| r.into_note()).collect())
     }
 
+    async fn count_notes(&self, query: NoteQuery) -> Result<i64, Error> {
+        let result = if let Some(ref tags) = query.tags {
+            if !tags.is_empty() {
+                let tags_list = tags
+                    .iter()
+                    .map(|t| format!("'{}'", t.replace('\'', "''")))
+                    .collect::<Vec<_>>()
+                    .join(",");
+
+                let sql = format!(
+                    "SELECT COUNT(DISTINCT n.id) as count FROM notes n
+                     WHERE n.id IN (
+                         SELECT note_id FROM note_tags nt2
+                         JOIN tags t2 ON nt2.tag_id = t2.id
+                         WHERE t2.name IN ({})
+                     )",
+                    tags_list
+                );
+
+                self.db
+                    .prepare(&sql)
+                    .first::<CountRow>(None)
+                    .await
+                    .map_err(|e| Error::Database(e.to_string()))?
+            } else {
+                self.db
+                    .prepare("SELECT COUNT(*) as count FROM notes")
+                    .first::<CountRow>(None)
+                    .await
+                    .map_err(|e| Error::Database(e.to_string()))?
+            }
+        } else {
+            self.db
+                .prepare("SELECT COUNT(*) as count FROM notes")
+                .first::<CountRow>(None)
+                .await
+                .map_err(|e| Error::Database(e.to_string()))?
+        };
+
+        Ok(result.map(|r| r.count).unwrap_or(0))
+    }
+
     async fn update_note(&self, id: i64, update: UpdateNote) -> Result<bool, Error> {
         // Check if note exists
         let count_stmt = self

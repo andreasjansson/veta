@@ -194,6 +194,52 @@ impl Database for SqliteDatabase {
         Ok(notes)
     }
 
+    async fn count_notes(&self, query: NoteQuery) -> Result<i64, Error> {
+        let conn = self.conn.lock().unwrap();
+
+        let mut sql = String::from("SELECT COUNT(DISTINCT n.id) FROM notes n");
+
+        let mut conditions = Vec::new();
+        let mut params_vec: Vec<String> = Vec::new();
+
+        if let Some(ref tags) = query.tags {
+            if !tags.is_empty() {
+                let placeholders: Vec<_> = (0..tags.len()).map(|i| format!("?{}", i + 1)).collect();
+                conditions.push(format!(
+                    "n.id IN (SELECT note_id FROM note_tags nt2 
+                              JOIN tags t2 ON nt2.tag_id = t2.id 
+                              WHERE t2.name IN ({}))",
+                    placeholders.join(",")
+                ));
+                params_vec.extend(tags.clone());
+            }
+        }
+
+        if let Some(ref from) = query.from {
+            conditions.push(format!("n.updated_at >= ?{}", params_vec.len() + 1));
+            params_vec.push(from.clone());
+        }
+
+        if let Some(ref to) = query.to {
+            conditions.push(format!("n.updated_at <= ?{}", params_vec.len() + 1));
+            params_vec.push(to.clone());
+        }
+
+        if !conditions.is_empty() {
+            sql.push_str(" WHERE ");
+            sql.push_str(&conditions.join(" AND "));
+        }
+
+        let params_refs: Vec<&dyn rusqlite::ToSql> =
+            params_vec.iter().map(|p| p as &dyn rusqlite::ToSql).collect();
+
+        let count: i64 = conn
+            .query_row(&sql, params_refs.as_slice(), |row| row.get(0))
+            .map_err(|e| Error::Database(e.to_string()))?;
+
+        Ok(count)
+    }
+
     async fn update_note(&self, id: i64, update: UpdateNote) -> Result<bool, Error> {
         let conn = self.conn.lock().unwrap();
 

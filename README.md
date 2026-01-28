@@ -98,7 +98,7 @@ $ veta ls gotchas --from "1 week ago" --to "now"
 # `--from` and `--to` can be used together or individually
 ```
 
-To avoid token explosions, we only show the latest 20 notes in the tag by default. To see more notes, use `--head/-n`, where the argument `0` lists all notes in the tag
+To avoid token explosions, we only show the latest 100 notes by default. If there are more, a message like `[Showing the latest 100/250 notes]` is displayed. Use `--head/-n` to change the limit, where `0` shows all notes.
 
 ### Show notes
 

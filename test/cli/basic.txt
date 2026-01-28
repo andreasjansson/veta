@@ -88,6 +88,7 @@ veta ls -n 2
 -----
 3: Third note ({{ modified3 }}) -- Other content
 2: Second note ({{ modified2 }}) -- Goodbye world
+[Showing the latest 2/3 notes]
 
 =====
 list notes with limit 0 shows all

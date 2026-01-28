@@ -57,12 +57,17 @@ impl<D: Database> VetaService<D> {
             limit: match query.limit {
                 Some(0) => None,
                 Some(n) => Some(n),
-                None => Some(20),
+                None => Some(100),
             },
             ..query
         };
         let notes = self.db.list_notes(query).await?;
         Ok(notes.into_iter().map(|n| n.to_summary(60)).collect())
+    }
+
+    /// Count notes matching the query (ignores limit).
+    pub async fn count_notes(&self, query: NoteQuery) -> Result<i64, Error> {
+        self.db.count_notes(query).await
     }
 
     /// Update an existing note.

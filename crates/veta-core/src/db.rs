@@ -15,6 +15,9 @@ pub trait Database {
     /// List notes matching the query.
     async fn list_notes(&self, query: NoteQuery) -> Result<Vec<Note>, Error>;
 
+    /// Count notes matching the query (ignores limit).
+    async fn count_notes(&self, query: NoteQuery) -> Result<i64, Error>;
+
     /// Update an existing note.
     async fn update_note(&self, id: i64, update: UpdateNote) -> Result<bool, Error>;
 
