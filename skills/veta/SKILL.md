@@ -63,7 +63,14 @@ veta add --title "User prefers explicit types" --tags "preferences,coding-style"
 
 # Long notes via stdin
 echo "Detailed explanation..." | veta add --title "API rate limiting" --tags "gotchas,api"
+
+# Include references to source code, URLs, or docs for context
+veta add --title "Auth token refresh bug" --tags "debugging,auth" \
+  --body "Token refresh was failing silently. Fixed by checking expiry before refresh." \
+  --references "src/auth/token.rs:142,https://docs.rs/jsonwebtoken"
 ```
+
+References are optional comma-separated pointers to source code locations (e.g., `src/file.rs:42`), URLs, or documentation links that provide context for the note.
 
 ### Find and read notes
 
