@@ -1,8 +1,10 @@
 ===
-add note with body from stdin
+reinitialize and add note with body from stdin
 ===
+veta init --reinitialize
 echo "Content from stdin" | veta add --title "Stdin note" --tags "stdin,test"
 ---
+Reinitialized veta database in .veta/db.sqlite
 Added note {{ id }}
 ---
 where
@@ -11,7 +13,7 @@ where
 ====
 verify stdin content was saved
 ====
-veta show 4
+veta show 1
 ----
 # Stdin note
 
