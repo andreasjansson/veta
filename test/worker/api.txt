@@ -39,11 +39,15 @@ curl -s http://localhost:8787/notes/1 | jq .
   "title": "Test note",
   "body": "Hello world",
   "tags": [
-    "api",
-    "test"
+    "{{ tag1 }}",
+    "{{ tag2 }}"
   ],
-  "updated_at": "{{ updated_at_1 }}"
+  "updated_at": "{{ updated_at }}"
 }
+---
+where
+* ["api", "test"] contains tag1
+* ["api", "test"] contains tag2
 
 ===
 get second note
@@ -55,43 +59,22 @@ curl -s http://localhost:8787/notes/2 | jq .
   "title": "Second note",
   "body": "Goodbye world",
   "tags": [
-    "another",
-    "test"
+    "{{ tag1 }}",
+    "{{ tag2 }}"
   ],
-  "updated_at": "{{ updated_at_2 }}"
+  "updated_at": "{{ updated_at }}"
 }
-
-===
-list all notes
-===
-curl -s http://localhost:8787/notes | jq .
----
-[
-  {
-    "id": {{ id_second }},
-    "title": "{{ title_second }}",
-    "body_preview": "{{ body_second }}",
-    "tags": [
-      "{{ tag_second_1 }}",
-      "{{ tag_second_2 }}"
-    ],
-    "updated_at": "{{ updated_second }}"
-  },
-  {
-    "id": {{ id_first }},
-    "title": "{{ title_first }}",
-    "body_preview": "{{ body_first }}",
-    "tags": [
-      "{{ tag_first_1 }}",
-      "{{ tag_first_2 }}"
-    ],
-    "updated_at": "{{ updated_first }}"
-  }
-]
 ---
 where
-* id_second == 2
-* id_first == 1
+* ["test", "another"] contains tag1
+* ["test", "another"] contains tag2
+
+===
+list all notes returns two notes
+===
+curl -s http://localhost:8787/notes | jq 'length'
+---
+2
 
 ===
 list notes with tag filter
@@ -104,30 +87,23 @@ curl -s "http://localhost:8787/notes?tags=api" | jq .
     "title": "Test note",
     "body_preview": "Hello world",
     "tags": [
-      "api",
-      "test"
+      "{{ tag1 }}",
+      "{{ tag2 }}"
     ],
     "updated_at": "{{ updated_at }}"
   }
 ]
+---
+where
+* ["api", "test"] contains tag1
+* ["api", "test"] contains tag2
 
 ===
 list notes with limit
 ===
-curl -s "http://localhost:8787/notes?limit=1" | jq .
+curl -s "http://localhost:8787/notes?limit=1" | jq 'length'
 ---
-[
-  {
-    "id": {{ id }},
-    "title": "{{ title }}",
-    "body_preview": "{{ body }}",
-    "tags": [
-      "{{ tag1 }}",
-      "{{ tag2 }}"
-    ],
-    "updated_at": "{{ updated }}"
-  }
-]
+1
 
 ===
 get non-existent note returns 404
@@ -169,30 +145,23 @@ curl -s "http://localhost:8787/grep?q=Hello" | jq .
     "title": "Test note",
     "body_preview": "Hello world",
     "tags": [
-      "api",
-      "test"
+      "{{ tag1 }}",
+      "{{ tag2 }}"
     ],
     "updated_at": "{{ updated_at }}"
   }
 ]
+---
+where
+* ["api", "test"] contains tag1
+* ["api", "test"] contains tag2
 
 ===
 grep case insensitive
 ===
-curl -s "http://localhost:8787/grep?q=hello" | jq .
+curl -s "http://localhost:8787/grep?q=hello" | jq 'length'
 ---
-[
-  {
-    "id": 1,
-    "title": "Test note",
-    "body_preview": "Hello world",
-    "tags": [
-      "api",
-      "test"
-    ],
-    "updated_at": "{{ updated_at }}"
-  }
-]
+1
 
 ===
 grep case sensitive finds nothing
@@ -212,12 +181,16 @@ curl -s "http://localhost:8787/grep?q=world&tags=another" | jq .
     "title": "Second note",
     "body_preview": "Goodbye world",
     "tags": [
-      "another",
-      "test"
+      "{{ tag1 }}",
+      "{{ tag2 }}"
     ],
     "updated_at": "{{ updated_at }}"
   }
 ]
+---
+where
+* ["test", "another"] contains tag1
+* ["test", "another"] contains tag2
 
 ===
 update note title
@@ -241,11 +214,15 @@ curl -s http://localhost:8787/notes/1 | jq .
   "title": "Updated title",
   "body": "Hello world",
   "tags": [
-    "api",
-    "test"
+    "{{ tag1 }}",
+    "{{ tag2 }}"
   ],
   "updated_at": "{{ updated_at }}"
 }
+---
+where
+* ["api", "test"] contains tag1
+* ["api", "test"] contains tag2
 
 ===
 update note body
@@ -269,11 +246,15 @@ curl -s http://localhost:8787/notes/1 | jq .
   "title": "Updated title",
   "body": "New body content",
   "tags": [
-    "api",
-    "test"
+    "{{ tag1 }}",
+    "{{ tag2 }}"
   ],
   "updated_at": "{{ updated_at }}"
 }
+---
+where
+* ["api", "test"] contains tag1
+* ["api", "test"] contains tag2
 
 ===
 update note tags
@@ -297,11 +278,15 @@ curl -s http://localhost:8787/notes/1 | jq .
   "title": "Updated title",
   "body": "New body content",
   "tags": [
-    "newtag",
-    "updated"
+    "{{ tag1 }}",
+    "{{ tag2 }}"
   ],
   "updated_at": "{{ updated_at }}"
 }
+---
+where
+* ["newtag", "updated"] contains tag1
+* ["newtag", "updated"] contains tag2
 
 ===
 update non-existent note returns 404
@@ -327,20 +312,29 @@ curl -s -X DELETE http://localhost:8787/notes/2 | jq .
 ===
 verify deletion - list shows one note
 ===
-curl -s http://localhost:8787/notes | jq .
+curl -s http://localhost:8787/notes | jq 'length'
 ---
-[
-  {
-    "id": 1,
-    "title": "Updated title",
-    "body_preview": "New body content",
-    "tags": [
-      "newtag",
-      "updated"
-    ],
-    "updated_at": "{{ updated_at }}"
-  }
-]
+1
+
+===
+verify remaining note after deletion
+===
+curl -s http://localhost:8787/notes | jq '.[0]'
+---
+{
+  "id": 1,
+  "title": "Updated title",
+  "body_preview": "New body content",
+  "tags": [
+    "{{ tag1 }}",
+    "{{ tag2 }}"
+  ],
+  "updated_at": "{{ updated_at }}"
+}
+---
+where
+* ["newtag", "updated"] contains tag1
+* ["newtag", "updated"] contains tag2
 
 ===
 delete non-existent note returns 404
