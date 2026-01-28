@@ -17,6 +17,7 @@ impl<D: Database> VetaService<D> {
         title: String,
         body: String,
         tags: Vec<String>,
+        references: Vec<String>,
     ) -> Result<i64, Error> {
         // Validation
         let title = title.trim().to_string();
@@ -33,7 +34,15 @@ impl<D: Database> VetaService<D> {
         tags.sort();
         tags.dedup();
 
-        self.db.add_note(CreateNote { title, body, tags }).await
+        // Normalize references: trim, deduplicate, remove empty
+        let mut references: Vec<String> = references
+            .into_iter()
+            .map(|r| r.trim().to_string())
+            .filter(|r| !r.is_empty())
+            .collect();
+        references.dedup();
+
+        self.db.add_note(CreateNote { title, body, tags, references }).await
     }
 
     /// Get a note by ID.
