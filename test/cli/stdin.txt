@@ -17,6 +17,7 @@ veta show 4
 
 Content from stdin
 
+
 ---
 
 Last modified: {{ modified }}
@@ -63,6 +64,7 @@ veta show 4
 # Stdin note
 
 Updated via stdin
+
 
 ---
 
