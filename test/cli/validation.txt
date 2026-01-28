@@ -45,11 +45,11 @@ veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "Lowercase test" --tag
 ---
 Added note 1
 
-===
+====
 verify tags are lowercase
-===
+====
 veta --db "$CCTR_WORK_DIR/validation-test.db" show 1
----
+----
 # Lowercase test
 
 body
@@ -66,11 +66,11 @@ veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "Dedup test" --tags "d
 ---
 Added note 2
 
-===
+====
 verify duplicate tags are removed
-===
+====
 veta --db "$CCTR_WORK_DIR/validation-test.db" show 2
----
+----
 # Dedup test
 
 body
@@ -87,11 +87,11 @@ veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "Empty tag test" --tag
 ---
 Added note 3
 
-===
+====
 verify empty tags are filtered
-===
+====
 veta --db "$CCTR_WORK_DIR/validation-test.db" show 3
----
+----
 # Empty tag test
 
 body
@@ -108,11 +108,11 @@ veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "Whitespace tag test" 
 ---
 Added note 4
 
-===
+====
 verify tags are trimmed
-===
+====
 veta --db "$CCTR_WORK_DIR/validation-test.db" show 4
----
+----
 # Whitespace tag test
 
 body
@@ -130,11 +130,11 @@ veta --db "$CCTR_WORK_DIR/validation-test.db" edit 1 --title "  " --body "body" 
 Error: validation error: title cannot be empty
 exit: 1
 
-===
+====
 verify note unchanged after failed edit
-===
+====
 veta --db "$CCTR_WORK_DIR/validation-test.db" show 1
----
+----
 # Lowercase test
 
 body
