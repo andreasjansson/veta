@@ -19,11 +19,11 @@ veta --db "$CCTR_WORK_DIR/test.db" add --title "Third note" --tags "other" --bod
 ---
 Added note 3
 
-===
+====
 show first note
-===
+====
 veta --db "$CCTR_WORK_DIR/test.db" show 1
----
+----
 # First note
 
 Hello world
@@ -33,11 +33,11 @@ Hello world
 Last modified: {{ modified }}
 Tags: basic,test
 
-===
+====
 show second note
-===
+====
 veta --db "$CCTR_WORK_DIR/test.db" show 2
----
+----
 # Second note
 
 Goodbye world
@@ -155,11 +155,11 @@ veta --db "$CCTR_WORK_DIR/test.db" edit 1 --title "Updated title" --body "Hello 
 ---
 Edited note 1: Updated title, body
 
-===
+====
 verify title was updated
-===
+====
 veta --db "$CCTR_WORK_DIR/test.db" show 1
----
+----
 # Updated title
 
 Hello world
@@ -176,11 +176,11 @@ veta --db "$CCTR_WORK_DIR/test.db" edit 1 --body "New body content"
 ---
 Edited note 1: Updated body
 
-===
+====
 verify body was updated
-===
+====
 veta --db "$CCTR_WORK_DIR/test.db" show 1
----
+----
 # Updated title
 
 New body content
@@ -197,11 +197,11 @@ veta --db "$CCTR_WORK_DIR/test.db" edit 1 --tags "updated,newtag" --body "New bo
 ---
 Edited note 1: Updated body, tags
 
-===
+====
 verify tags were updated
-===
+====
 veta --db "$CCTR_WORK_DIR/test.db" show 1
----
+----
 # Updated title
 
 New body content
