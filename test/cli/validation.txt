@@ -1,4 +1,11 @@
 ===
+reinitialize database for validation tests
+===
+veta init --reinitialize
+---
+Reinitialized veta database in .veta/db.sqlite
+
+===
 reject empty title
 ===
 veta add --title "  " --tags "test" --body "body" 2>&1 ; echo "exit: $?"
