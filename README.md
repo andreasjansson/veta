@@ -126,9 +126,13 @@ References are only shown if the note has any.
 $ echo "my new body content..." | veta edit 71
 Edited note 71: Updated body
 
-# For short notes, use `--body`. You can also edit tags and title
+# For short notes, use `--body`. You can also edit tags, title, and references
 $ veta edit 71 --title "My new title" --tags "comma,separated,tags" --body "Short body"
 Edited note 71: Updated title, tags, body
+
+# Update references
+$ veta edit 71 --references "src/new_file.rs,https://docs.example.com"
+Edited note 71: Updated references
 ```
 
 ### Delete notes
