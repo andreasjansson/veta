@@ -2,8 +2,7 @@ name = "veta-test"
 main = "build/worker/shim.mjs"
 compatibility_date = "2025-01-01"
 
-[build]
-command = "cargo install -q worker-build && worker-build --release"
+# No build command - we use pre-built artifacts
 
 [[d1_databases]]
 binding = "VETA_DB"
