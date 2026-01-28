@@ -1,0 +1,16 @@
+[package]
+name = "veta-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "veta"
+path = "src/main.rs"
+
+[dependencies]
+veta-core.workspace = true
+veta-sqlite.workspace = true
+clap.workspace = true
+tokio.workspace = true
+anyhow.workspace = true
