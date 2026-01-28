@@ -267,7 +267,7 @@ async fn main() -> Result<()> {
     let service = VetaService::new(db);
 
     match cli.command {
-        Commands::Init => unreachable!(),
+        Commands::Init { .. } => unreachable!(),
         
         Commands::Add { title, tags, body, references } => {
             let body = match body {
