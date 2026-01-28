@@ -114,7 +114,9 @@ body line 2
 
 Last modified: 2026-01-07 11:41
 Tags: testing,implementation-notes
-References: src/auth.rs:42, https://jwt.io/introduction
+References:
+  - src/auth.rs:42
+  - https://jwt.io/introduction
 ```
 
 References are only shown if the note has any.
