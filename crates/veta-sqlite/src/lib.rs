@@ -37,6 +37,8 @@ impl SqliteDatabase {
         let conn = self.conn.lock().unwrap();
         conn.execute_batch(include_str!("../../../schema/migrations/0001_initial.sql"))
             .map_err(|e| Error::Database(e.to_string()))?;
+        // Migration 0002: Add references column (ignore error if column already exists)
+        let _ = conn.execute_batch(include_str!("../../../schema/migrations/0002_add_references.sql"));
         Ok(())
     }
 
@@ -46,6 +48,16 @@ impl SqliteDatabase {
             .unwrap_or_default();
         tags.sort();
         tags
+    }
+
+    fn parse_references(refs_str: Option<String>) -> Vec<String> {
+        refs_str
+            .and_then(|s| serde_json::from_str(&s).ok())
+            .unwrap_or_default()
+    }
+
+    fn serialize_references(refs: &[String]) -> String {
+        serde_json::to_string(refs).unwrap_or_else(|_| "[]".to_string())
     }
 }
 
