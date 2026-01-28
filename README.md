@@ -19,6 +19,17 @@ Veta runs both as a **CLI** (using local SQLite) and as a **Cloudflare Worker** 
 
 ## CLI Usage
 
+### Initialize
+
+Before using Veta, initialize a database in your project directory:
+
+```
+$ veta init
+Initialized veta database in .veta/db.sqlite
+```
+
+This creates a `.veta` directory with the SQLite database. Veta commands work from this directory and any subdirectory (it searches up the tree for `.veta`).
+
 ### Add note
 
 ```
@@ -46,10 +57,10 @@ debugging (9 notes)
 ### List notes within a tag
 
 ```
-# List tags within one or more tags
+# List notes within one or more tags
 $ veta ls --tags testing
-78: Second issue note (2026-01-28 10:35 UTC) -- Second testing body truncated...
-41: First testing note (2026-01-26 22:30 UTC) -- First testing body truncated...
+78: Second issue note (2026-01-28 10:35) -- Second testing body truncated...
+41: First testing note (2026-01-26 22:30) -- First testing body truncated...
 
 # List all notes
 $ veta ls
@@ -79,20 +90,20 @@ body line 2
 
 ---
 
-Last modified: 2026-01-07 11:41 UTC
+Last modified: 2026-01-07 11:41
 Tags: testing,implementation-notes
 ```
 
 ### Edit notes
 
 ```
-# For long content, pipe stdin to `veta add`
+# For long content, pipe stdin to `veta edit`
 $ echo "my new body content..." | veta edit 71
-Edited note 1: Updated body
+Edited note 71: Updated body
 
-# For short notes, use `--body`. You can also edit tags and body
+# For short notes, use `--body`. You can also edit tags and title
 $ veta edit 71 --title "My new title" --tags "comma,separated,tags" --body "Short body"
-Edited note 2: Updated title, tags, body
+Edited note 71: Updated title, tags, body
 ```
 
 ### Delete notes
