@@ -243,3 +243,98 @@ mkdir -p subdir/nested && cd subdir/nested && veta ls
 ---
 2: Second note ({{ modified2 }}) -- Goodbye world
 1: Updated title ({{ modified1 }}) -- New body content
+
+===
+add note with multiline body for head test
+===
+veta add --title "Multiline note" --tags "test" --body "Line 1
+Line 2
+Line 3
+Line 4
+Line 5"
+---
+Added note {{ id: number }}
+
+===
+show multiple notes
+===
+veta show 1 2
+---
+# Updated title
+
+New body content
+
+---
+
+Last modified: {{ modified1 }}
+Tags: newtag,updated
+
+========================================
+
+# Second note
+
+Goodbye world
+
+---
+
+Last modified: {{ modified2 }}
+Tags: another,test
+
+===
+show with --head truncates body
+===
+veta show 4 -n 2
+---
+# Multiline note
+
+Line 1
+Line 2
+...
+
+---
+
+Last modified: {{ modified }}
+Tags: test
+
+===
+show multiple with --head
+===
+veta show 1 4 -n 1
+---
+# Updated title
+
+New body content
+
+---
+
+Last modified: {{ modified1 }}
+Tags: newtag,updated
+
+========================================
+
+# Multiline note
+
+Line 1
+...
+
+---
+
+Last modified: {{ modified2 }}
+Tags: test
+
+===
+show with not found note shows error
+===
+veta show 1 999 2>&1 ; echo "exit: $?"
+---
+# Updated title
+
+New body content
+
+---
+
+Last modified: {{ modified }}
+Tags: newtag,updated
+
+Note 999 not found
+exit: 1
