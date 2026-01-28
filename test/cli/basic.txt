@@ -1,0 +1,118 @@
+===
+add a note with body flag
+===
+veta --db "$CCTR_WORK_DIR/test.db" add --title "First note" --tags "test,basic" --body "Hello world"
+---
+Added note 1
+
+===
+add a second note
+===
+veta --db "$CCTR_WORK_DIR/test.db" add --title "Second note" --tags "test,another" --body "Goodbye world"
+---
+Added note 2
+
+===
+list all notes
+===
+veta --db "$CCTR_WORK_DIR/test.db" ls | wc -l | tr -d ' '
+---
+2
+
+===
+list notes with tag filter
+===
+veta --db "$CCTR_WORK_DIR/test.db" ls --tags basic | wc -l | tr -d ' '
+---
+1
+
+===
+show a note
+===
+veta --db "$CCTR_WORK_DIR/test.db" show 1 | head -1
+---
+# First note
+
+===
+show a note body
+===
+veta --db "$CCTR_WORK_DIR/test.db" show 1 | grep "Hello"
+---
+Hello world
+
+===
+show a note tags
+===
+veta --db "$CCTR_WORK_DIR/test.db" show 1 | grep "Tags:"
+---
+Tags: basic,test
+
+===
+list tags
+===
+veta --db "$CCTR_WORK_DIR/test.db" tags | wc -l | tr -d ' '
+---
+3
+
+===
+grep for notes
+===
+veta --db "$CCTR_WORK_DIR/test.db" grep "Hello" | wc -l | tr -d ' '
+---
+1
+
+===
+grep case insensitive
+===
+veta --db "$CCTR_WORK_DIR/test.db" grep "hello" | wc -l | tr -d ' '
+---
+1
+
+===
+grep case sensitive finds nothing
+===
+veta --db "$CCTR_WORK_DIR/test.db" grep -C "hello" | wc -l | tr -d ' '
+---
+0
+
+===
+edit a note title
+===
+veta --db "$CCTR_WORK_DIR/test.db" edit 1 --title "Updated title"
+---
+Edited note 1: Updated title
+
+===
+verify title was updated
+===
+veta --db "$CCTR_WORK_DIR/test.db" show 1 | head -1
+---
+# Updated title
+
+===
+edit a note body
+===
+veta --db "$CCTR_WORK_DIR/test.db" edit 1 --body "New body content"
+---
+Edited note 1: Updated body
+
+===
+verify body was updated
+===
+veta --db "$CCTR_WORK_DIR/test.db" show 1 | grep "New body"
+---
+New body content
+
+===
+delete a note
+===
+veta --db "$CCTR_WORK_DIR/test.db" delete 2
+---
+Deleted note 2
+
+===
+verify note was deleted
+===
+veta --db "$CCTR_WORK_DIR/test.db" ls | wc -l | tr -d ' '
+---
+1
