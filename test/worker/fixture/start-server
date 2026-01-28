@@ -8,13 +8,13 @@ set -e
 pkill -f "wrangler.*veta-test" 2>/dev/null || true
 sleep 0.5
 
-# Build the worker from the main project
-cd ~/projects/veta/crates/veta-worker
-cargo install -q worker-build 2>/dev/null || true
-worker-build --release 2>/dev/null
-
-# Copy build artifacts to fixture
-cp -r build "$CCTR_FIXTURE_DIR/"
+# Build the worker from the main project (if build dir doesn't exist)
+if [ ! -d "$CCTR_FIXTURE_DIR/build" ]; then
+    cd ~/projects/veta/crates/veta-worker
+    cargo install -q worker-build 2>/dev/null || true
+    worker-build --release 2>/dev/null
+    cp -r build "$CCTR_FIXTURE_DIR/"
+fi
 
 # Install wrangler if needed
 cd "$CCTR_FIXTURE_DIR"
