@@ -1,0 +1,140 @@
+=============================================
+add notes for show tests
+=============================================
+veta add --title "First note" --tags "test" --body "Hello world"
+veta add --title "Second note" --tags "test" --body "Goodbye world" --references "src/main.rs,https://example.com"
+veta add --title "Multiline note" --tags "test" --body "Line 1
+Line 2
+Line 3
+Line 4
+Line 5"
+---------------------------------------------
+Added note 1
+Added note 2
+Added note 3
+
+=============================================
+show single note
+=============================================
+veta show 1
+---------------------------------------------
+# First note
+
+Hello world
+
+---
+
+Last modified: {{ modified }}
+Tags: test
+
+=============================================
+show note with references
+=============================================
+veta show 2
+---------------------------------------------
+# Second note
+
+Goodbye world
+
+---
+
+Last modified: {{ modified }}
+Tags: test
+References:
+  - src/main.rs
+  - https://example.com
+
+=============================================
+show multiple notes
+=============================================
+veta show 1 2
+---------------------------------------------
+# First note
+
+Hello world
+
+---
+
+Last modified: {{ modified1 }}
+Tags: test
+
+========================================
+
+# Second note
+
+Goodbye world
+
+---
+
+Last modified: {{ modified2 }}
+Tags: test
+References:
+  - src/main.rs
+  - https://example.com
+
+=============================================
+show with --head truncates body
+=============================================
+veta show 3 -n 2
+---------------------------------------------
+# Multiline note
+
+Line 1
+Line 2
+...
+
+---
+
+Last modified: {{ modified }}
+Tags: test
+
+=============================================
+show multiple with --head
+=============================================
+veta show 1 3 -n 1
+---------------------------------------------
+# First note
+
+Hello world
+
+---
+
+Last modified: {{ modified1 }}
+Tags: test
+
+========================================
+
+# Multiline note
+
+Line 1
+...
+
+---
+
+Last modified: {{ modified2 }}
+Tags: test
+
+=============================================
+show with not found note shows error
+=============================================
+veta show 1 999 2>&1 ; echo "exit: $?"
+---------------------------------------------
+# First note
+
+Hello world
+
+---
+
+Last modified: {{ modified }}
+Tags: test
+
+Note 999 not found
+exit: 1
+
+=============================================
+show no ids provided
+=============================================
+veta show 2>&1 ; echo "exit: $?"
+---------------------------------------------
+No note IDs provided
+exit: 1
