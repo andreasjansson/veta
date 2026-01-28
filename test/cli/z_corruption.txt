@@ -1,12 +1,11 @@
 ===
-setup - add a note first
+reinitialize and add a note first
 ===
+veta init --reinitialize
 veta add --title "Test note" --tags "test" --body "Test content"
 ---
-Added note {{ id }}
----
-where
-* id > 0
+Reinitialized veta database in .veta/db.sqlite
+Added note 1
 
 ===
 corrupt the database
