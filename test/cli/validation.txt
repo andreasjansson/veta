@@ -150,8 +150,8 @@ grep with invalid regex fails gracefully
 veta --db "$CCTR_WORK_DIR/validation-test.db" grep "[invalid" 2>&1 ; echo "exit: $?"
 ---
 Error: validation error: invalid regex: regex parse error:
-    [invalid
-    ^
+    (?i)[invalid
+        ^
 error: unclosed character class
 exit: 1
 
