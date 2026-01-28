@@ -221,7 +221,7 @@ impl Database for D1DatabaseWrapper {
                          LEFT JOIN note_tags nt ON n.id = nt.note_id
                          LEFT JOIN tags t ON nt.tag_id = t.id
                          GROUP BY n.id
-                         ORDER BY n.updated_at DESC
+                         ORDER BY n.updated_at DESC, n.id DESC
                          LIMIT {}",
                         limit
                     ))
@@ -237,7 +237,7 @@ impl Database for D1DatabaseWrapper {
                      LEFT JOIN note_tags nt ON n.id = nt.note_id
                      LEFT JOIN tags t ON nt.tag_id = t.id
                      GROUP BY n.id
-                     ORDER BY n.updated_at DESC
+                     ORDER BY n.updated_at DESC, n.id DESC
                      LIMIT {}",
                     limit
                 ))
