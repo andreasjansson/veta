@@ -161,6 +161,8 @@ Use consistent, descriptive tags:
 - WHY (rationale/context)
 - Example if helpful
 
+**References:** Always include for technical notes - future you needs to find the code!
+
 **Example of a good note:**
 ```bash
 veta add --title "Django ORM: select_related vs prefetch_related" \
@@ -169,7 +171,8 @@ veta add --title "Django ORM: select_related vs prefetch_related" \
 prefetch_related: use for ManyToMany/reverse FK (separate query, then Python join)
 
 Discovered this when N+1 queries caused 10s page loads. 
-Fixed by adding select_related('author') to book queryset."
+Fixed by adding select_related('author') to book queryset." \
+  --references "myapp/views.py:45,myapp/models.py:12"
 ```
 
 ## Session Protocol
