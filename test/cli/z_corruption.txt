@@ -50,11 +50,11 @@ veta init
 ---
 Initialized veta database in .veta/db.sqlite
 
-===
+====
 verify new database works
-===
+====
 veta add --title "Fresh note" --tags "new" --body "After corruption"
----
+----
 Added note 1
 
 ====
