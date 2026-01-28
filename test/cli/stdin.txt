@@ -5,11 +5,11 @@ echo "Content from stdin" | veta --db "$CCTR_WORK_DIR/stdin-test.db" add --title
 ---
 Added note 1
 
-===
+====
 verify stdin content was saved
-===
+====
 veta --db "$CCTR_WORK_DIR/stdin-test.db" show 1
----
+----
 # Stdin note
 
 Content from stdin
@@ -26,11 +26,11 @@ printf "Line one\nLine two\nLine three" | veta --db "$CCTR_WORK_DIR/stdin-test.d
 ---
 Added note 2
 
-===
+====
 verify multiline content was saved
-===
+====
 veta --db "$CCTR_WORK_DIR/stdin-test.db" show 2
----
+----
 # Multiline note
 
 Line one
@@ -49,11 +49,11 @@ echo "Updated via stdin" | veta --db "$CCTR_WORK_DIR/stdin-test.db" edit 1
 ---
 Edited note 1: Updated body
 
-===
+====
 verify stdin edit was saved
-===
+====
 veta --db "$CCTR_WORK_DIR/stdin-test.db" show 1
----
+----
 # Stdin note
 
 Updated via stdin
@@ -70,11 +70,11 @@ printf "New line one\nNew line two" | veta --db "$CCTR_WORK_DIR/stdin-test.db" e
 ---
 Edited note 2: Updated body
 
-===
+====
 verify multiline edit was saved
-===
+====
 veta --db "$CCTR_WORK_DIR/stdin-test.db" show 2
----
+----
 # Multiline note
 
 New line one
