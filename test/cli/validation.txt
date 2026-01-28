@@ -1,9 +1,18 @@
 ===
 reject empty title
 ===
-veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "  " --tags "test" --body "body" 2>&1 | grep -i "empty"
+veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "  " --tags "test" --body "body" 2>&1 ; echo "exit: $?"
 ---
 Error: validation error: title cannot be empty
+exit: 1
+
+===
+reject whitespace-only title
+===
+veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "   	  " --tags "test" --body "body" 2>&1 ; echo "exit: $?"
+---
+Error: validation error: title cannot be empty
+exit: 1
 
 ===
 show non-existent note fails
@@ -32,17 +41,134 @@ exit: 1
 ===
 tags are normalized to lowercase
 ===
-veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "Test" --tags "UPPER,Mixed" --body "body"
-veta --db "$CCTR_WORK_DIR/validation-test.db" show 1 | grep "Tags:"
+veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "Lowercase test" --tags "UPPER,Mixed,lower" --body "body"
 ---
 Added note 1
-Tags: mixed,upper
+
+===
+verify tags are lowercase
+===
+veta --db "$CCTR_WORK_DIR/validation-test.db" show 1
+---
+# Lowercase test
+
+body
+
+---
+
+Last modified: {{ modified }}
+Tags: lower,mixed,upper
 
 ===
 duplicate tags are removed
 ===
-veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "Test2" --tags "dup,dup,DUP" --body "body"
-veta --db "$CCTR_WORK_DIR/validation-test.db" show 2 | grep "Tags:"
+veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "Dedup test" --tags "dup,dup,DUP,Dup" --body "body"
 ---
 Added note 2
+
+===
+verify duplicate tags are removed
+===
+veta --db "$CCTR_WORK_DIR/validation-test.db" show 2
+---
+# Dedup test
+
+body
+
+---
+
+Last modified: {{ modified }}
 Tags: dup
+
+===
+empty tags are filtered out
+===
+veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "Empty tag test" --tags "valid,,also-valid,  " --body "body"
+---
+Added note 3
+
+===
+verify empty tags are filtered
+===
+veta --db "$CCTR_WORK_DIR/validation-test.db" show 3
+---
+# Empty tag test
+
+body
+
+---
+
+Last modified: {{ modified }}
+Tags: also-valid,valid
+
+===
+tags are trimmed of whitespace
+===
+veta --db "$CCTR_WORK_DIR/validation-test.db" add --title "Whitespace tag test" --tags "  spaced  ,  padded  " --body "body"
+---
+Added note 4
+
+===
+verify tags are trimmed
+===
+veta --db "$CCTR_WORK_DIR/validation-test.db" show 4
+---
+# Whitespace tag test
+
+body
+
+---
+
+Last modified: {{ modified }}
+Tags: padded,spaced
+
+===
+edit with empty title fails
+===
+veta --db "$CCTR_WORK_DIR/validation-test.db" edit 1 --title "  " --body "body" 2>&1 ; echo "exit: $?"
+---
+Error: validation error: title cannot be empty
+exit: 1
+
+===
+verify note unchanged after failed edit
+===
+veta --db "$CCTR_WORK_DIR/validation-test.db" show 1
+---
+# Lowercase test
+
+body
+
+---
+
+Last modified: {{ modified }}
+Tags: lower,mixed,upper
+
+===
+grep with invalid regex fails gracefully
+===
+veta --db "$CCTR_WORK_DIR/validation-test.db" grep "[invalid" 2>&1 ; echo "exit: $?"
+---
+Error: validation error: invalid regex: regex parse error:
+    [invalid
+    ^
+error: unclosed character class
+exit: 1
+
+===
+list empty database shows nothing
+===
+veta --db "$CCTR_WORK_DIR/empty.db" ls
+---
+
+===
+tags on empty database shows nothing
+===
+veta --db "$CCTR_WORK_DIR/empty.db" tags
+---
+
+===
+grep on empty database shows nothing
+===
+veta --db "$CCTR_WORK_DIR/empty.db" grep "anything"
+---
