@@ -69,6 +69,9 @@ enum Commands {
         /// New body (reads from stdin if not provided and stdin is not a tty)
         #[arg(long)]
         body: Option<String>,
+        /// New comma-separated references (source code paths, URLs, documentation links, etc.)
+        #[arg(long)]
+        references: Option<String>,
     },
     /// Delete a note
     Delete {
