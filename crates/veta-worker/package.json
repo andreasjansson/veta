@@ -1,0 +1,26 @@
+{
+  "name": "@veta/worker",
+  "version": "0.1.0",
+  "description": "Veta knowledge base - Cloudflare Worker",
+  "main": "build/worker/shim.mjs",
+  "scripts": {
+    "build": "cargo install -q worker-build && worker-build --release",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "files": [
+    "build/",
+    "wrangler.toml"
+  ],
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "veta",
+    "knowledge-base"
+  ],
+  "author": "Andreas Jansson",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^4"
+  }
+}
