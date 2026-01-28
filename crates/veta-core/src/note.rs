@@ -45,6 +45,8 @@ pub struct CreateNote {
     pub title: String,
     pub body: String,
     pub tags: Vec<String>,
+    /// References to external resources (source code paths, URLs, documentation links, etc.)
+    pub references: Vec<String>,
 }
 
 /// Parameters for updating an existing note.
@@ -53,6 +55,8 @@ pub struct UpdateNote {
     pub title: Option<String>,
     pub body: Option<String>,
     pub tags: Option<Vec<String>>,
+    /// References to external resources (source code paths, URLs, documentation links, etc.)
+    pub references: Option<Vec<String>>,
 }
 
 impl Note {
