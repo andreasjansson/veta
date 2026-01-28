@@ -99,7 +99,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
                 Err(e) => return json_error(&format!("Invalid JSON: {}", e), 400),
             };
 
-            match service.add_note(body.title, body.body, body.tags).await {
+            match service.add_note(body.title, body.body, body.tags, body.references).await {
                 Ok(id) => json_response(&IdResponse { id }, 201),
                 Err(e) => json_error(&e.to_string(), 400),
             }
