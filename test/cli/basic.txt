@@ -1,8 +1,10 @@
 ===
-add a note with body flag
+reinitialize and add a note with body flag
 ===
+veta init --reinitialize
 veta add --title "First note" --tags "test,basic" --body "Hello world"
 ---
+Reinitialized veta database in .veta/db.sqlite
 Added note 1
 
 ===
