@@ -290,10 +290,10 @@ The worker exposes a RESTful HTTP API:
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `POST` | `/notes` | Create a note. Body: `{title, body, tags}` |
+| `POST` | `/notes` | Create a note. Body: `{title, body, tags, references?}` |
 | `GET` | `/notes` | List notes. Query: `?tags=a,b&limit=20` |
 | `GET` | `/notes/:id` | Get a single note |
-| `PATCH` | `/notes/:id` | Update a note. Body: `{title?, body?, tags?}` |
+| `PATCH` | `/notes/:id` | Update a note. Body: `{title?, body?, tags?, references?}` |
 | `DELETE` | `/notes/:id` | Delete a note |
 | `GET` | `/tags` | List all tags with note counts |
 | `GET` | `/grep` | Search notes. Query: `?q=pattern&tags=a,b&case_sensitive=true` |
