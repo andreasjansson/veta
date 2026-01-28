@@ -1,0 +1,10 @@
+{
+  "name": "veta-worker-test",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^4"
+  }
+}
