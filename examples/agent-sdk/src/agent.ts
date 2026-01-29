@@ -43,7 +43,7 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === "/check-open-ai-key") {
-      return Response.json({ success: !!process.env.OPENAI_API_KEY });
+      return Response.json({ success: !!env.OPENAI_API_KEY });
     }
 
     return (
