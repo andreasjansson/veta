@@ -22,7 +22,7 @@ if [ ! -d node_modules/ws ]; then
 fi
 
 # Run migrations locally using the veta config which has migrations_dir set
-npx wrangler d1 migrations apply veta-example-db --local -c wrangler.veta.jsonc 2>&1 | grep -v "^?" || true
+npx wrangler d1 migrations apply veta-example-db --local -c wrangler.veta.jsonc >/dev/null 2>&1 || true
 
 # Create .dev.vars if it doesn't exist (with dummy key for structure tests)
 if [ ! -f .dev.vars ]; then
