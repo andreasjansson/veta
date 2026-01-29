@@ -54,7 +54,13 @@ ws.on('message', (data) => {
 
 ws.on('error', (err) => {
   console.log('error');
-  console.error(err.message);
+  console.error('WebSocket error:', err.message);
+  process.exit(1);
+});
+
+ws.on('unexpected-response', (req, res) => {
+  console.log('error');
+  console.error('Unexpected response:', res.statusCode, res.statusMessage);
   process.exit(1);
 });
 
