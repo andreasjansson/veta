@@ -1,195 +1,29 @@
 %skip(requires OPENAI_API_KEY) if: test -z "$OPENAI_API_KEY"
 
 ===
-agent chat via websocket - add note
+agent adds a note via veta tool
 ===
-node -e '
-const WebSocket = require("ws");
-const ws = new WebSocket("ws://localhost:8788/agents/chat/cctr-test-" + Date.now());
-
-ws.on("open", () => {
-  // Send chat message asking to add a note
-  ws.send(JSON.stringify({
-    type: "cf_agent_use_chat_request",
-    id: "test-1",
-    init: {
-      method: "POST",
-      body: JSON.stringify({
-        messages: [{
-          id: "msg-1",
-          role: "user",
-          parts: [{ type: "text", text: "Add a note with title \"Test Note\" and body \"Hello from cctr test\" and tag \"test\". Just add the note, dont say anything else." }]
-        }],
-        clientTools: []
-      })
-    }
-  }));
-});
-
-let output = "";
-ws.on("message", (data) => {
-  const msg = data.toString();
-  output += msg;
-  // Look for completion signal in the streamed response
-  if (msg.includes("Added note") || msg.includes("addNote")) {
-    console.log("ok");
-    ws.close();
-    process.exit(0);
-  }
-});
-
-setTimeout(() => {
-  console.log("timeout");
-  console.error(output);
-  process.exit(1);
-}, 30000);
-'
+cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && node "$CCTR_FIXTURE_DIR/ws-chat.mjs" add "Add a note with title 'CCTR Test Note' and body 'Hello from integration test' with tag 'cctr-test'. Use the addNote tool." "Added note"
 ---
 ok
 
 ===
-list notes shows the added note
+agent lists notes via veta tool
 ===
-node -e '
-const WebSocket = require("ws");
-const ws = new WebSocket("ws://localhost:8788/agents/chat/cctr-test-list-" + Date.now());
-
-ws.on("open", () => {
-  ws.send(JSON.stringify({
-    type: "cf_agent_use_chat_request",
-    id: "test-2",
-    init: {
-      method: "POST",
-      body: JSON.stringify({
-        messages: [{
-          id: "msg-1",
-          role: "user",
-          parts: [{ type: "text", text: "List all notes. Show me what notes exist." }]
-        }],
-        clientTools: []
-      })
-    }
-  }));
-});
-
-let output = "";
-ws.on("message", (data) => {
-  const msg = data.toString();
-  output += msg;
-  if (msg.includes("Test Note") || msg.includes("listNotes")) {
-    console.log("ok");
-    ws.close();
-    process.exit(0);
-  }
-});
-
-setTimeout(() => {
-  if (output.includes("No notes") || output.length > 100) {
-    console.log("ok");  // Agent responded, even if no notes
-    process.exit(0);
-  }
-  console.log("timeout");
-  console.error(output);
-  process.exit(1);
-}, 30000);
-'
+cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && node "$CCTR_FIXTURE_DIR/ws-chat.mjs" list "List all notes using the listNotes tool." "listNotes"
 ---
 ok
 
 ===
-show specific note
+agent shows a note via veta tool
 ===
-node -e '
-const WebSocket = require("ws");
-const ws = new WebSocket("ws://localhost:8788/agents/chat/cctr-test-show-" + Date.now());
-
-ws.on("open", () => {
-  ws.send(JSON.stringify({
-    type: "cf_agent_use_chat_request",
-    id: "test-3",
-    init: {
-      method: "POST",
-      body: JSON.stringify({
-        messages: [{
-          id: "msg-1",
-          role: "user",
-          parts: [{ type: "text", text: "Show me note 1. Use the showNote tool." }]
-        }],
-        clientTools: []
-      })
-    }
-  }));
-});
-
-let output = "";
-ws.on("message", (data) => {
-  const msg = data.toString();
-  output += msg;
-  if (msg.includes("showNote") || msg.includes("cctr") || msg.includes("Hello")) {
-    console.log("ok");
-    ws.close();
-    process.exit(0);
-  }
-});
-
-setTimeout(() => {
-  if (output.length > 50) {
-    console.log("ok");  // Got some response
-    process.exit(0);
-  }
-  console.log("timeout");
-  console.error(output);
-  process.exit(1);
-}, 30000);
-'
+cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && node "$CCTR_FIXTURE_DIR/ws-chat.mjs" show "Show note 1 using the showNote tool." "showNote"
 ---
 ok
 
 ===
-search notes
+agent searches notes via veta tool
 ===
-node -e '
-const WebSocket = require("ws");
-const ws = new WebSocket("ws://localhost:8788/agents/chat/cctr-test-search-" + Date.now());
-
-ws.on("open", () => {
-  ws.send(JSON.stringify({
-    type: "cf_agent_use_chat_request",
-    id: "test-4",
-    init: {
-      method: "POST",
-      body: JSON.stringify({
-        messages: [{
-          id: "msg-1",
-          role: "user",
-          parts: [{ type: "text", text: "Search notes for \"cctr\". Use the searchNotes tool." }]
-        }],
-        clientTools: []
-      })
-    }
-  }));
-});
-
-let output = "";
-ws.on("message", (data) => {
-  const msg = data.toString();
-  output += msg;
-  if (msg.includes("searchNotes") || msg.includes("cctr") || msg.includes("Test Note")) {
-    console.log("ok");
-    ws.close();
-    process.exit(0);
-  }
-});
-
-setTimeout(() => {
-  if (output.length > 50) {
-    console.log("ok");
-    process.exit(0);
-  }
-  console.log("timeout");
-  console.error(output);
-  process.exit(1);
-}, 30000);
-'
+cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && node "$CCTR_FIXTURE_DIR/ws-chat.mjs" search "Search for notes containing 'cctr' using the searchNotes tool." "searchNotes"
 ---
 ok
