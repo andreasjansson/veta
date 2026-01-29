@@ -1,7 +1,11 @@
 {
   "name": "veta",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Veta knowledge base - Cloudflare Worker",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andreasjansson/veta"
+  },
   "main": "build/worker/shim.mjs",
   "scripts": {
     "build": "cargo install -q worker-build && worker-build --release",
