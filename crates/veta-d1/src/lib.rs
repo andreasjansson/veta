@@ -238,7 +238,7 @@ impl Database for D1DatabaseWrapper {
                     .map_err(|e| Error::Database(e.to_string()))?
             } else {
                 self.db
-                    .prepare(&format!(
+                    .prepare(format!(
                         "SELECT n.id, n.title, n.body, n.updated_at, n.\"references\", GROUP_CONCAT(t.name) as tags
                          FROM notes n
                          LEFT JOIN note_tags nt ON n.id = nt.note_id
@@ -254,7 +254,7 @@ impl Database for D1DatabaseWrapper {
             }
         } else {
             self.db
-                .prepare(&format!(
+                .prepare(format!(
                     "SELECT n.id, n.title, n.body, n.updated_at, n.\"references\", GROUP_CONCAT(t.name) as tags
                      FROM notes n
                      LEFT JOIN note_tags nt ON n.id = nt.note_id
