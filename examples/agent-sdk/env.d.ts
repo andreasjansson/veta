@@ -9,3 +9,8 @@ declare namespace NodeJS {
     OPENAI_API_KEY: string;
   }
 }
+
+declare module "veta" {
+  const worker: ExportedHandler;
+  export default worker;
+}
