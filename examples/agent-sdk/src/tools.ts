@@ -1,5 +1,5 @@
 import { tool, type ToolSet } from "ai";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { getCurrentAgent } from "agents";
 import type { Chat } from "./agent";
 
