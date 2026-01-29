@@ -1,0 +1,5 @@
+===
+stop agent-sdk example server
+===
+$CCTR_FIXTURE_DIR/stop-server
+---
