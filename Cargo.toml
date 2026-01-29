@@ -9,7 +9,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "0.2.4"
+version = "0.2.5"
 edition = "2021"
 authors = ["Andreas Jansson"]
 license = "MIT"
@@ -17,9 +17,9 @@ homepage = "https://github.com/andreasjansson/veta"
 repository = "https://github.com/andreasjansson/veta"
 
 [workspace.dependencies]
-veta-core = { version = "0.2.4", path = "crates/veta-core" }
-veta-sqlite = { version = "0.2.4", path = "crates/veta-sqlite" }
-veta-d1 = { version = "0.2.4", path = "crates/veta-d1" }
+veta-core = { version = "0.2.5", path = "crates/veta-core" }
+veta-sqlite = { version = "0.2.5", path = "crates/veta-sqlite" }
+veta-d1 = { version = "0.2.5", path = "crates/veta-d1" }
 
 async-trait = "0.1"
 serde = { version = "1", features = ["derive"] }
