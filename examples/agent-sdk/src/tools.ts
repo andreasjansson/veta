@@ -12,7 +12,7 @@ function veta() {
 export const tools = {
   addNote: tool({
     description: "Add a note to the Veta knowledge base",
-    parameters: z.object({
+    inputSchema: z.object({
       title: z.string().describe("Note title"),
       body: z.string().describe("Note content"),
       tags: z.array(z.string()).describe("Tags for organization"),
@@ -30,7 +30,7 @@ export const tools = {
 
   listNotes: tool({
     description: "List notes from the Veta knowledge base, optionally filtered by tags",
-    parameters: z.object({
+    inputSchema: z.object({
       tags: z.array(z.string()).optional().describe("Filter by these tags"),
     }),
     execute: async ({ tags }) => {
@@ -44,7 +44,7 @@ export const tools = {
 
   showNote: tool({
     description: "Show the full content of a specific note",
-    parameters: z.object({
+    inputSchema: z.object({
       id: z.number().describe("Note ID"),
     }),
     execute: async ({ id }) => {
@@ -57,7 +57,7 @@ export const tools = {
 
   searchNotes: tool({
     description: "Search notes by pattern (regex supported)",
-    parameters: z.object({
+    inputSchema: z.object({
       query: z.string().describe("Search pattern"),
       tags: z.array(z.string()).optional().describe("Filter by these tags"),
     }),
@@ -73,7 +73,7 @@ export const tools = {
 
   listTags: tool({
     description: "List all tags in the Veta knowledge base",
-    parameters: z.object({}),
+    inputSchema: z.object({}),
     execute: async () => {
       const res = await veta().fetch("http://veta/tags");
       const tags = (await res.json()) as { name: string; count: number }[];
@@ -84,7 +84,7 @@ export const tools = {
 
   deleteNote: tool({
     description: "Delete a note from the Veta knowledge base",
-    parameters: z.object({
+    inputSchema: z.object({
       id: z.number().describe("Note ID to delete"),
     }),
     execute: async ({ id }) => {
