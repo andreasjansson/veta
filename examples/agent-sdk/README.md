@@ -22,15 +22,13 @@ npm install
 npx wrangler d1 create veta-example-db
 ```
 
-3. Copy the `database_id` from the output and update both `wrangler.jsonc` and `wrangler.veta.jsonc`.
+3. Copy the `database_id` from the output and update `wrangler.veta.jsonc`.
 
-4. Run migrations:
+4. Run migrations (migrations are in `node_modules/veta/migrations/`):
 
 ```bash
 npx wrangler d1 migrations apply veta-example-db --local
 ```
-
-(migrations are in `node_modules/veta/migrations/`)
 
 5. Create `.dev.vars` with your OpenAI API key:
 
@@ -61,17 +59,13 @@ npx wrangler d1 migrations apply veta-example-db --remote
 npx wrangler secret put OPENAI_API_KEY
 ```
 
-3. Deploy the Veta worker:
+3. Deploy both workers:
 
 ```bash
-npx wrangler deploy -c wrangler.veta.jsonc
+npm run deploy
 ```
 
-4. Deploy the agent worker:
-
-```bash
-npx wrangler deploy
-```
+This deploys the Veta worker first (since the agent depends on it), then the agent worker.
 
 ## How It Works
 
