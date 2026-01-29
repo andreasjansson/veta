@@ -1,3 +1,5 @@
+%shell bash
+
 =====
 reinitialize database for validation tests
 =====

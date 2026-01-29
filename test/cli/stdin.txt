@@ -1,3 +1,5 @@
+%shell bash
+
 =====
 reinitialize and add note with body from stdin
 =====
