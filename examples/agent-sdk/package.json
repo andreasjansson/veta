@@ -1,0 +1,24 @@
+{
+  "name": "veta-agent-example",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "types": "wrangler types"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^3.0.2",
+    "@cloudflare/ai-chat": "^0.0.3",
+    "agents": "^0.3.3",
+    "ai": "^6.0.5",
+    "veta": "^0.2.3",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20251231.0",
+    "typescript": "^5.9.3",
+    "wrangler": "4.56.0"
+  }
+}
