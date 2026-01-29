@@ -9,7 +9,8 @@ if (!message) {
 }
 
 const port = process.env.TEST_PORT || '8787';
-const ws = new WebSocket(`ws://localhost:${port}/agents/chat/test-${Date.now()}`);
+const agentId = process.env.TEST_AGENT_ID || `test-${Date.now()}`;
+const ws = new WebSocket(`ws://localhost:${port}/agents/chat/${agentId}`);
 
 ws.on('open', () => {
   ws.send(JSON.stringify({
