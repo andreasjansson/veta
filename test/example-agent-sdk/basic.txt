@@ -1,34 +1,34 @@
 ===
 UI is served at root
 ===
-curl -s http://localhost:8787/ | grep -o '<title>.*</title>'
+curl -s http://localhost:8788/ | grep -o '<title>.*</title>'
 ---
 <title>Veta Agent</title>
 
 ===
 UI contains React app
 ===
-curl -s http://localhost:8787/ | grep -o 'id="root"'
+curl -s http://localhost:8788/ | grep -o 'id="root"'
 ---
 id="root"
 
 ===
 UI loads tailwind
 ===
-curl -s http://localhost:8787/ | grep -c 'tailwindcss'
+curl -s http://localhost:8788/ | grep -c 'tailwindcss'
 ---
 1
 
 ===
 check-open-ai-key endpoint returns json with success field
 ===
-curl -s http://localhost:8787/check-open-ai-key | jq 'has("success")'
+curl -s http://localhost:8788/check-open-ai-key | jq 'has("success")'
 ---
 true
 
 ===
 non-existent path returns 404
 ===
-curl -s -o /dev/null -w '%{http_code}' http://localhost:8787/nonexistent
+curl -s -o /dev/null -w '%{http_code}' http://localhost:8788/nonexistent
 ---
 404
