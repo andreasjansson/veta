@@ -14,7 +14,7 @@ process.on('SIGHUP', () => {
 
 const wrangler = spawn('npx', [
   'wrangler', 'dev',
-  '-c', 'wrangler.jsonc',
+  '-c', 'wrangler.agent.jsonc',
   '-c', 'wrangler.veta.jsonc',
   '--port', '8787'
 ], {
