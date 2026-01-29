@@ -350,7 +350,8 @@ jobs:
           end
           EOF
           
-          git clone https://x-access-token:${GH_TOKEN}@github.com/andreasjansson/homebrew-tap.git
+          # Use gh CLI to handle authentication
+          gh repo clone andreasjansson/homebrew-tap
           cp veta.rb homebrew-tap/Formula/veta.rb
           cd homebrew-tap
           git config user.name "github-actions[bot]"
