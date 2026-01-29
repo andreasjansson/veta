@@ -3,7 +3,7 @@ UI is served at root
 ===
 curl -s http://localhost:8788/ | grep -o '<title>.*</title>'
 ---
-<title>Veta Agent</title>
+<title>Veta Agent Chat</title>
 
 ===
 UI contains React app
