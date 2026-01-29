@@ -18,7 +18,7 @@ cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 TEST_AGENT_ID=cc
 {{ response }}
 ---
 where
-* response contains "Banana" or response contains "banana"
+* lower(response) contains "banana"
 
 ===
 agent shows the note with full content
@@ -28,4 +28,4 @@ cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 TEST_AGENT_ID=cc
 {{ response }}
 ---
 where
-* response contains "Blend" or response contains "blend" or response contains "banana" or response contains "Banana"
+* lower(response) contains "blend" or lower(response) contains "banana"
