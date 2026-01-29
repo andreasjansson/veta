@@ -76,9 +76,13 @@ export const tools = {
       const params = new URLSearchParams({ q: query });
       if (tags?.length) params.set("tags", tags.join(","));
       const res = await veta().fetch(`http://veta/grep?${params}`);
-      const notes = (await res.json()) as { id: number; title: string; body: string }[];
+      if (!res.ok) {
+        const error = await res.text();
+        return `Search error: ${error}`;
+      }
+      const notes = (await res.json()) as { id: number; title: string; body?: string }[];
       if (!notes.length) return "No matching notes found.";
-      return notes.map((n) => `[${n.id}] ${n.title}: ${n.body.slice(0, 100)}...`).join("\n\n");
+      return notes.map((n) => `[${n.id}] ${n.title}: ${(n.body || "").slice(0, 100)}...`).join("\n\n");
     },
   }),
 
