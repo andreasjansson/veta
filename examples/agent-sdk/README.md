@@ -79,7 +79,7 @@ The agent has access to these Veta tools:
 - `listTags` - See all available tags
 - `deleteNote` - Remove a note
 
-The Veta worker runs as a separate service, and the agent calls it via service bindings (the `VETA` binding in `wrangler.jsonc`).
+The Veta worker runs as a separate service, and the agent calls it via service bindings (the `VETA` binding in `wrangler.agent.jsonc`).
 
 ## Example Prompts
 
