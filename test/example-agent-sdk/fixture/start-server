@@ -16,6 +16,11 @@ if [ ! -d node_modules ]; then
     npm install --silent 2>/dev/null
 fi
 
+# Install ws for WebSocket tests (if not already installed)
+if [ ! -d node_modules/ws ]; then
+    npm install ws --save-dev --silent 2>/dev/null
+fi
+
 # Run migrations locally (suppress output)
 npx wrangler d1 migrations apply veta-example-db --local >/dev/null 2>&1 || true
 
