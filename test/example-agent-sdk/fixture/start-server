@@ -1,0 +1,42 @@
+#!/bin/bash
+# Start the agent-sdk example workers for testing
+
+set -e
+
+EXAMPLE_DIR="$(cd "$CCTR_TEST_PATH/../.." && pwd)/examples/agent-sdk"
+
+# Kill any existing server
+pkill -f "wrangler.*veta-agent-example" 2>/dev/null || true
+pkill -f "wrangler.*veta-example" 2>/dev/null || true
+sleep 0.5
+
+# Install dependencies if needed
+cd "$EXAMPLE_DIR"
+if [ ! -d node_modules ]; then
+    npm install --silent 2>/dev/null
+fi
+
+# Run migrations locally
+npx wrangler d1 migrations apply veta-example-db --local 2>/dev/null || true
+
+# Create .dev.vars if it doesn't exist (with dummy key for structure tests)
+if [ ! -f .dev.vars ]; then
+    echo "OPENAI_API_KEY=${OPENAI_API_KEY:-sk-test-dummy-key}" > .dev.vars
+fi
+
+# Start the multi-worker dev server
+node "$CCTR_FIXTURE_DIR/server.mjs" > /tmp/agent-sdk-test.log 2>&1 &
+echo $! > /tmp/agent-sdk-test.pid
+
+# Wait for server to be ready
+for i in {1..60}; do
+    if curl -s -o /dev/null http://localhost:8787/ 2>/dev/null; then
+        echo "ready"
+        exit 0
+    fi
+    sleep 0.5
+done
+
+echo "timeout"
+cat /tmp/agent-sdk-test.log
+exit 1
