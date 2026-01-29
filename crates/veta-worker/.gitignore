@@ -1,0 +1,2 @@
+# Empty .gitignore - prevents npm from walking up to root .gitignore
+# Actual git ignores are in the root .gitignore
