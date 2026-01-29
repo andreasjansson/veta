@@ -9,7 +9,7 @@ import {
   type ToolSet,
 } from "ai";
 import { openai } from "@ai-sdk/openai";
-import { tools, createExecutions } from "./tools";
+import { tools } from "./tools";
 
 const model = openai("gpt-4o-mini");
 
