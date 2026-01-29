@@ -1,29 +1,41 @@
 %skip(requires OPENAI_API_KEY) if: test -z "$OPENAI_API_KEY"
 
 ===
-agent adds a note via veta tool
+agent adds a note with unique content
 ===
-cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 node test-ws-chat.mjs add "Add a note titled 'CCTR Test' with body 'Hello from test' and tag 'test'. Use addNote tool." "tool-call"
+cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 node test-ws-chat.mjs "Add a note with title 'Banana Smoothie Recipe' and body 'Blend 2 bananas with ice and milk' and tag 'recipes'. Use the addNote tool and confirm it was added."
 ---
-ok
+{{ response }}
+---
+where
+* response contains "Added note"
 
 ===
-agent lists notes via veta tool
+agent lists notes and shows the added content
 ===
-cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 node test-ws-chat.mjs list "List all notes using listNotes tool." "tool-call"
+cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 node test-ws-chat.mjs "List all notes. What notes exist?"
 ---
-ok
+{{ response }}
+---
+where
+* response contains "Banana" or response contains "banana"
 
 ===
-agent shows a note via veta tool
+agent shows the note with full content
 ===
-cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 node test-ws-chat.mjs show "Show note 1 using showNote tool." "tool-call"
+cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 node test-ws-chat.mjs "Show me note 1. Display its full content."
 ---
-ok
+{{ response }}
+---
+where
+* response contains "Blend" or response contains "blend" or response contains "banana" or response contains "Banana"
 
 ===
-agent searches notes via veta tool
+agent searches and finds the note
 ===
-cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 node test-ws-chat.mjs search "Search notes for 'test' using searchNotes tool." "tool-call"
+cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 node test-ws-chat.mjs "Search notes for 'banana'. What do you find?"
 ---
-ok
+{{ response }}
+---
+where
+* response contains "Banana" or response contains "banana" or response contains "Smoothie" or response contains "smoothie"
