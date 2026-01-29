@@ -1,11 +1,14 @@
-%skip(Windows-only tests) if: test "$OS" != "Windows_NT"
+%skip(Windows-only tests) platform: unix
 
 =====
 initialize veta database on Windows
 =====
 veta init --reinitialize
 -----
-Reinitialized veta database in .veta/db.sqlite
+Reinitialized veta database in {{ path }}
+-----
+where
+* path matches /\.veta[\/\\]db\.sqlite/
 
 =====
 add and list notes on Windows

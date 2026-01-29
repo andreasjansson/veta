@@ -10,10 +10,13 @@ Line 3
 Line 4
 Line 5"
 ---------------------------------------------
-Reinitialized veta database in .veta/db.sqlite
+Reinitialized veta database in {{ path }}
 Added note 1
 Added note 2
 Added note 3
+---------------------------------------------
+where
+* path matches /\.veta[\/\\]db\.sqlite/
 
 =============================================
 show single note

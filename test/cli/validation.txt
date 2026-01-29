@@ -3,7 +3,10 @@ reinitialize database for validation tests
 =====
 veta init --reinitialize
 -----
-Reinitialized veta database in .veta/db.sqlite
+Reinitialized veta database in {{ path }}
+-----
+where
+* path matches /\.veta[\/\\]db\.sqlite/
 
 =====
 reject empty title
@@ -178,11 +181,14 @@ veta init --reinitialize
 veta ls
 -----
 Added note 5
-Reinitialized veta database in .veta/db.sqlite
+Reinitialized veta database in {{ path }}
+-----
+where
+* path matches /\.veta[\/\\]db\.sqlite/
 
 =====
 veta commands fail without init
-%skip(Unix shell commands) if: test "$OS" = "Windows_NT"
+%skip(Unix shell commands) platform: windows
 =====
 cd /tmp && rm -rf veta-no-init-test && mkdir veta-no-init-test && cd veta-no-init-test && veta ls 2>&1 ; echo "exit: $?"
 -----

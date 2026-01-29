@@ -4,8 +4,11 @@ reinitialize and add a note with body flag
 veta init --reinitialize
 veta add --title "First note" --tags "test,basic" --body "Hello world"
 -----
-Reinitialized veta database in .veta/db.sqlite
+Reinitialized veta database in {{ path }}
 Added note 1
+-----
+where
+* path matches /\.veta[\/\\]db\.sqlite/
 
 =====
 add a second note
@@ -241,7 +244,7 @@ updated (1 note)
 
 =====
 veta works from subdirectory
-%skip(Unix shell commands) if: test "$OS" = "Windows_NT"
+%skip(Unix shell commands) platform: windows
 =====
 mkdir -p subdir/nested && cd subdir/nested && veta ls
 -----

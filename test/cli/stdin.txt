@@ -4,8 +4,11 @@ reinitialize and add note with body from stdin
 veta init --reinitialize
 echo "Content from stdin" | veta add --title "Stdin note" --tags "stdin,test"
 -----
-Reinitialized veta database in .veta/db.sqlite
+Reinitialized veta database in {{ path }}
 Added note 1
+-----
+where
+* path matches /\.veta[\/\\]db\.sqlite/
 
 =====
 verify stdin content was saved

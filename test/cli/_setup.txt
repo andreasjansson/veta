@@ -3,4 +3,7 @@ initialize veta database
 =====
 veta init
 -----
-Initialized veta database in .veta/db.sqlite
+Initialized veta database in {{ path }}
+-----
+where
+* path matches /\.veta[\/\\]db\.sqlite/
