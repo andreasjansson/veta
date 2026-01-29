@@ -1,30 +1,27 @@
 #!/usr/bin/env node
-// WebSocket chat test script for cctr integration tests
+// Send a message to the agent and print the response
 import WebSocket from 'ws';
 
-const action = process.argv[2];
-const prompt = process.argv[3];
-const successPattern = process.argv[4];
-
-if (!action || !prompt) {
-  console.error('Usage: ws-chat.mjs <action> <prompt> [successPattern]');
+const message = process.argv[2];
+if (!message) {
+  console.error('Usage: test-ws-chat.mjs <message>');
   process.exit(1);
 }
 
 const port = process.env.TEST_PORT || '8787';
-const ws = new WebSocket(`ws://localhost:${port}/agents/chat/cctr-${action}-${Date.now()}`);
+const ws = new WebSocket(`ws://localhost:${port}/agents/chat/test-${Date.now()}`);
 
 ws.on('open', () => {
   ws.send(JSON.stringify({
     type: 'cf_agent_use_chat_request',
-    id: `test-${action}`,
+    id: 'test-1',
     init: {
       method: 'POST',
       body: JSON.stringify({
         messages: [{
           id: 'msg-1',
           role: 'user',
-          parts: [{ type: 'text', text: prompt }]
+          parts: [{ type: 'text', text: message }]
         }],
         clientTools: []
       })
@@ -33,69 +30,58 @@ ws.on('open', () => {
 });
 
 let output = '';
-let messageCount = 0;
+let done = false;
+
 ws.on('message', (data) => {
   const msg = data.toString();
-  output += msg;
-  messageCount++;
   
-  // Parse to check for tool calls in the structured response
+  // Skip the initial MCP message
+  if (msg.includes('cf_agent_mcp_servers')) return;
+  
   try {
     const parsed = JSON.parse(msg);
-    // Check for tool invocations in the AI response
-    if (parsed.type === 'tool-call' || parsed.type === 'tool-result' ||
-        (parsed.toolInvocations && parsed.toolInvocations.length > 0) ||
-        msg.includes('"type":"tool-call"') || msg.includes('"type":"tool-result"')) {
-      console.log('ok');
-      ws.close();
-      process.exit(0);
+    if (parsed.type === 'cf_agent_use_chat_response') {
+      // Extract the body content
+      if (parsed.body) {
+        try {
+          const body = JSON.parse(parsed.body);
+          // Collect text deltas and tool outputs
+          if (body.type === 'text-delta' && body.textDelta) {
+            output += body.textDelta;
+          } else if (body.type === 'tool-output-available' && body.output) {
+            output += body.output + '\n';
+          }
+        } catch (e) {
+          // Body wasn't JSON, append as-is
+          output += parsed.body;
+        }
+      }
+      // Check if this is the final message
+      if (parsed.done) {
+        done = true;
+        ws.close();
+      }
     }
   } catch (e) {
-    // Not JSON, check as string
-  }
-  
-  // Check for success pattern in raw output
-  if (successPattern && (msg.includes(successPattern) || output.includes(successPattern))) {
-    console.log('ok');
-    ws.close();
-    process.exit(0);
-  }
-  
-  // Check for common tool-related patterns
-  if (msg.includes('tool_calls') || msg.includes('toolInvocations') || 
-      msg.includes('addNote') || msg.includes('listNotes') ||
-      msg.includes('showNote') || msg.includes('searchNotes') ||
-      msg.includes('deleteNote')) {
-    console.log('ok');
-    ws.close();
-    process.exit(0);
+    // Not JSON, ignore
   }
 });
 
+ws.on('close', () => {
+  console.log(output.trim());
+  process.exit(0);
+});
+
 ws.on('error', (err) => {
-  console.log('error');
   console.error('WebSocket error:', err.message);
   process.exit(1);
 });
 
-ws.on('unexpected-response', (req, res) => {
-  console.log('error');
-  console.error('Unexpected response:', res.statusCode, res.statusMessage);
-  process.exit(1);
-});
-
-ws.on('close', () => {
-  // If we got meaningful output, consider it a success
-  if (output.length > 100) {
-    console.log('ok');
-    process.exit(0);
-  }
-});
-
-// Timeout - fail if we didn't match the expected pattern
+// Timeout after 60 seconds
 setTimeout(() => {
-  console.log('timeout');
-  console.error(`Messages: ${messageCount}, Length: ${output.length}`);
-  console.error('Output sample:', output.slice(0, 1000));
-  process.exit(1);
-}, 30000);
+  if (!done) {
+    console.error('Timeout waiting for response');
+    console.log(output.trim());
+    process.exit(1);
+  }
+}, 60000);
