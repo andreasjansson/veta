@@ -4,9 +4,16 @@ import { getCurrentAgent } from "agents";
 import type { Chat } from "./agent";
 
 function veta() {
-  const { agent } = getCurrentAgent<Chat>();
+  const ctx = getCurrentAgent<Chat>();
+  if (!ctx?.agent) {
+    throw new Error("No agent context available");
+  }
   // @ts-expect-error - env is protected but accessible at runtime
-  return agent!.env.VETA as Fetcher;
+  const fetcher = ctx.agent.env.VETA as Fetcher;
+  if (!fetcher) {
+    throw new Error("VETA service binding not available");
+  }
+  return fetcher;
 }
 
 export const tools = {
