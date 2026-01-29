@@ -21,8 +21,8 @@ if [ ! -d node_modules/ws ]; then
     npm install ws --save-dev --silent 2>/dev/null
 fi
 
-# Run migrations locally (suppress output)
-npx wrangler d1 migrations apply veta-example-db --local >/dev/null 2>&1 || true
+# Run migrations locally using the veta config which has migrations_dir set
+npx wrangler d1 migrations apply veta-example-db --local -c wrangler.veta.jsonc 2>&1 | grep -v "^?" || true
 
 # Create .dev.vars if it doesn't exist (with dummy key for structure tests)
 if [ ! -f .dev.vars ]; then
