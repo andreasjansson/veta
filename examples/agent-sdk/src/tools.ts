@@ -25,13 +25,20 @@ export const tools = {
       tags: z.array(z.string()).describe("Tags for organization"),
     }),
     execute: async ({ title, body, tags }) => {
-      const res = await veta().fetch("http://veta/notes", {
+      const fetcher = veta();
+      const res = await fetcher.fetch("http://veta/notes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, body, tags }),
       });
-      const data = (await res.json()) as { id: number };
-      return `Added note ${data.id}: ${title}`;
+      const text = await res.text();
+      console.log(`[addNote] Response status: ${res.status}, body: ${text}`);
+      try {
+        const data = JSON.parse(text) as { id: number };
+        return `Added note ${data.id}: ${title}`;
+      } catch (e) {
+        return `Error adding note: ${text}`;
+      }
     },
   }),
 
