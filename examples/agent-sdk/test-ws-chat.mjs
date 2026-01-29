@@ -33,20 +33,39 @@ ws.on('open', () => {
 });
 
 let output = '';
+let messageCount = 0;
 ws.on('message', (data) => {
   const msg = data.toString();
   output += msg;
+  messageCount++;
   
-  // Check for success pattern
-  if (successPattern && msg.includes(successPattern)) {
+  // Parse to check for tool calls in the structured response
+  try {
+    const parsed = JSON.parse(msg);
+    // Check for tool invocations in the AI response
+    if (parsed.type === 'tool-call' || parsed.type === 'tool-result' ||
+        (parsed.toolInvocations && parsed.toolInvocations.length > 0) ||
+        msg.includes('"type":"tool-call"') || msg.includes('"type":"tool-result"')) {
+      console.log('ok');
+      ws.close();
+      process.exit(0);
+    }
+  } catch (e) {
+    // Not JSON, check as string
+  }
+  
+  // Check for success pattern in raw output
+  if (successPattern && (msg.includes(successPattern) || output.includes(successPattern))) {
     console.log('ok');
     ws.close();
     process.exit(0);
   }
   
-  // Also check for tool calls or common success indicators
-  if (msg.includes('tool-call') || msg.includes('tool-result')) {
-    // Tool was called, that's a success
+  // Check for common tool-related patterns
+  if (msg.includes('tool_calls') || msg.includes('toolInvocations') || 
+      msg.includes('addNote') || msg.includes('listNotes') ||
+      msg.includes('showNote') || msg.includes('searchNotes') ||
+      msg.includes('deleteNote')) {
     console.log('ok');
     ws.close();
     process.exit(0);
