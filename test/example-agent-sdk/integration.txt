@@ -3,27 +3,27 @@
 ===
 agent adds a note via veta tool
 ===
-cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && node test-ws-chat.mjs add "Add a note with title 'CCTR Test Note' and body 'Hello from integration test' with tag 'cctr-test'. Use the addNote tool." "Added note"
+cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 node test-ws-chat.mjs add "Add a note titled 'CCTR Test' with body 'Hello from test' and tag 'test'. Use addNote tool." "tool-call"
 ---
 ok
 
 ===
 agent lists notes via veta tool
 ===
-cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && node test-ws-chat.mjs list "List all notes using the listNotes tool." "listNotes"
+cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 node test-ws-chat.mjs list "List all notes using listNotes tool." "tool-call"
 ---
 ok
 
 ===
 agent shows a note via veta tool
 ===
-cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && node test-ws-chat.mjs show "Show note 1 using the showNote tool." "showNote"
+cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 node test-ws-chat.mjs show "Show note 1 using showNote tool." "tool-call"
 ---
 ok
 
 ===
 agent searches notes via veta tool
 ===
-cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && node test-ws-chat.mjs search "Search for notes containing 'cctr' using the searchNotes tool." "searchNotes"
+cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 node test-ws-chat.mjs search "Search notes for 'test' using searchNotes tool." "tool-call"
 ---
 ok
