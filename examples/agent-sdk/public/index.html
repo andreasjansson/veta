@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Veta Agent</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body class="bg-gray-900 text-white">
+  <div id="root"></div>
+  <script type="text/babel" data-type="module">
+const { useState, useRef, useEffect } = React;
+
+function App() {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef(null);
+  const agentId = useRef(crypto.randomUUID());
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+
+    const userMessage = { role: "user", content: input };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`/agents/chat/${agentId.current}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [...messages, userMessage].map((m) => ({
+            role: m.role,
+            parts: [{ type: "text", text: m.content }],
+          })),
+        }),
+      });
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let assistantContent = "";
+      let toolCalls = [];
+
+      setMessages((prev) => [...prev, { role: "assistant", content: "", toolCalls: [] }]);
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        for (const line of chunk.split("\n")) {
+          if (!line.startsWith("data: ")) continue;
+          const data = line.slice(6);
+          if (data === "[DONE]") continue;
+
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.type === "text" && parsed.content) {
+              assistantContent += parsed.content;
+              setMessages((prev) => {
+                const updated = [...prev];
+                updated[updated.length - 1] = {
+                  role: "assistant",
+                  content: assistantContent,
+                  toolCalls,
+                };
+                return updated;
+              });
+            } else if (parsed.type === "tool-call") {
+              toolCalls = [...toolCalls, { name: parsed.name, args: parsed.args }];
+              setMessages((prev) => {
+                const updated = [...prev];
+                updated[updated.length - 1] = {
+                  role: "assistant",
+                  content: assistantContent,
+                  toolCalls,
+                };
+                return updated;
+              });
+            } else if (parsed.type === "tool-result") {
+              toolCalls = toolCalls.map((tc) =>
+                tc.name === parsed.name ? { ...tc, result: parsed.result } : tc
+              );
+              setMessages((prev) => {
+                const updated = [...prev];
+                updated[updated.length - 1] = {
+                  role: "assistant",
+                  content: assistantContent,
+                  toolCalls,
+                };
+                return updated;
+              });
+            }
+          } catch {}
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="h-screen flex flex-col max-w-2xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4 text-center">Veta Agent</h1>
+
+      <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+        {messages.map((msg, i) => (
+          <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div className={`max-w-[80%] rounded-lg p-3 ${
+              msg.role === "user" ? "bg-blue-600" : "bg-gray-700"
+            }`}>
+              {msg.toolCalls?.length > 0 && (
+                <div className="mb-2 space-y-1">
+                  {msg.toolCalls.map((tc, j) => (
+                    <div key={j} className="text-xs bg-gray-800 rounded p-2">
+                      <span className="text-yellow-400">{tc.name}</span>
+                      {tc.result && <div className="text-gray-400 mt-1 truncate">{tc.result.slice(0, 100)}</div>}
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div
+                className="prose prose-invert prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: marked.parse(msg.content || "") }}
+              />
+            </div>
+          </div>
+        ))}
+        <div ref={messagesEndRef} />
+      </div>
+
+      <form onSubmit={sendMessage} className="flex gap-2">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Ask me anything..."
+          className="flex-1 bg-gray-800 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          disabled={isLoading}
+        />
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg px-4 py-2"
+        >
+          {isLoading ? "..." : "Send"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
