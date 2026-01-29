@@ -1,4 +1,4 @@
-%skip(Windows-only tests) platform: unix
+%platform windows
 
 =====
 initialize veta database on Windows

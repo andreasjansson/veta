@@ -1,4 +1,4 @@
-%skip(Unix-only tests) platform: windows
+%platform unix
 
 =====
 reinitialize and add a note first

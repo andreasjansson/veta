@@ -186,11 +186,3 @@ Reinitialized veta database in {{ path }}
 where
 * path matches /\.veta[\/\\]db\.sqlite/
 
-=====
-veta commands fail without init
-%skip(Unix shell commands) platform: windows
-=====
-cd /tmp && rm -rf veta-no-init-test && mkdir veta-no-init-test && cd veta-no-init-test && veta ls 2>&1 ; echo "exit: $?"
------
-Error: No .veta directory found. Run 'veta init' to initialize a new database.
-exit: 1

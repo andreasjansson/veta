@@ -242,11 +242,3 @@ newtag (1 note)
 test (1 note)
 updated (1 note)
 
-=====
-veta works from subdirectory
-%skip(Unix shell commands) platform: windows
-=====
-mkdir -p subdir/nested && cd subdir/nested && veta ls
------
-1: Updated title ({{ modified1 }}) -- New body content
-2: Second note ({{ modified2 }}) -- Goodbye world

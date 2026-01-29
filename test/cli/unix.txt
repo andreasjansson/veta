@@ -1,0 +1,23 @@
+%platform unix
+
+=====
+veta works from subdirectory
+=====
+veta init --reinitialize
+veta add --title "Test note" --tags "test" --body "Test body"
+mkdir -p subdir/nested && cd subdir/nested && veta ls
+-----
+Reinitialized veta database in {{ path }}
+Added note 1
+1: Test note ({{ modified }}) -- Test body
+-----
+where
+* path matches /\.veta[\/\\]db\.sqlite/
+
+=====
+veta commands fail without init
+=====
+cd /tmp && rm -rf veta-no-init-test && mkdir veta-no-init-test && cd veta-no-init-test && veta ls 2>&1 ; echo "exit: $?"
+-----
+Error: No .veta directory found. Run 'veta init' to initialize a new database.
+exit: 1
