@@ -1,0 +1,6 @@
+# Ignore dev files, but NOT the build directory
+.wrangler/
+node_modules/
+src/
+Cargo.toml
+*.rs
