@@ -16,8 +16,8 @@ if [ ! -d node_modules ]; then
     npm install --silent 2>/dev/null
 fi
 
-# Run migrations locally
-npx wrangler d1 migrations apply veta-example-db --local 2>/dev/null || true
+# Run migrations locally (suppress output)
+npx wrangler d1 migrations apply veta-example-db --local >/dev/null 2>&1 || true
 
 # Create .dev.vars if it doesn't exist (with dummy key for structure tests)
 if [ ! -f .dev.vars ]; then
