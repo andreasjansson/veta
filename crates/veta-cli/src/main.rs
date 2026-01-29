@@ -11,7 +11,7 @@ const VETA_DIR: &str = ".veta";
 const DB_FILE: &str = "db.sqlite";
 
 #[derive(Parser)]
-#[command(name = "veta", about = "Memory and knowledge base for agents")]
+#[command(name = "veta", about = "Memory and knowledge base for agents", version)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
