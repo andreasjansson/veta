@@ -92,14 +92,8 @@ ws.on('close', () => {
   }
 });
 
-// Shorter timeout - if we haven't matched by now, show what we got
+// Timeout - fail if we didn't match the expected pattern
 setTimeout(() => {
-  // If we received messages but didn't match pattern, still count as success
-  // since the agent responded
-  if (messageCount > 3 || output.length > 200) {
-    console.log('ok');
-    process.exit(0);
-  }
   console.log('timeout');
   console.error(`Messages: ${messageCount}, Length: ${output.length}`);
   console.error('Output sample:', output.slice(0, 1000));
