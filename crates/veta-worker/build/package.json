@@ -1,0 +1,16 @@
+{
+  "files": [
+    "index_bg.wasm",
+    "index.js",
+    "index.d.ts"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "name": "veta-worker",
+  "sideEffects": [
+    "./index.js"
+  ],
+  "type": "module",
+  "types": "index.d.ts",
+  "version": "0.3.6"
+}
