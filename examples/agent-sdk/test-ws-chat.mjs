@@ -47,8 +47,8 @@ ws.on('message', (data) => {
         try {
           const body = JSON.parse(parsed.body);
           // Collect text deltas and tool outputs
-          if (body.type === 'text-delta' && body.textDelta) {
-            output += body.textDelta;
+          if (body.type === 'text-delta' && (body.delta || body.textDelta)) {
+            output += body.delta || body.textDelta;
           } else if (body.type === 'tool-output-available' && body.output) {
             output += body.output + '\n';
           }
