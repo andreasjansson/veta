@@ -4,8 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
+    "dev": "wrangler dev -c wrangler.jsonc -c wrangler.veta.jsonc",
+    "deploy:veta": "wrangler deploy -c wrangler.veta.jsonc",
+    "deploy:agent": "wrangler deploy -c wrangler.jsonc",
+    "deploy": "npm run deploy:veta && npm run deploy:agent",
     "types": "wrangler types"
   },
   "dependencies": {
