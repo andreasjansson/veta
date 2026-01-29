@@ -1,0 +1,6 @@
+===
+start agent-sdk example server
+===
+$CCTR_FIXTURE_DIR/start-server
+---
+ready
