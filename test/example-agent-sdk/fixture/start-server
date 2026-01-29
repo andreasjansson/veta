@@ -24,6 +24,9 @@ if [ ! -f .dev.vars ]; then
     echo "OPENAI_API_KEY=${OPENAI_API_KEY:-sk-test-dummy-key}" > .dev.vars
 fi
 
+# Export the example dir for the server script
+export VETA_EXAMPLE_DIR="$EXAMPLE_DIR"
+
 # Start the multi-worker dev server
 node "$CCTR_FIXTURE_DIR/server.mjs" > /tmp/agent-sdk-test.log 2>&1 &
 echo $! > /tmp/agent-sdk-test.pid
