@@ -147,7 +147,10 @@ veta show 2>&1 ; echo "exit: $?"
 error: the following required arguments were not provided:
   <IDS>
 
-Usage: veta show <IDS>
+Usage: {{ cmd }} show <IDS>
 
 For more information, try '--help'.
 exit: 2
+---------------------------------------------
+where
+* cmd matches /^veta(\.exe)?$/
