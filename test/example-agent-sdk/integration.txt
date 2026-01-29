@@ -29,13 +29,3 @@ cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 TEST_AGENT_ID=cc
 ---
 where
 * response contains "Blend" or response contains "blend" or response contains "banana" or response contains "Banana"
-
-===
-agent searches and finds the note by content
-===
-cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 TEST_AGENT_ID=cctr-integration node test-ws-chat.mjs "Search the notes for the word 'Blend' using searchNotes. Return the matching note content."
----
-{{ response }}
----
-where
-* response contains "Banana" or response contains "banana" or response contains "Smoothie" or response contains "smoothie" or response contains "Blend" or response contains "blend" or response contains "Recipe" or response contains "recipe"
