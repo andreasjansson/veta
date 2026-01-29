@@ -15,7 +15,7 @@
     "@cloudflare/ai-chat": "^0.0.4",
     "agents": "^0.3.3",
     "ai": "^6.0.5",
-    "veta": "^0.2.3",
+    "veta": "^0.3.5",
     "zod": "^3.24.4"
   },
   "devDependencies": {
