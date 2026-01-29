@@ -10,6 +10,7 @@ Veta runs both as a **CLI** (using local SQLite) and as a **Cloudflare Worker** 
 
 ## Table of Contents
 
+- [Installation](#installation)
 - [Claude Code Skill](#claude-code-skill)
 - [CLI Usage](#cli-usage)
 - [Worker Deployment](#worker-deployment)
@@ -17,6 +18,35 @@ Veta runs both as a **CLI** (using local SQLite) and as a **Cloudflare Worker** 
   - [Multi-Worker Architecture](#multi-worker-architecture-service-bindings)
 - [HTTP API](#http-api)
 - [Architecture](#architecture)
+
+## Installation
+
+### Via Homebrew (macOS/Linux)
+
+```bash
+brew install andreasjansson/tap/veta
+```
+
+### Via Cargo
+
+```bash
+cargo install veta-cli
+```
+
+### Pre-built binaries
+
+Download from the [releases page](https://github.com/andreasjansson/veta/releases). Binaries are available for:
+- Linux (x86_64, ARM64)
+- macOS (Intel, Apple Silicon)
+- Windows (x86_64, ARM64)
+
+### From source
+
+```bash
+git clone https://github.com/andreasjansson/veta.git
+cd veta
+cargo install --path crates/veta-cli
+```
 
 ## Claude Code Skill
 
