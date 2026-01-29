@@ -175,7 +175,7 @@ $ veta grep "cloudflare" --tags deployment,testing
 
 ## Worker Deployment
 
-Veta publishes a pre-built WASM worker to npm as `@veta/worker`. This can be deployed standalone or integrated into an existing multi-worker Cloudflare project.
+Veta publishes a pre-built WASM worker to npm as `veta`. This can be deployed standalone or integrated into an existing multi-worker Cloudflare project.
 
 ### Standalone Worker
 
@@ -187,12 +187,12 @@ mkdir my-veta && cd my-veta
 
 # Initialize with npm
 npm init -y
-npm install @veta/worker wrangler
+npm install veta wrangler
 
 # Create wrangler.toml
 cat > wrangler.toml << 'EOF'
 name = "my-veta"
-main = "node_modules/@veta/worker/dist/shim.mjs"
+main = "node_modules/veta/build/worker/shim.mjs"
 compatibility_date = "2025-01-01"
 
 [[d1_databases]]
@@ -221,7 +221,7 @@ For projects with multiple workers (like a monorepo with UI, API, and agent work
 
 Create `src/veta/index.ts`:
 ```typescript
-export { default } from '@veta/worker';
+export { default } from 'veta';
 ```
 
 Create `wrangler.veta.toml`:

@@ -265,7 +265,7 @@ jobs:
           ### Worker
 
           ```bash
-          npm install @veta/worker
+          npm install veta
           ```
 
           ## Binaries
@@ -449,13 +449,13 @@ jobs:
         run: |
           mkdir smoke-test && cd smoke-test
           npm init -y
-          npm install @veta/worker@${{ needs.check-release.outputs.version }} wrangler
+          npm install veta@${{ needs.check-release.outputs.version }} wrangler
       - name: Setup wrangler.toml
         working-directory: smoke-test
         run: |
           cat > wrangler.toml << 'EOF'
           name = "veta-smoke-test"
-          main = "node_modules/@veta/worker/build/worker/shim.mjs"
+          main = "node_modules/veta/build/worker/shim.mjs"
           compatibility_date = "2025-01-01"
 
           [[d1_databases]]
