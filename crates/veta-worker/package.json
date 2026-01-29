@@ -1,6 +1,6 @@
 {
   "name": "veta",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Veta knowledge base - Cloudflare Worker",
   "main": "build/worker/shim.mjs",
   "scripts": {
