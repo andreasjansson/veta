@@ -16,7 +16,7 @@ const wrangler = spawn('npx', [
   'wrangler', 'dev',
   '-c', 'wrangler.agent.jsonc',
   '-c', 'wrangler.veta.jsonc',
-  '--port', '8787'
+  '--port', '8788'
 ], {
   cwd: exampleDir,
   stdio: 'inherit',
