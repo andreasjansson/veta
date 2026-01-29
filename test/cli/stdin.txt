@@ -1,4 +1,4 @@
-%platform unix, windows
+%platform unix
 %shell bash
 
 =====
