@@ -8,6 +8,13 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: "VT323", monospace; }
+    body { background: #0a0a0a; color: #00ff00; }
+  </style>
 </head>
 <body>
   <div id="root"></div>
@@ -22,7 +29,6 @@
     const messagesEndRef = useRef(null);
     const wsRef = useRef(null);
     const agentId = useRef(crypto.randomUUID());
-    const pendingMessageId = useRef(null);
 
     useEffect(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -30,71 +36,41 @@
 
     useEffect(() => {
       connectWebSocket();
-      return () => {
-        if (wsRef.current) {
-          wsRef.current.close();
-        }
-      };
+      return () => wsRef.current?.close();
     }, []);
 
     const connectWebSocket = () => {
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       const ws = new WebSocket(`${protocol}//${window.location.host}/agents/chat/${agentId.current}`);
       
-      ws.onopen = () => {
-        setIsConnected(true);
-      };
-
+      ws.onopen = () => setIsConnected(true);
       ws.onclose = () => {
         setIsConnected(false);
-        // Reconnect after 2 seconds
         setTimeout(connectWebSocket, 2000);
       };
-
-      ws.onerror = (error) => {
-        console.error("WebSocket error:", error);
-      };
-
+      ws.onerror = (e) => console.error("WebSocket error:", e);
       ws.onmessage = (event) => {
         try {
-          const data = JSON.parse(event.data);
-          handleMessage(data);
-        } catch (e) {
-          console.error("Failed to parse message:", e);
-        }
+          handleMessage(JSON.parse(event.data));
+        } catch (e) {}
       };
-
       wsRef.current = ws;
     };
 
     const handleMessage = (data) => {
-      // Skip MCP setup messages
       if (data.type === "cf_agent_mcp_servers") return;
 
       if (data.type === "cf_agent_use_chat_response") {
         try {
           const body = JSON.parse(data.body);
           
-          if (body.type === "text-delta" && (body.delta || body.textDelta)) {
-            const text = body.delta || body.textDelta;
+          if (body.type === "tool-input-available") {
             setMessages(prev => {
               const updated = [...prev];
               const lastMsg = updated[updated.length - 1];
-              if (lastMsg && lastMsg.role === "assistant") {
-                lastMsg.content += text;
-              }
-              return [...updated];
-            });
-          } else if (body.type === "tool-input-available") {
-            setMessages(prev => {
-              const updated = [...prev];
-              const lastMsg = updated[updated.length - 1];
-              if (lastMsg && lastMsg.role === "assistant") {
+              if (lastMsg?.role === "assistant") {
                 lastMsg.toolCalls = lastMsg.toolCalls || [];
-                lastMsg.toolCalls.push({
-                  name: body.toolName,
-                  input: body.input
-                });
+                lastMsg.toolCalls.push({ name: body.toolName, input: body.input });
               }
               return [...updated];
             });
@@ -102,22 +78,28 @@
             setMessages(prev => {
               const updated = [...prev];
               const lastMsg = updated[updated.length - 1];
-              if (lastMsg && lastMsg.role === "assistant") {
+              if (lastMsg?.role === "assistant") {
                 lastMsg.toolResults = lastMsg.toolResults || [];
                 lastMsg.toolResults.push(body.output);
+              }
+              return [...updated];
+            });
+          } else if (body.type === "text-delta" && (body.delta || body.textDelta)) {
+            const text = body.delta || body.textDelta;
+            setMessages(prev => {
+              const updated = [...prev];
+              const lastMsg = updated[updated.length - 1];
+              if (lastMsg?.role === "assistant") {
+                lastMsg.content += text;
               }
               return [...updated];
             });
           } else if (body.type === "finish") {
             setIsLoading(false);
           }
-        } catch (e) {
-          // Body wasn't JSON
-        }
+        } catch (e) {}
 
-        if (data.done) {
-          setIsLoading(false);
-        }
+        if (data.done) setIsLoading(false);
       }
     };
 
@@ -126,18 +108,11 @@
       if (!input.trim() || isLoading || !isConnected) return;
 
       const userMessage = { role: "user", content: input };
-      setMessages(prev => [...prev, userMessage]);
-      
-      // Add placeholder for assistant response
-      setMessages(prev => [...prev, { role: "assistant", content: "", toolCalls: [], toolResults: [] }]);
-      
-      const messageId = crypto.randomUUID();
-      pendingMessageId.current = messageId;
+      setMessages(prev => [...prev, userMessage, { role: "assistant", content: "", toolCalls: [], toolResults: [] }]);
 
-      // Send via WebSocket
       wsRef.current.send(JSON.stringify({
         type: "cf_agent_use_chat_request",
-        id: messageId,
+        id: crypto.randomUUID(),
         init: {
           method: "POST",
           body: JSON.stringify({
@@ -156,68 +131,64 @@
     };
 
     return (
-      <div className="min-h-screen bg-gray-100 flex flex-col">
-        <header className="bg-white shadow-sm p-4">
-          <h1 className="text-xl font-semibold text-gray-800">Veta Agent Chat</h1>
-          <p className="text-sm text-gray-500">
-            {isConnected ? "🟢 Connected" : "🔴 Disconnected"}
-          </p>
+      <div className="min-h-screen flex flex-col text-lg">
+        <header className="border-b-2 border-green-500 p-4">
+          <h1 className="text-2xl text-green-400">VETA AGENT</h1>
+          <p className="text-sm">{isConnected ? "[CONNECTED]" : "[DISCONNECTED]"}</p>
         </header>
 
         <main className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[80%] rounded-lg p-3 ${
-                msg.role === "user" ? "bg-blue-500 text-white" : "bg-white shadow"
+              <div className={`max-w-[80%] p-3 border-2 ${
+                msg.role === "user" 
+                  ? "border-cyan-500 text-cyan-400 bg-cyan-950/30" 
+                  : "border-green-500 text-green-400 bg-green-950/30"
               }`}>
-                <p className="whitespace-pre-wrap">{msg.content}</p>
-                {msg.toolCalls?.length > 0 && (
-                  <div className="mt-2 pt-2 border-t border-gray-200 text-sm text-gray-600">
+                {msg.role === "assistant" && msg.toolCalls?.length > 0 && (
+                  <div className="mb-2 pb-2 border-b border-green-700">
                     {msg.toolCalls.map((tc, j) => (
-                      <div key={j} className="font-mono text-xs bg-gray-100 p-1 rounded mt-1">
-                        🔧 {tc.name}({JSON.stringify(tc.input)})
+                      <div key={j} className="text-yellow-500 text-sm">
+                        &gt; {tc.name}({JSON.stringify(tc.input)})
                       </div>
                     ))}
                   </div>
                 )}
-                {msg.toolResults?.length > 0 && (
-                  <div className="mt-2 text-sm text-gray-600">
+                {msg.role === "assistant" && msg.toolResults?.length > 0 && (
+                  <div className="mb-2 pb-2 border-b border-green-700">
                     {msg.toolResults.map((result, j) => (
-                      <div key={j} className="font-mono text-xs bg-green-50 p-1 rounded mt-1">
-                        ✅ {result}
-                      </div>
+                      <div key={j} className="text-emerald-400 text-sm">{result}</div>
                     ))}
                   </div>
+                )}
+                {msg.role === "assistant" && isLoading && !msg.content && !msg.toolCalls?.length ? (
+                  <span className="animate-pulse">_</span>
+                ) : (
+                  <p className="whitespace-pre-wrap">{msg.content}</p>
                 )}
               </div>
             </div>
           ))}
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="bg-white shadow rounded-lg p-3">
-                <span className="animate-pulse">Thinking...</span>
-              </div>
-            </div>
-          )}
           <div ref={messagesEndRef} />
         </main>
 
-        <form onSubmit={sendMessage} className="p-4 bg-white shadow-lg">
+        <form onSubmit={sendMessage} className="p-4 border-t-2 border-green-500">
           <div className="flex gap-2">
+            <span className="text-green-500 py-2">&gt;</span>
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask the agent something..."
-              className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter command..."
+              className="flex-1 p-2 bg-transparent border-2 border-green-700 text-green-400 placeholder-green-800 focus:outline-none focus:border-green-500"
               disabled={!isConnected || isLoading}
             />
             <button
               type="submit"
               disabled={!isConnected || isLoading || !input.trim()}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 border-2 border-green-500 text-green-400 hover:bg-green-950 disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              Send
+              SEND
             </button>
           </div>
         </form>
