@@ -11,7 +11,8 @@ if (!action || !prompt) {
   process.exit(1);
 }
 
-const ws = new WebSocket(`ws://localhost:8788/agents/chat/cctr-${action}-${Date.now()}`);
+const port = process.env.TEST_PORT || '8787';
+const ws = new WebSocket(`ws://localhost:${port}/agents/chat/cctr-${action}-${Date.now()}`);
 
 ws.on('open', () => {
   ws.send(JSON.stringify({
