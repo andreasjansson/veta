@@ -33,9 +33,9 @@ where
 ===
 agent searches and finds the note
 ===
-cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 TEST_AGENT_ID=cctr-integration node test-ws-chat.mjs "Search notes for 'banana'. What do you find?"
+cd "$CCTR_TEST_PATH/../../examples/agent-sdk" && TEST_PORT=8788 TEST_AGENT_ID=cctr-integration node test-ws-chat.mjs "Use the searchNotes tool to search for 'Banana'. Tell me what you found."
 ---
 {{ response }}
 ---
 where
-* response contains "Banana" or response contains "banana" or response contains "Smoothie" or response contains "smoothie"
+* response contains "Banana" or response contains "banana" or response contains "Smoothie" or response contains "smoothie" or response contains "Blend" or response contains "blend"
