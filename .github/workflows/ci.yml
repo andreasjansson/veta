@@ -350,15 +350,15 @@ jobs:
           end
           EOF
           
-          # Use gh CLI to handle authentication
-          gh repo clone andreasjansson/homebrew-tap
+          # Clone and push using token auth
+          git clone https://x-access-token:${GH_TOKEN}@github.com/andreasjansson/homebrew-tap.git
           cp veta.rb homebrew-tap/Formula/veta.rb
           cd homebrew-tap
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Formula/veta.rb
           git commit -m "Update veta to ${VERSION}"
-          git push
+          git push https://x-access-token:${GH_TOKEN}@github.com/andreasjansson/homebrew-tap.git
 
   # Post-release smoke tests
   smoke-test-cli-macos:
