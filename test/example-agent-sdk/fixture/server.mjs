@@ -12,15 +12,12 @@ process.on('SIGHUP', () => {
   console.log('Received SIGHUP, ignoring...');
 });
 
-const wrangler = spawn('npx', [
-  'wrangler', 'dev',
-  '-c', 'wrangler.agent.jsonc',
-  '-c', 'wrangler.veta.jsonc',
-  '--port', '8788'
-], {
+// Use shell: true to inherit PATH and find npx
+const wrangler = spawn('npx wrangler dev -c wrangler.agent.jsonc -c wrangler.veta.jsonc --port 8788', [], {
   cwd: exampleDir,
   stdio: 'inherit',
   detached: true,
+  shell: true,
 });
 
 wrangler.unref();
