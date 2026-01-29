@@ -1,0 +1,21 @@
+%skip(requires OPENAI_API_KEY) if: test -z "$OPENAI_API_KEY"
+
+===
+agent can respond to simple message
+===
+curl -s -X POST http://localhost:8787/agents/chat/test-integration \
+  -H "Content-Type: application/json" \
+  -d '{"messages": [{"role": "user", "parts": [{"type": "text", "text": "Say hello"}]}]}' \
+  -o /dev/null -w '%{http_code}'
+---
+200
+
+===
+agent can use veta to add a note
+===
+RESPONSE=$(curl -s -X POST http://localhost:8787/agents/chat/test-veta \
+  -H "Content-Type: application/json" \
+  -d '{"messages": [{"role": "user", "parts": [{"type": "text", "text": "Remember that my favorite color is blue. Use the addNote tool."}]}]}')
+echo "$RESPONSE" | grep -q "addNote\|Added note" && echo "ok" || echo "fail"
+---
+ok
