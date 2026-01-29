@@ -1,4 +1,4 @@
-import { routeAgentRequest } from "agents";
+import { routeAgentRequest, getCurrentAgent } from "agents";
 import { AIChatAgent } from "@cloudflare/ai-chat";
 import {
   streamText,
@@ -9,16 +9,22 @@ import {
   type StreamTextOnFinishCallback,
   type ToolSet,
 } from "ai";
-import { openai } from "@ai-sdk/openai";
+import { createOpenAI } from "@ai-sdk/openai";
 import { tools } from "./tools";
-
-const model = openai("gpt-4o-mini");
 
 export class Chat extends AIChatAgent<Env> {
   async onChatMessage(
     onFinish: StreamTextOnFinishCallback<ToolSet>,
     options?: { abortSignal?: AbortSignal }
   ) {
+    // Get API key from environment binding
+    const agent = getCurrentAgent<Env>();
+    // @ts-expect-error - env is protected but we need it for the API key
+    const apiKey = agent.env.OPENAI_API_KEY;
+    
+    const openai = createOpenAI({ apiKey });
+    const model = openai("gpt-4o-mini");
+
     const stream = createUIMessageStream({
       execute: async ({ writer }) => {
         const result = streamText({
