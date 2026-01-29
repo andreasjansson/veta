@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Start the multi-worker dev server for testing
 
-import { spawn } from 'child_process';
+import { spawn, execSync } from 'child_process';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -12,12 +12,18 @@ process.on('SIGHUP', () => {
   console.log('Received SIGHUP, ignoring...');
 });
 
-// Use shell: true to inherit PATH and find npx
-const wrangler = spawn('npx wrangler dev -c wrangler.agent.jsonc -c wrangler.veta.jsonc --port 8788', [], {
+// Find npx in the example directory's node_modules
+const npxPath = join(exampleDir, 'node_modules', '.bin', 'wrangler');
+
+const wrangler = spawn(npxPath, [
+  'dev',
+  '-c', 'wrangler.agent.jsonc',
+  '-c', 'wrangler.veta.jsonc',
+  '--port', '8788'
+], {
   cwd: exampleDir,
   stdio: 'inherit',
   detached: true,
-  shell: true,
 });
 
 wrangler.unref();
