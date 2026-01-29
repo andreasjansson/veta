@@ -1,0 +1,89 @@
+===
+UI is served at root
+===
+curl -s http://localhost:8787/ | grep -o '<title>.*</title>'
+---
+<title>Veta Agent</title>
+
+===
+check-open-ai-key endpoint returns json
+===
+curl -s http://localhost:8787/check-open-ai-key | jq 'has("success")'
+---
+true
+
+===
+agent endpoint exists
+===
+curl -s -o /dev/null -w '%{http_code}' http://localhost:8787/agents/chat/test-agent
+---
+{{ status }}
+---
+where
+* status == 101 or status == 200 or status == 426
+
+===
+veta api health check via service binding
+===
+curl -s http://localhost:8787/veta/
+---
+Veta API
+
+===
+create note via veta api
+===
+curl -s -X POST http://localhost:8787/veta/notes \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Test note", "body": "Hello from tests", "tags": ["test"]}' \
+  | jq .
+---
+{
+  "id": 1
+}
+
+===
+list notes via veta api
+===
+curl -s http://localhost:8787/veta/notes | jq 'length'
+---
+1
+
+===
+get note via veta api
+===
+curl -s http://localhost:8787/veta/notes/1 | jq '{title, body}'
+---
+{
+  "title": "Test note",
+  "body": "Hello from tests"
+}
+
+===
+list tags via veta api
+===
+curl -s http://localhost:8787/veta/tags | jq '.[0].name'
+---
+"test"
+
+===
+search notes via veta api
+===
+curl -s "http://localhost:8787/veta/grep?q=Hello" | jq 'length'
+---
+1
+
+===
+delete note via veta api
+===
+curl -s -X DELETE http://localhost:8787/veta/notes/1 | jq .
+---
+{
+  "ok": true
+}
+
+===
+verify deletion
+===
+curl -s http://localhost:8787/veta/notes | jq 'length'
+---
+0
