@@ -1,6 +1,13 @@
-# Ignore dev files, but NOT the build directory
+# NPM ignore file
+# Note: We explicitly DO want to include build/ in the package
+# even though it's in the root .gitignore
+
+# Ignore source and dev files
 .wrangler/
 node_modules/
 src/
 Cargo.toml
 *.rs
+
+# Explicitly include build (negate gitignore)
+!build/
