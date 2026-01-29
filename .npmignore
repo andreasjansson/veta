@@ -1,0 +1,3 @@
+# Root npmignore - this file exists to prevent npm from using .gitignore
+# The actual package is in crates/veta-worker/ which has its own .npmignore
+*
