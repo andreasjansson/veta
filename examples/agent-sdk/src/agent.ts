@@ -5,6 +5,7 @@ import {
   createUIMessageStream,
   convertToModelMessages,
   createUIMessageStreamResponse,
+  stepCountIs,
   type StreamTextOnFinishCallback,
   type ToolSet,
 } from "ai";
@@ -26,8 +27,8 @@ Use Veta to remember important information across conversations.`,
           messages: await convertToModelMessages(this.messages),
           model,
           tools,
-          onFinish: onFinish as StreamTextOnFinishCallback<typeof tools>,
-          maxSteps: 5,
+          onFinish: onFinish as unknown as StreamTextOnFinishCallback<typeof tools>,
+          stopWhen: stepCountIs(5),
           abortSignal: options?.abortSignal,
         });
         writer.merge(result.toUIMessageStream());
