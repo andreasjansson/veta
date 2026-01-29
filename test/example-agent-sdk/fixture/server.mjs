@@ -1,21 +1,23 @@
 #!/usr/bin/env node
 // Start the multi-worker dev server for testing
 
-import { spawn, execSync } from 'child_process';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { spawn } from 'child_process';
+import { join } from 'path';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const exampleDir = join(__dirname, '..', '..', '..', 'examples', 'agent-sdk');
+const exampleDir = process.env.VETA_EXAMPLE_DIR;
+if (!exampleDir) {
+  console.error('VETA_EXAMPLE_DIR not set');
+  process.exit(1);
+}
 
 process.on('SIGHUP', () => {
   console.log('Received SIGHUP, ignoring...');
 });
 
-// Find npx in the example directory's node_modules
-const npxPath = join(exampleDir, 'node_modules', '.bin', 'wrangler');
+// Use wrangler directly from node_modules
+const wranglerPath = join(exampleDir, 'node_modules', '.bin', 'wrangler');
 
-const wrangler = spawn(npxPath, [
+const wrangler = spawn(wranglerPath, [
   'dev',
   '-c', 'wrangler.agent.jsonc',
   '-c', 'wrangler.veta.jsonc',
