@@ -45,7 +45,7 @@ Download from the [releases page](https://github.com/andreasjansson/veta/release
 ```bash
 git clone https://github.com/andreasjansson/veta.git
 cd veta
-cargo install --path crates/veta-cli
+cargo install --path crates/veta
 ```
 
 ## Claude Code Skill
