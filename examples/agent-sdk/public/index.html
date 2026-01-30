@@ -28,6 +28,7 @@
     const [isConnected, setIsConnected] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef(null);
+    const inputRef = useRef(null);
     const wsRef = useRef(null);
     const agentId = useRef(crypto.randomUUID());
 
