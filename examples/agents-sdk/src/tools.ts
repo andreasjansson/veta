@@ -47,9 +47,9 @@ export const tools = {
     execute: async ({ tags }) => {
       const params = tags?.length ? `?tags=${tags.join(",")}` : "";
       const res = await veta().fetch(`http://veta/notes${params}`);
-      const notes = (await res.json()) as { id: number; title: string; tags: string[] }[];
+      const notes = (await res.json()) as { id: number; title: string; body_preview: string; tags: string[] }[];
       if (!notes.length) return "No notes found.";
-      return notes.map((n) => `[${n.id}] ${n.title} (${n.tags.join(", ")})`).join("\n");
+      return notes.map((n) => `[${n.id}] ${n.title} (${n.tags.join(", ")})\n${n.body_preview}`).join("\n\n");
     },
   }),
 
