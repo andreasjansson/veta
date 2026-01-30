@@ -28,11 +28,9 @@ fi
 node "$CCTR_FIXTURE_DIR/server.mjs" > /tmp/veta-test.log 2>&1 &
 echo $! > /tmp/veta-test.pid
 
-# Wait for server to be ready
+# Wait for server to be ready (migrations run automatically on first request)
 for i in {1..60}; do
     if curl -s -o /dev/null http://localhost:8787/ 2>/dev/null; then
-        # Run migrations
-        curl -s -X POST http://localhost:8787/migrate > /dev/null
         echo "ready"
         exit 0
     fi
