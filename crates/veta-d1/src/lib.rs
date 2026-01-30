@@ -92,13 +92,11 @@ impl D1DatabaseWrapper {
                 }
                 // ALTER TABLE doesn't support IF NOT EXISTS, so ignore errors for those
                 if statement.starts_with("ALTER TABLE") {
-                    let _ = self.db.prepare(statement).run().await;
+                    let _ = self.db.prepare(*statement).run().await;
                 } else {
-                    self.db
-                        .prepare(statement)
-                        .run()
-                        .await
-                        .map_err(|e| Error::Database(format!("Migration {} failed: {}", migration.name, e)))?;
+                    self.db.prepare(*statement).run().await.map_err(|e| {
+                        Error::Database(format!("Migration {} failed: {}", migration.name, e))
+                    })?;
                 }
             }
         }
