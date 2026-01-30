@@ -12,9 +12,28 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <style>
+    /* CGA 16-color palette */
+    :root {
+      --cga-black: #000000;
+      --cga-blue: #0000AA;
+      --cga-green: #00AA00;
+      --cga-cyan: #00AAAA;
+      --cga-red: #AA0000;
+      --cga-magenta: #AA00AA;
+      --cga-brown: #AA5500;
+      --cga-light-gray: #AAAAAA;
+      --cga-dark-gray: #555555;
+      --cga-light-blue: #5555FF;
+      --cga-light-green: #55FF55;
+      --cga-light-cyan: #55FFFF;
+      --cga-light-red: #FF5555;
+      --cga-light-magenta: #FF55FF;
+      --cga-yellow: #FFFF55;
+      --cga-white: #FFFFFF;
+    }
     * { font-family: "VT323", monospace; }
     html, body, #root { height: 100%; margin: 0; overflow: hidden; }
-    body { background: #0a0a0a; color: #00ff00; font-size: 1.5rem; }
+    body { background: var(--cga-black); color: var(--cga-light-green); font-size: 1.5rem; }
   </style>
 </head>
 <body>
@@ -31,8 +50,8 @@
         const displayValue = typeof value === 'string' ? value : JSON.stringify(value);
         return (
           <div key={key} className="pl-4">
-            <span className="text-cyan-600">{key}:</span>{" "}
-            <span className="text-cyan-400 whitespace-pre-wrap">{displayValue}</span>
+            <span style={{color: 'var(--cga-cyan)'}}>{key}:</span>{" "}
+            <span style={{color: 'var(--cga-light-cyan)'}} className="whitespace-pre-wrap">{displayValue}</span>
           </div>
         );
       });
@@ -40,26 +59,27 @@
 
     return (
       <div className="flex justify-start">
-        <div className="max-w-[80%] p-3 border-2 border-yellow-600 bg-yellow-950/20">
+        <div className="max-w-[80%] p-3 border-2" style={{borderColor: 'var(--cga-brown)', backgroundColor: 'rgba(170, 85, 0, 0.1)'}}>
           <button
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-2 text-yellow-500 hover:text-yellow-400 cursor-pointer text-left w-full"
+            className="flex items-center gap-2 cursor-pointer text-left w-full"
+            style={{color: 'var(--cga-yellow)'}}
           >
-            <span className="text-yellow-700">{expanded ? "[-]" : "[+]"}</span>
+            <span style={{color: 'var(--cga-brown)'}}>{expanded ? "[-]" : "[+]"}</span>
             <span>{toolCall.name}</span>
           </button>
           {expanded && (
-            <div className="mt-2 pt-2 border-t border-yellow-800">
+            <div className="mt-2 pt-2" style={{borderTop: '1px solid var(--cga-brown)'}}>
               {toolCall.input && Object.keys(toolCall.input).length > 0 && (
                 <div className="mb-2">
-                  <div className="text-yellow-700">INPUT:</div>
+                  <div style={{color: 'var(--cga-brown)'}}>INPUT:</div>
                   {formatInput(toolCall.input)}
                 </div>
               )}
               {result !== undefined && (
                 <div>
-                  <div className="text-yellow-700">OUTPUT:</div>
-                  <div className="pl-4 text-emerald-400 whitespace-pre-wrap">{result}</div>
+                  <div style={{color: 'var(--cga-brown)'}}>OUTPUT:</div>
+                  <div className="pl-4 whitespace-pre-wrap" style={{color: 'var(--cga-light-green)'}}>{result}</div>
                 </div>
               )}
             </div>
@@ -187,10 +207,10 @@
 
     return (
       <div className="h-full flex flex-col">
-        <header className="border-b-2 border-green-500 p-4 flex justify-between items-center">
+        <header className="border-b-2 p-4 flex justify-between items-center" style={{borderColor: 'var(--cga-green)'}}>
           <div className="flex items-center gap-4">
-            <h1 className="text-green-400">VETA AGENT</h1>
-            <span>{isConnected ? "[CONNECTED]" : "[DISCONNECTED]"}</span>
+            <h1 style={{color: 'var(--cga-light-green)'}}>VETA AGENT</h1>
+            <span style={{color: 'var(--cga-light-gray)'}}>{isConnected ? "[CONNECTED]" : "[DISCONNECTED]"}</span>
           </div>
           <button
             onClick={() => {
@@ -199,7 +219,10 @@
               agentId.current = crypto.randomUUID();
               connectWebSocket();
             }}
-            className="px-4 py-2 border-2 border-green-500 text-green-400 hover:bg-green-950"
+            className="px-4 py-2 border-2"
+            style={{borderColor: 'var(--cga-green)', color: 'var(--cga-light-green)'}}
+            onMouseOver={(e) => e.target.style.backgroundColor = 'var(--cga-green)'}
+            onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
           >
             NEW CHAT
           </button>
@@ -210,7 +233,7 @@
             <React.Fragment key={i}>
               {msg.role === "user" ? (
                 <div className="flex justify-end">
-                  <div className="max-w-[80%] p-3 border-2 border-cyan-500 text-cyan-400 bg-cyan-950/30">
+                  <div className="max-w-[80%] p-3 border-2" style={{borderColor: 'var(--cga-cyan)', color: 'var(--cga-light-cyan)', backgroundColor: 'rgba(0, 170, 170, 0.1)'}}>
                     <p className="whitespace-pre-wrap">{msg.content}</p>
                   </div>
                 </div>
@@ -225,7 +248,7 @@
                   ))}
                   {(msg.content || (isLoading && i === messages.length - 1 && !msg.toolCalls?.length)) && (
                     <div className="flex justify-start">
-                      <div className="max-w-[80%] p-3 border-2 border-green-500 text-green-400 bg-green-950/30">
+                      <div className="max-w-[80%] p-3 border-2" style={{borderColor: 'var(--cga-green)', color: 'var(--cga-light-green)', backgroundColor: 'rgba(0, 170, 0, 0.1)'}}>
                         {isLoading && i === messages.length - 1 && !msg.content ? (
                           <span className="animate-pulse">_</span>
                         ) : (
@@ -241,22 +264,24 @@
           <div ref={messagesEndRef} />
         </main>
 
-        <form onSubmit={sendMessage} className="p-4 border-t-2 border-green-500">
+        <form onSubmit={sendMessage} className="p-4 border-t-2" style={{borderColor: 'var(--cga-green)'}}>
           <div className="flex gap-2">
-            <span className="text-green-500 py-2">&gt;</span>
+            <span className="py-2" style={{color: 'var(--cga-green)'}}>&gt;</span>
             <input
               ref={inputRef}
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Enter command..."
-              className="flex-1 p-2 bg-transparent border-2 border-green-700 text-green-400 placeholder-green-800 focus:outline-none focus:border-green-500"
+              className="flex-1 p-2 bg-transparent border-2 focus:outline-none"
+              style={{borderColor: 'var(--cga-green)', color: 'var(--cga-light-green)'}}
               disabled={!isConnected || isLoading}
             />
             <button
               type="submit"
               disabled={!isConnected || isLoading || !input.trim()}
-              className="px-4 py-2 border-2 border-green-500 text-green-400 hover:bg-green-950 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="px-4 py-2 border-2 disabled:opacity-30 disabled:cursor-not-allowed"
+              style={{borderColor: 'var(--cga-green)', color: 'var(--cga-light-green)'}}
             >
               SEND
             </button>
