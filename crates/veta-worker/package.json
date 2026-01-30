@@ -6,9 +6,7 @@
     "type": "git",
     "url": "https://github.com/andreasjansson/veta"
   },
-  "main": "build/worker/shim.mjs",
   "exports": {
-    ".": "./build/worker/shim.mjs",
     "./worker": "./build/worker/shim.mjs"
   },
   "scripts": {
