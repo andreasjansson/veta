@@ -200,8 +200,8 @@ fn open_database(path: &Path) -> Result<SqliteDatabase> {
         }
     }
 
+    // Migrations run automatically in SqliteDatabase::open()
     let db = SqliteDatabase::open(path).context("Failed to open database")?;
-    db.run_migrations().context("Failed to run migrations")?;
     Ok(db)
 }
 
