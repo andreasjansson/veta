@@ -79,10 +79,10 @@ enum Commands {
         #[arg(long)]
         references: Option<String>,
     },
-    /// Delete a note
-    Delete {
-        /// Note ID
-        id: i64,
+    /// Delete one or more notes
+    Rm {
+        /// Comma-separated note IDs
+        ids: String,
     },
     /// List all tags
     Tags,
