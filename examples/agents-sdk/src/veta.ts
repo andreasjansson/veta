@@ -1,1 +1,1 @@
-export { default } from "veta";
+export { default } from "veta/worker";
