@@ -58,17 +58,30 @@ fn json_error(msg: &str, status: u16) -> Result<Response> {
 }
 
 async fn get_service(env: &Env) -> std::result::Result<VetaService<D1DatabaseWrapper>, Response> {
-    let db = env.d1("VETA_DB").map_err(|e| {
-        json_error(&format!("Database binding error: {}", e), 500).unwrap()
-    })?;
+    let db = match env.d1("VETA_DB") {
+        Ok(db) => db,
+        Err(e) => {
+            return Err(json_error(&format!("Database binding error: {}", e), 500).unwrap())
+        }
+    };
     let mut wrapper = D1DatabaseWrapper::new(db);
 
     // Ensure migrations have been run (fast no-op after first check)
-    wrapper.ensure_initialized().await.map_err(|e| {
-        json_error(&format!("Database initialization error: {}", e), 500).unwrap()
-    })?;
+    if let Err(e) = wrapper.ensure_initialized().await {
+        return Err(json_error(&format!("Database initialization error: {}", e), 500).unwrap());
+    }
 
     Ok(VetaService::new(wrapper))
+}
+
+/// Macro to handle service initialization errors in route handlers
+macro_rules! get_service_or_return {
+    ($env:expr) => {
+        match get_service($env).await {
+            Ok(service) => service,
+            Err(response) => return Ok(response),
+        }
+    };
 }
 
 fn parse_query_tags(url: &Url) -> Option<Vec<String>> {
