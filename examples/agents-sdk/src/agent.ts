@@ -21,11 +21,17 @@ export class Chat extends AIChatAgent<Env> {
     const apiKey = this.env.OPENAI_API_KEY;
     
     if (!apiKey) {
-      throw new Error(
+      const errorMessage = 
         "OPENAI_API_KEY is not set. " +
-        "Run: npx wrangler secret put OPENAI_API_KEY -c wrangler.agent.jsonc\n" +
-        "Or add it to .dev.vars for local development."
-      );
+        "Run: npx wrangler secret put OPENAI_API_KEY -c wrangler.agent.jsonc -- " +
+        "Or add it to .dev.vars for local development.";
+      
+      const stream = createUIMessageStream({
+        execute: async ({ writer }) => {
+          writer.write({ type: "error", errorText: errorMessage });
+        },
+      });
+      return createUIMessageStreamResponse({ stream });
     }
     
     const openai = createOpenAI({ apiKey });
