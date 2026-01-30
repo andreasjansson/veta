@@ -187,7 +187,7 @@
               const lastMsg = updated[updated.length - 1];
               if (lastMsg?.role === "assistant") {
                 lastMsg.toolCalls = lastMsg.toolCalls || [];
-                lastMsg.toolCalls.push({ name: body.toolName, input: body.input });
+                lastMsg.toolCalls.push({ id: body.toolCallId, name: body.toolName, input: body.input });
               }
               return [...updated];
             });
@@ -195,9 +195,12 @@
             setMessages(prev => {
               const updated = [...prev];
               const lastMsg = updated[updated.length - 1];
-              if (lastMsg?.role === "assistant") {
-                lastMsg.toolResults = lastMsg.toolResults || [];
-                lastMsg.toolResults.push(body.output);
+              if (lastMsg?.role === "assistant" && lastMsg.toolCalls) {
+                // Find the matching tool call by ID and attach the result
+                const toolCall = lastMsg.toolCalls.find(tc => tc.id === body.toolCallId);
+                if (toolCall) {
+                  toolCall.result = body.output;
+                }
               }
               return [...updated];
             });
