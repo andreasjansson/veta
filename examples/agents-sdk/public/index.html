@@ -205,7 +205,7 @@
         {/* Title bar */}
         <div className="bg-cga-blue text-cga-white px-4 flex justify-between items-center">
           <span>VETA AGENT {isConnected ? "[CONNECTED]" : "[DISCONNECTED]"}</span>
-          <button className="btn px-2 my-1 leading-none" onClick={() => { wsRef.current?.close(); setMessages([]); agentId.current = crypto.randomUUID(); connectWebSocket(); }}>
+          <button className="btn px-2 my-1 leading-none" onClick={() => { wsRef.current?.close(); setMessages([]); agentId.current = crypto.randomUUID(); connectWebSocket(); setTimeout(() => inputRef.current?.focus(), 100); }}>
             NEW CHAT
           </button>
         </div>
