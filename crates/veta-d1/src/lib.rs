@@ -2,59 +2,115 @@
 
 use regex::Regex;
 use serde::Deserialize;
-use veta_core::{CreateNote, Database, Error, Note, NoteQuery, TagCount, UpdateNote};
+use std::sync::atomic::{AtomicBool, Ordering};
+use veta_core::{
+    get_pending_migrations, CreateNote, Database, Error, Note, NoteQuery, TagCount, UpdateNote,
+    SCHEMA_VERSION,
+};
 use wasm_bindgen::JsValue;
 use worker::d1::D1Database;
+
+/// Track whether we've already checked migrations in this isolate.
+/// This avoids redundant checks on every request within the same worker instance.
+static MIGRATIONS_CHECKED: AtomicBool = AtomicBool::new(false);
 
 /// D1-backed database implementation.
 pub struct D1DatabaseWrapper {
     db: D1Database,
+    initialized: bool,
+}
+
+#[derive(Deserialize)]
+struct MetaRow {
+    value: String,
 }
 
 impl D1DatabaseWrapper {
     pub fn new(db: D1Database) -> Self {
-        Self { db }
+        Self {
+            db,
+            initialized: false,
+        }
     }
 
-    /// Run database migrations.
-    pub async fn run_migrations(&self) -> Result<(), Error> {
-        // Run each statement separately since exec() has issues with multiple statements
-        let statements = [
-            "CREATE TABLE IF NOT EXISTS notes (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT NOT NULL,
-                body TEXT NOT NULL,
-                created_at TEXT NOT NULL DEFAULT (datetime('now')),
-                updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-            )",
-            "CREATE TABLE IF NOT EXISTS tags (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL UNIQUE
-            )",
-            "CREATE TABLE IF NOT EXISTS note_tags (
-                note_id INTEGER NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
-                tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
-                PRIMARY KEY (note_id, tag_id)
-            )",
-            "CREATE INDEX IF NOT EXISTS idx_notes_updated_at ON notes(updated_at)",
-            "CREATE INDEX IF NOT EXISTS idx_note_tags_tag_id ON note_tags(tag_id)",
-            "CREATE INDEX IF NOT EXISTS idx_tags_name ON tags(name)",
-        ];
-
-        for sql in statements {
-            self.db
-                .prepare(sql)
-                .run()
-                .await
-                .map_err(|e| Error::Database(e.to_string()))?;
+    /// Ensure migrations have been run. Called automatically on first database access.
+    pub async fn ensure_initialized(&mut self) -> Result<(), Error> {
+        // Fast path: already initialized in this instance
+        if self.initialized {
+            return Ok(());
         }
 
-        // Migration 0002: Add references column (ignore error if column already exists)
-        let _ = self
-            .db
-            .prepare("ALTER TABLE notes ADD COLUMN \"references\" TEXT NOT NULL DEFAULT '[]'")
+        // Check if another request in this isolate already ran migrations
+        if MIGRATIONS_CHECKED.load(Ordering::Relaxed) {
+            self.initialized = true;
+            return Ok(());
+        }
+
+        self.run_migrations().await?;
+
+        MIGRATIONS_CHECKED.store(true, Ordering::Relaxed);
+        self.initialized = true;
+        Ok(())
+    }
+
+    /// Run any pending database migrations.
+    async fn run_migrations(&self) -> Result<(), Error> {
+        // Ensure _veta_meta table exists
+        self.db
+            .prepare(
+                "CREATE TABLE IF NOT EXISTS _veta_meta (
+                    key TEXT PRIMARY KEY,
+                    value TEXT NOT NULL
+                )",
+            )
             .run()
-            .await;
+            .await
+            .map_err(|e| Error::Database(e.to_string()))?;
+
+        // Get current schema version
+        let current_version: i64 = match self
+            .db
+            .prepare("SELECT value FROM _veta_meta WHERE key = 'schema_version'")
+            .first::<MetaRow>(None)
+            .await
+        {
+            Ok(Some(row)) => row.value.parse().unwrap_or(0),
+            _ => 0,
+        };
+
+        // Already up to date
+        if current_version >= SCHEMA_VERSION {
+            return Ok(());
+        }
+
+        // Run pending migrations
+        for migration in get_pending_migrations(current_version) {
+            for statement in migration.statements {
+                // Skip _veta_meta creation (already done above)
+                if statement.contains("_veta_meta") {
+                    continue;
+                }
+                // ALTER TABLE doesn't support IF NOT EXISTS, so ignore errors for those
+                if statement.starts_with("ALTER TABLE") {
+                    let _ = self.db.prepare(statement).run().await;
+                } else {
+                    self.db
+                        .prepare(statement)
+                        .run()
+                        .await
+                        .map_err(|e| Error::Database(format!("Migration {} failed: {}", migration.name, e)))?;
+                }
+            }
+        }
+
+        // Update schema version
+        self.db
+            .prepare("INSERT OR REPLACE INTO _veta_meta (key, value) VALUES ('schema_version', ?1)")
+            .bind(&[SCHEMA_VERSION.to_string().into()])
+            .map_err(|e| Error::Database(e.to_string()))?
+            .run()
+            .await
+            .map_err(|e| Error::Database(e.to_string()))?;
 
         Ok(())
     }
