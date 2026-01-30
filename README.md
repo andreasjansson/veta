@@ -234,18 +234,9 @@ compatibility_date = "2025-01-01"
 [[d1_databases]]
 binding = "VETA_DB"
 database_name = "my-veta-db"
-database_id = "<YOUR_DATABASE_ID>"
 EOF
 
-# Create the D1 database
-npx wrangler d1 create my-veta-db
-# Copy the database_id into wrangler.toml
-
-# Apply migrations
-npx wrangler d1 migrations apply my-veta-db --local
-npx wrangler d1 migrations apply my-veta-db --remote
-
-# Deploy
+# Deploy (D1 database is auto-provisioned, migrations run automatically)
 npx wrangler deploy
 ```
 
