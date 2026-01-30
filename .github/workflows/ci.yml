@@ -32,7 +32,7 @@ jobs:
         with:
           components: clippy
       - uses: Swatinem/rust-cache@v2
-      - run: cargo clippy --all-targets -p veta-core -p veta-sqlite -p veta-cli -- -D warnings
+      - run: cargo clippy --all-targets -p veta-core -p veta-sqlite -p veta -- -D warnings
 
   test:
     name: Unit Tests
