@@ -57,11 +57,13 @@
     .btn {
       background: #AAAAAA;
       color: #000000;
-      border: 3px outset #888888;
+      border-style: solid;
+      border-width: 3px;
+      border-color: #FFFFFF #555555 #555555 #FFFFFF;
       cursor: pointer;
     }
-    .btn:hover { background: #CCCCCC; border-color: #AAAAAA; }
-    .btn:active { border-style: inset; }
+    .btn:hover { background: #BBBBBB; }
+    .btn:active { border-color: #555555 #FFFFFF #FFFFFF #555555; }
     .btn:disabled { color: #555555; cursor: not-allowed; }
   </style>
 </head>
