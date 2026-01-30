@@ -199,7 +199,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         })
         // GET /tags - List all tags
         .get_async("/tags", |_, ctx| async move {
-            let service = get_service(&ctx.env).await?;
+            let service = get_service_or_return!(&ctx.env);
 
             match service.list_tags().await {
                 Ok(tags) => json_response(&tags, 200),
@@ -208,7 +208,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         })
         // GET /grep - Search notes
         .get_async("/grep", |req, ctx| async move {
-            let service = get_service(&ctx.env).await?;
+            let service = get_service_or_return!(&ctx.env);
             let url = req.url()?;
 
             let pattern = parse_query_string(&url, "q").unwrap_or_default();
