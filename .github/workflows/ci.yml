@@ -60,7 +60,7 @@ jobs:
         with:
           tool: cctr
       - name: Build CLI
-        run: cargo build --release -p veta-cli
+        run: cargo build --release -p veta
       - name: Add to PATH (Unix)
         if: runner.os != 'Windows'
         run: echo "$PWD/target/release" >> $GITHUB_PATH
