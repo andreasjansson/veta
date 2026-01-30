@@ -51,7 +51,7 @@ npx wrangler d1 create veta-example-db
 3. Set your OpenAI API key as a secret:
 
 ```bash
-npx wrangler secret put OPENAI_API_KEY
+npx wrangler secret put OPENAI_API_KEY -c wrangler.agent.jsonc
 ```
 
 4. Deploy both workers (migrations run automatically):
