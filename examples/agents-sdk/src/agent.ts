@@ -20,6 +20,14 @@ export class Chat extends AIChatAgent<Env> {
     // @ts-expect-error - env is protected but we need it for the API key
     const apiKey = this.env.OPENAI_API_KEY;
     
+    if (!apiKey) {
+      throw new Error(
+        "OPENAI_API_KEY is not set. " +
+        "Run: npx wrangler secret put OPENAI_API_KEY -c wrangler.agent.jsonc\n" +
+        "Or add it to .dev.vars for local development."
+      );
+    }
+    
     const openai = createOpenAI({ apiKey });
     const model = openai("gpt-4o-mini");
 
