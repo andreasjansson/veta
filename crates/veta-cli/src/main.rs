@@ -252,9 +252,8 @@ async fn main() -> Result<()> {
             std::fs::create_dir_all(&veta_dir).context("Failed to create .veta directory")?;
         }
 
-        let db = SqliteDatabase::open(&db_path).context("Failed to create database")?;
-        db.run_migrations()
-            .context("Failed to initialize database schema")?;
+        // Migrations run automatically in SqliteDatabase::open()
+        let _db = SqliteDatabase::open(&db_path).context("Failed to create database")?;
 
         if reinitialize {
             println!("Reinitialized veta database in {}", db_path.display());
