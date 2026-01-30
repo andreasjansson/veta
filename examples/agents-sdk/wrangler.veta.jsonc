@@ -6,9 +6,7 @@
   "d1_databases": [
     {
       "binding": "VETA_DB",
-      "database_name": "veta-example-db",
-      "database_id": "",
-      "migrations_dir": "../../schema/migrations"
+      "database_name": "veta-example-db"
     }
   ]
 }
