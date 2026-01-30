@@ -44,6 +44,24 @@ Note 999 not found
 exit: 1
 
 =====
+delete multiple with some not found still deletes existing ones
+=====
+veta add --title "Temp note" --tags "temp" --body "temp"
+veta rm 1,888,999 2>&1 ; echo "exit: $?"
+-----
+Added note 1
+Deleted note 1
+Note 888 not found
+Note 999 not found
+exit: 1
+
+=====
+verify partial delete worked
+=====
+veta ls
+-----
+
+=====
 edit non-existent note fails
 =====
 veta edit 999 --title "new" --body "" 2>&1 ; echo "exit: $?"
