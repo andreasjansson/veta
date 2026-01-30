@@ -7,198 +7,94 @@
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cga: {
+              black: '#000000',
+              blue: '#0000AA',
+              green: '#00AA00',
+              cyan: '#00AAAA',
+              red: '#AA0000',
+              magenta: '#AA00AA',
+              brown: '#AA5500',
+              'light-gray': '#AAAAAA',
+              'dark-gray': '#555555',
+              'light-blue': '#5555FF',
+              'light-green': '#55FF55',
+              'light-cyan': '#55FFFF',
+              'light-red': '#FF5555',
+              'light-magenta': '#FF55FF',
+              yellow: '#FFFF55',
+              white: '#FFFFFF',
+            }
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    /* CGA 16-color palette */
-    :root {
-      --cga-black: #000000;
-      --cga-blue: #0000AA;
-      --cga-green: #00AA00;
-      --cga-cyan: #00AAAA;
-      --cga-red: #AA0000;
-      --cga-magenta: #AA00AA;
-      --cga-brown: #AA5500;
-      --cga-light-gray: #AAAAAA;
-      --cga-dark-gray: #555555;
-      --cga-light-blue: #5555FF;
-      --cga-light-green: #55FF55;
-      --cga-light-cyan: #55FFFF;
-      --cga-light-red: #FF5555;
-      --cga-light-magenta: #FF55FF;
-      --cga-yellow: #FFFF55;
-      --cga-white: #FFFFFF;
-    }
+    * { font-family: "VT323", monospace; }
+    html, body, #root { height: 100%; margin: 0; overflow: hidden; }
+    body { font-size: 24px; }
 
-    * {
-      font-family: "VT323", monospace;
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html, body, #root {
-      height: 100%;
-      overflow: hidden;
-    }
-
-    body {
-      background: var(--cga-black);
-      color: var(--cga-white);
-      font-size: 24px;
-      line-height: 1.2;
-      --line-height: 1.2em;
-    }
-
-    /* Custom scrollbar - webkit */
-    ::-webkit-scrollbar {
-      -webkit-appearance: none;
-      width: 2ch;
-      height: 2ch;
-      background: var(--cga-light-gray);
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--cga-light-gray);
-      border: 1px solid var(--cga-dark-gray);
-      box-shadow:
-        inset 1px 1px 0 var(--cga-dark-gray),
-        inset -1px -1px 0 var(--cga-white);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--cga-light-gray);
-      border: 1px solid var(--cga-white);
-      box-shadow:
-        inset 1px 1px 0 var(--cga-white),
-        inset -1px -1px 0 var(--cga-dark-gray);
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--cga-white);
-    }
-
-    ::-webkit-scrollbar-button:single-button {
-      background: var(--cga-light-gray);
-      border: 1px solid var(--cga-white);
-      box-shadow:
-        inset 1px 1px 0 var(--cga-white),
-        inset -1px -1px 0 var(--cga-dark-gray);
-      height: 1em;
-      display: block;
-    }
-
-    ::-webkit-scrollbar-button:single-button:hover {
-      background: var(--cga-white);
-    }
-
-    /* Custom scrollbar - Firefox */
-    * {
-      scrollbar-width: auto;
-      scrollbar-color: var(--cga-light-gray) var(--cga-dark-gray);
-    }
-
-    /* 3D raised box effect */
     .box-raised {
-      border: 1px solid var(--cga-white);
-      box-shadow:
-        inset 1px 1px 0 var(--cga-white),
-        inset -1px -1px 0 var(--cga-dark-gray),
-        2px 2px 0 var(--cga-black);
+      border: 1px solid #FFFFFF;
+      box-shadow: inset 1px 1px 0 #FFFFFF, inset -1px -1px 0 #555555, 2px 2px 0 #000000;
     }
 
-    /* 3D inset box effect */
     .box-inset {
-      border: 1px solid var(--cga-dark-gray);
-      box-shadow:
-        inset 1px 1px 0 var(--cga-dark-gray),
-        inset -1px -1px 0 var(--cga-light-gray);
+      border: 1px solid #555555;
+      box-shadow: inset 1px 1px 0 #555555, inset -1px -1px 0 #AAAAAA;
     }
 
-    /* Button style */
     .btn {
-      background: var(--cga-light-gray);
-      color: var(--cga-black);
-      border: 1px solid var(--cga-white);
-      box-shadow:
-        inset 1px 1px 0 var(--cga-white),
-        inset -1px -1px 0 var(--cga-dark-gray),
-        1px 1px 0 var(--cga-black);
+      background: #AAAAAA;
+      color: #000000;
+      border: 1px solid #FFFFFF;
+      box-shadow: inset 1px 1px 0 #FFFFFF, inset -1px -1px 0 #555555, 1px 1px 0 #000000;
       cursor: pointer;
-      padding: 0 1ch;
-      font: inherit;
-      line-height: var(--line-height);
     }
-
-    .btn:hover {
-      background: var(--cga-white);
-    }
-
-    .btn:active {
-      background: var(--cga-light-gray);
-      box-shadow:
-        inset 1px 1px 0 var(--cga-dark-gray),
-        inset -1px -1px 0 var(--cga-white);
-    }
-
-    .btn:disabled {
-      background: var(--cga-light-gray);
-      color: var(--cga-dark-gray);
-      cursor: not-allowed;
-    }
+    .btn:hover { background: #FFFFFF; }
+    .btn:active { box-shadow: inset 1px 1px 0 #555555, inset -1px -1px 0 #FFFFFF; }
+    .btn:disabled { color: #555555; cursor: not-allowed; }
   </style>
 </head>
-<body>
+<body class="bg-cga-black text-cga-white">
   <div id="root"></div>
   <script type="text/babel">
   const { useState, useEffect, useRef } = React;
 
   function ToolCall({ toolCall, result }) {
     const [expanded, setExpanded] = useState(false);
-
-    const formatInput = (input) => {
-      if (!input || typeof input !== 'object') return null;
-      return Object.entries(input).map(([key, value]) => {
-        const displayValue = typeof value === 'string' ? value : JSON.stringify(value);
-        return (
-          <div key={key} style={{marginLeft: '2ch'}}>
-            <span style={{color: 'var(--cga-white)'}}>{key}:</span>{" "}
-            <span style={{color: 'var(--cga-yellow)', whiteSpace: 'pre-wrap'}}>{displayValue}</span>
-          </div>
-        );
-      });
-    };
-
     return (
-      <div
-        className="box-raised"
-        style={{
-          background: 'var(--cga-brown)',
-          color: 'var(--cga-yellow)',
-          padding: '0 1ch',
-          marginBottom: 'var(--line-height)',
-        }}
-      >
-        <div
-          onClick={() => setExpanded(!expanded)}
-          style={{cursor: 'pointer', display: 'flex', gap: '1ch'}}
-        >
-          <span style={{color: 'var(--cga-yellow)'}}>{expanded ? "[-]" : "[+]"}</span>
-          <span>{toolCall.name}</span>
+      <div className="box-raised bg-cga-brown text-cga-yellow px-4 py-2 mb-4">
+        <div onClick={() => setExpanded(!expanded)} className="cursor-pointer">
+          <span>{expanded ? "[-]" : "[+]"}</span> {toolCall.name}
         </div>
         {expanded && (
-          <div style={{marginTop: 'var(--line-height)', borderTop: '1px solid var(--cga-yellow)', paddingTop: 'var(--line-height)'}}>
+          <div className="mt-2 pt-2 border-t border-cga-yellow">
             {toolCall.input && Object.keys(toolCall.input).length > 0 && (
-              <div style={{marginBottom: 'var(--line-height)'}}>
-                <div style={{color: 'var(--cga-light-gray)'}}>INPUT:</div>
-                {formatInput(toolCall.input)}
+              <div className="mb-2">
+                <div className="text-cga-light-gray">INPUT:</div>
+                {Object.entries(toolCall.input).map(([k, v]) => (
+                  <div key={k} className="ml-8">
+                    <span className="text-cga-white">{k}:</span>{" "}
+                    <span className="text-cga-yellow whitespace-pre-wrap">{typeof v === 'string' ? v : JSON.stringify(v)}</span>
+                  </div>
+                ))}
               </div>
             )}
             {result !== undefined && (
               <div>
-                <div style={{color: 'var(--cga-light-gray)'}}>OUTPUT:</div>
-                <div style={{marginLeft: '2ch', color: 'var(--cga-light-green)', whiteSpace: 'pre-wrap'}}>{result}</div>
+                <div className="text-cga-light-gray">OUTPUT:</div>
+                <div className="ml-8 text-cga-light-green whitespace-pre-wrap">{result}</div>
               </div>
             )}
           </div>
@@ -217,46 +113,25 @@
     const wsRef = useRef(null);
     const agentId = useRef(crypto.randomUUID());
 
-    useEffect(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
-
-    useEffect(() => {
-      if (!isLoading && isConnected) {
-        inputRef.current?.focus();
-      }
-    }, [isLoading, isConnected]);
-
-    useEffect(() => {
-      connectWebSocket();
-      return () => wsRef.current?.close();
-    }, []);
+    useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "instant" }); }, [messages]);
+    useEffect(() => { if (!isLoading && isConnected) inputRef.current?.focus(); }, [isLoading, isConnected]);
+    useEffect(() => { connectWebSocket(); return () => wsRef.current?.close(); }, []);
 
     const connectWebSocket = () => {
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       const ws = new WebSocket(`${protocol}//${window.location.host}/agents/chat/${agentId.current}`);
-      
       ws.onopen = () => setIsConnected(true);
-      ws.onclose = () => {
-        setIsConnected(false);
-        setTimeout(connectWebSocket, 2000);
-      };
+      ws.onclose = () => { setIsConnected(false); setTimeout(connectWebSocket, 2000); };
       ws.onerror = (e) => console.error("WebSocket error:", e);
-      ws.onmessage = (event) => {
-        try {
-          handleMessage(JSON.parse(event.data));
-        } catch (e) {}
-      };
+      ws.onmessage = (event) => { try { handleMessage(JSON.parse(event.data)); } catch (e) {} };
       wsRef.current = ws;
     };
 
     const handleMessage = (data) => {
       if (data.type === "cf_agent_mcp_servers") return;
-
       if (data.type === "cf_agent_use_chat_response") {
         try {
           const body = JSON.parse(data.body);
-          
           if (body.type === "tool-input-available") {
             setMessages(prev => {
               const updated = [...prev];
@@ -278,20 +153,16 @@
               return [...updated];
             });
           } else if (body.type === "text-delta" && (body.delta || body.textDelta)) {
-            const text = body.delta || body.textDelta;
             setMessages(prev => {
               const updated = [...prev];
               const lastMsg = updated[updated.length - 1];
-              if (lastMsg?.role === "assistant") {
-                lastMsg.content += text;
-              }
+              if (lastMsg?.role === "assistant") lastMsg.content += body.delta || body.textDelta;
               return [...updated];
             });
           } else if (body.type === "finish") {
             setIsLoading(false);
           }
         } catch (e) {}
-
         if (data.done) setIsLoading(false);
       }
     };
@@ -299,109 +170,48 @@
     const sendMessage = (e) => {
       e.preventDefault();
       if (!input.trim() || isLoading || !isConnected) return;
-
       const userMessage = { role: "user", content: input };
       setMessages(prev => [...prev, userMessage, { role: "assistant", content: "", toolCalls: [], toolResults: [] }]);
-
       wsRef.current.send(JSON.stringify({
         type: "cf_agent_use_chat_request",
         id: crypto.randomUUID(),
         init: {
           method: "POST",
           body: JSON.stringify({
-            messages: [...messages, userMessage].map(m => ({
-              id: crypto.randomUUID(),
-              role: m.role,
-              parts: [{ type: "text", text: m.content }]
-            })),
+            messages: [...messages, userMessage].map(m => ({ id: crypto.randomUUID(), role: m.role, parts: [{ type: "text", text: m.content }] })),
             clientTools: []
           })
         }
       }));
-
       setInput("");
       setIsLoading(true);
     };
 
     return (
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          background: 'var(--cga-light-gray)',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
+      <div className="w-full h-full bg-cga-light-gray flex flex-col">
         {/* Title bar */}
-        <div style={{
-          background: 'var(--cga-blue)',
-          color: 'var(--cga-white)',
-          padding: '0 1ch',
-          height: 'var(--line-height)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
+        <div className="bg-cga-blue text-cga-white px-4 py-2 flex justify-between items-center">
           <span>VETA AGENT {isConnected ? "[CONNECTED]" : "[DISCONNECTED]"}</span>
-          <button
-            className="btn"
-            onClick={() => {
-              wsRef.current?.close();
-              setMessages([]);
-              agentId.current = crypto.randomUUID();
-              connectWebSocket();
-            }}
-            style={{padding: '0 1ch'}}
-          >
+          <button className="btn px-4 py-2" onClick={() => { wsRef.current?.close(); setMessages([]); agentId.current = crypto.randomUUID(); connectWebSocket(); }}>
             NEW CHAT
           </button>
         </div>
 
         {/* Message area */}
-        <div
-          className="box-inset"
-          style={{
-            flex: 1,
-            margin: 'var(--line-height) 1ch',
-            padding: 'var(--line-height) 1ch',
-            background: 'var(--cga-black)',
-            color: 'var(--cga-light-green)',
-            overflowY: 'scroll',
-          }}
-          onWheel={(e) => {
-            e.preventDefault();
-            const lineHeight = parseFloat(getComputedStyle(document.body).lineHeight);
-            const direction = e.deltaY > 0 ? 1 : -1;
-            e.currentTarget.scrollTop += direction * lineHeight;
-          }}
-        >
+        <div className="box-inset flex-1 m-4 p-4 bg-cga-black text-cga-light-green overflow-y-auto">
           {messages.map((msg, i) => (
             <React.Fragment key={i}>
               {msg.role === "user" ? (
-                <div style={{
-                  color: 'var(--cga-light-cyan)',
-                  marginBottom: 'var(--line-height)',
-                }}>
-                  <span style={{color: 'var(--cga-cyan)'}}>&gt; </span>
-                  <span style={{whiteSpace: 'pre-wrap'}}>{msg.content}</span>
+                <div className="text-cga-light-cyan mb-4">
+                  <span className="text-cga-cyan">&gt; </span>
+                  <span className="whitespace-pre-wrap">{msg.content}</span>
                 </div>
               ) : (
                 <>
-                  {msg.toolCalls?.map((tc, j) => (
-                    <ToolCall 
-                      key={`${i}-tool-${j}`} 
-                      toolCall={tc} 
-                      result={msg.toolResults?.[j]}
-                    />
-                  ))}
+                  {msg.toolCalls?.map((tc, j) => <ToolCall key={`${i}-tool-${j}`} toolCall={tc} result={msg.toolResults?.[j]} />)}
                   {(msg.content || (isLoading && i === messages.length - 1 && !msg.toolCalls?.length)) && (
-                    <div style={{marginBottom: 'var(--line-height)', whiteSpace: 'pre-wrap'}}>
-                      {isLoading && i === messages.length - 1 && !msg.content ? (
-                        <span style={{animation: 'blink 1s infinite'}}>_</span>
-                      ) : (
-                        msg.content
-                      )}
+                    <div className="mb-4 whitespace-pre-wrap">
+                      {isLoading && i === messages.length - 1 && !msg.content ? "_" : msg.content}
                     </div>
                   )}
                 </>
@@ -412,46 +222,20 @@
         </div>
 
         {/* Input area */}
-        <form onSubmit={sendMessage} style={{
-          display: 'flex',
-          gap: '1ch',
-          padding: '0 1ch',
-          marginBottom: 'var(--line-height)',
-        }}>
-          <div
-            className="box-inset"
-            style={{
-              flex: 1,
-              display: 'flex',
-              background: 'var(--cga-black)',
-            }}
-          >
-            <span style={{color: 'var(--cga-light-green)', padding: '0 0 0 1ch'}}>&gt;</span>
+        <form onSubmit={sendMessage} className="flex gap-4 px-4 pb-4">
+          <div className="box-inset flex-1 flex bg-cga-black">
+            <span className="text-cga-light-green px-4 py-2">&gt;</span>
             <input
               ref={inputRef}
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder=""
               disabled={!isConnected || isLoading}
-              style={{
-                flex: 1,
-                background: 'transparent',
-                border: 'none',
-                outline: 'none',
-                color: 'var(--cga-light-green)',
-                padding: '0 1ch',
-                font: 'inherit',
-              }}
+              className="flex-1 bg-transparent border-none outline-none text-cga-light-green py-2 pr-4"
+              style={{ font: 'inherit' }}
             />
           </div>
-          <button
-            type="submit"
-            disabled={!isConnected || isLoading || !input.trim()}
-            className="btn"
-          >
-            SEND
-          </button>
+          <button type="submit" disabled={!isConnected || isLoading || !input.trim()} className="btn px-4 py-2">SEND</button>
         </form>
       </div>
     );
