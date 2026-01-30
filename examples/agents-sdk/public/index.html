@@ -109,11 +109,24 @@
     const [isConnected, setIsConnected] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef(null);
+    const messagesContainerRef = useRef(null);
     const inputRef = useRef(null);
     const wsRef = useRef(null);
     const agentId = useRef(crypto.randomUUID());
+    const shouldAutoScroll = useRef(true);
 
-    useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "instant" }); }, [messages]);
+    useEffect(() => {
+      if (shouldAutoScroll.current) {
+        messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
+      }
+    }, [messages]);
+
+    const handleScroll = () => {
+      const el = messagesContainerRef.current;
+      if (!el) return;
+      const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 50;
+      shouldAutoScroll.current = atBottom;
+    };
     useEffect(() => { if (!isLoading && isConnected) inputRef.current?.focus(); }, [isLoading, isConnected]);
     useEffect(() => { connectWebSocket(); return () => wsRef.current?.close(); }, []);
 
