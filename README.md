@@ -260,16 +260,9 @@ compatibility_date = "2025-01-01"
 [[d1_databases]]
 binding = "VETA_DB"
 database_name = "my-project-veta-db"
-database_id = "<YOUR_DATABASE_ID>"
-
-[env.production]
-name = "my-project-veta"
-
-[[env.production.d1_databases]]
-binding = "VETA_DB"
-database_name = "my-project-veta-db-prod"
-database_id = "<YOUR_PRODUCTION_DATABASE_ID>"
 ```
+
+Migrations run automatically on first request - no manual setup needed.
 
 **2. Add service binding to consuming workers:**
 
