@@ -17,7 +17,6 @@ export class Chat extends AIChatAgent<Env> {
     onFinish: StreamTextOnFinishCallback<ToolSet>,
     options?: { abortSignal?: AbortSignal }
   ) {
-    // @ts-expect-error - env is protected but we need it for the API key
     const apiKey = this.env.OPENAI_API_KEY;
     
     if (!apiKey) {
