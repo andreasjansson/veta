@@ -171,6 +171,8 @@ Use consistent, descriptive tags:
 - WHY (rationale/context)
 - Example if helpful
 
+**First 140 characters matter!** When listing notes (`veta ls`), only the first 140 characters of the body are shown as a preview. Front-load the most important information so it's visible in listings.
+
 **References:** Always include for technical notes - future you needs to find the code!
 
 **Example of a good note:**
