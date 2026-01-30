@@ -182,8 +182,14 @@ Edited note 71: Updated references
 ### Delete notes
 
 ```
-$ veta delete 45
+$ veta rm 45
 Deleted note 45
+
+# Delete multiple notes at once
+$ veta rm 1,2,3
+Deleted note 1
+Deleted note 2
+Deleted note 3
 ```
 
 ### Grep for notes with regular expressions
