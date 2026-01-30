@@ -7,7 +7,6 @@
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
@@ -31,9 +30,123 @@
       --cga-yellow: #FFFF55;
       --cga-white: #FFFFFF;
     }
-    * { font-family: "VT323", monospace; }
-    html, body, #root { height: 100%; margin: 0; overflow: hidden; }
-    body { background: var(--cga-black); color: var(--cga-light-green); font-size: 1.5rem; }
+
+    * {
+      font-family: "VT323", monospace;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body, #root {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: var(--cga-black);
+      color: var(--cga-white);
+      font-size: 24px;
+      line-height: 1.2;
+      --line-height: 1.2em;
+    }
+
+    /* Custom scrollbar - webkit */
+    ::-webkit-scrollbar {
+      -webkit-appearance: none;
+      width: 2ch;
+      height: 2ch;
+      background: var(--cga-light-gray);
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--cga-light-gray);
+      border: 1px solid var(--cga-dark-gray);
+      box-shadow:
+        inset 1px 1px 0 var(--cga-dark-gray),
+        inset -1px -1px 0 var(--cga-white);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--cga-light-gray);
+      border: 1px solid var(--cga-white);
+      box-shadow:
+        inset 1px 1px 0 var(--cga-white),
+        inset -1px -1px 0 var(--cga-dark-gray);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--cga-white);
+    }
+
+    ::-webkit-scrollbar-button:single-button {
+      background: var(--cga-light-gray);
+      border: 1px solid var(--cga-white);
+      box-shadow:
+        inset 1px 1px 0 var(--cga-white),
+        inset -1px -1px 0 var(--cga-dark-gray);
+      height: 1em;
+      display: block;
+    }
+
+    ::-webkit-scrollbar-button:single-button:hover {
+      background: var(--cga-white);
+    }
+
+    /* Custom scrollbar - Firefox */
+    * {
+      scrollbar-width: auto;
+      scrollbar-color: var(--cga-light-gray) var(--cga-dark-gray);
+    }
+
+    /* 3D raised box effect */
+    .box-raised {
+      border: 1px solid var(--cga-white);
+      box-shadow:
+        inset 1px 1px 0 var(--cga-white),
+        inset -1px -1px 0 var(--cga-dark-gray),
+        2px 2px 0 var(--cga-black);
+    }
+
+    /* 3D inset box effect */
+    .box-inset {
+      border: 1px solid var(--cga-dark-gray);
+      box-shadow:
+        inset 1px 1px 0 var(--cga-dark-gray),
+        inset -1px -1px 0 var(--cga-light-gray);
+    }
+
+    /* Button style */
+    .btn {
+      background: var(--cga-light-gray);
+      color: var(--cga-black);
+      border: 1px solid var(--cga-white);
+      box-shadow:
+        inset 1px 1px 0 var(--cga-white),
+        inset -1px -1px 0 var(--cga-dark-gray),
+        1px 1px 0 var(--cga-black);
+      cursor: pointer;
+      padding: 0 1ch;
+      font: inherit;
+      line-height: var(--line-height);
+    }
+
+    .btn:hover {
+      background: var(--cga-white);
+    }
+
+    .btn:active {
+      background: var(--cga-light-gray);
+      box-shadow:
+        inset 1px 1px 0 var(--cga-dark-gray),
+        inset -1px -1px 0 var(--cga-white);
+    }
+
+    .btn:disabled {
+      background: var(--cga-light-gray);
+      color: var(--cga-dark-gray);
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
@@ -49,42 +162,47 @@
       return Object.entries(input).map(([key, value]) => {
         const displayValue = typeof value === 'string' ? value : JSON.stringify(value);
         return (
-          <div key={key} className="pl-4">
-            <span style={{color: 'var(--cga-cyan)'}}>{key}:</span>{" "}
-            <span style={{color: 'var(--cga-light-cyan)'}} className="whitespace-pre-wrap">{displayValue}</span>
+          <div key={key} style={{marginLeft: '2ch'}}>
+            <span style={{color: 'var(--cga-white)'}}>{key}:</span>{" "}
+            <span style={{color: 'var(--cga-yellow)', whiteSpace: 'pre-wrap'}}>{displayValue}</span>
           </div>
         );
       });
     };
 
     return (
-      <div className="flex justify-start">
-        <div className="max-w-[80%] p-3 border-2" style={{borderColor: 'var(--cga-brown)', backgroundColor: 'rgba(170, 85, 0, 0.1)'}}>
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-2 cursor-pointer text-left w-full"
-            style={{color: 'var(--cga-yellow)'}}
-          >
-            <span style={{color: 'var(--cga-brown)'}}>{expanded ? "[-]" : "[+]"}</span>
-            <span>{toolCall.name}</span>
-          </button>
-          {expanded && (
-            <div className="mt-2 pt-2" style={{borderTop: '1px solid var(--cga-brown)'}}>
-              {toolCall.input && Object.keys(toolCall.input).length > 0 && (
-                <div className="mb-2">
-                  <div style={{color: 'var(--cga-brown)'}}>INPUT:</div>
-                  {formatInput(toolCall.input)}
-                </div>
-              )}
-              {result !== undefined && (
-                <div>
-                  <div style={{color: 'var(--cga-brown)'}}>OUTPUT:</div>
-                  <div className="pl-4 whitespace-pre-wrap" style={{color: 'var(--cga-light-green)'}}>{result}</div>
-                </div>
-              )}
-            </div>
-          )}
+      <div
+        className="box-raised"
+        style={{
+          background: 'var(--cga-brown)',
+          color: 'var(--cga-yellow)',
+          padding: '0 1ch',
+          marginBottom: 'var(--line-height)',
+        }}
+      >
+        <div
+          onClick={() => setExpanded(!expanded)}
+          style={{cursor: 'pointer', display: 'flex', gap: '1ch'}}
+        >
+          <span style={{color: 'var(--cga-yellow)'}}>{expanded ? "[-]" : "[+]"}</span>
+          <span>{toolCall.name}</span>
         </div>
+        {expanded && (
+          <div style={{marginTop: 'var(--line-height)', borderTop: '1px solid var(--cga-yellow)', paddingTop: 'var(--line-height)'}}>
+            {toolCall.input && Object.keys(toolCall.input).length > 0 && (
+              <div style={{marginBottom: 'var(--line-height)'}}>
+                <div style={{color: 'var(--cga-light-gray)'}}>INPUT:</div>
+                {formatInput(toolCall.input)}
+              </div>
+            )}
+            {result !== undefined && (
+              <div>
+                <div style={{color: 'var(--cga-light-gray)'}}>OUTPUT:</div>
+                <div style={{marginLeft: '2ch', color: 'var(--cga-light-green)', whiteSpace: 'pre-wrap'}}>{result}</div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     );
   }
@@ -206,36 +324,67 @@
     };
 
     return (
-      <div className="h-full flex flex-col">
-        <header className="border-b-2 p-4 flex justify-between items-center" style={{borderColor: 'var(--cga-green)'}}>
-          <div className="flex items-center gap-4">
-            <h1 style={{color: 'var(--cga-light-green)'}}>VETA AGENT</h1>
-            <span style={{color: 'var(--cga-light-gray)'}}>{isConnected ? "[CONNECTED]" : "[DISCONNECTED]"}</span>
-          </div>
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          background: 'var(--cga-light-gray)',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {/* Title bar */}
+        <div style={{
+          background: 'var(--cga-blue)',
+          color: 'var(--cga-white)',
+          padding: '0 1ch',
+          height: 'var(--line-height)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+          <span>VETA AGENT {isConnected ? "[CONNECTED]" : "[DISCONNECTED]"}</span>
           <button
+            className="btn"
             onClick={() => {
               wsRef.current?.close();
               setMessages([]);
               agentId.current = crypto.randomUUID();
               connectWebSocket();
             }}
-            className="px-4 py-2 border-2"
-            style={{borderColor: 'var(--cga-green)', color: 'var(--cga-light-green)'}}
-            onMouseOver={(e) => e.target.style.backgroundColor = 'var(--cga-green)'}
-            onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
+            style={{padding: '0 1ch'}}
           >
             NEW CHAT
           </button>
-        </header>
+        </div>
 
-        <main className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
+        {/* Message area */}
+        <div
+          className="box-inset"
+          style={{
+            flex: 1,
+            margin: 'var(--line-height) 1ch',
+            padding: 'var(--line-height) 1ch',
+            background: 'var(--cga-black)',
+            color: 'var(--cga-light-green)',
+            overflowY: 'scroll',
+          }}
+          onWheel={(e) => {
+            e.preventDefault();
+            const lineHeight = parseFloat(getComputedStyle(document.body).lineHeight);
+            const direction = e.deltaY > 0 ? 1 : -1;
+            e.currentTarget.scrollTop += direction * lineHeight;
+          }}
+        >
           {messages.map((msg, i) => (
             <React.Fragment key={i}>
               {msg.role === "user" ? (
-                <div className="flex justify-end">
-                  <div className="max-w-[80%] p-3 border-2" style={{borderColor: 'var(--cga-cyan)', color: 'var(--cga-light-cyan)', backgroundColor: 'rgba(0, 170, 170, 0.1)'}}>
-                    <p className="whitespace-pre-wrap">{msg.content}</p>
-                  </div>
+                <div style={{
+                  color: 'var(--cga-light-cyan)',
+                  marginBottom: 'var(--line-height)',
+                }}>
+                  <span style={{color: 'var(--cga-cyan)'}}>&gt; </span>
+                  <span style={{whiteSpace: 'pre-wrap'}}>{msg.content}</span>
                 </div>
               ) : (
                 <>
@@ -247,14 +396,12 @@
                     />
                   ))}
                   {(msg.content || (isLoading && i === messages.length - 1 && !msg.toolCalls?.length)) && (
-                    <div className="flex justify-start">
-                      <div className="max-w-[80%] p-3 border-2" style={{borderColor: 'var(--cga-green)', color: 'var(--cga-light-green)', backgroundColor: 'rgba(0, 170, 0, 0.1)'}}>
-                        {isLoading && i === messages.length - 1 && !msg.content ? (
-                          <span className="animate-pulse">_</span>
-                        ) : (
-                          <p className="whitespace-pre-wrap">{msg.content}</p>
-                        )}
-                      </div>
+                    <div style={{marginBottom: 'var(--line-height)', whiteSpace: 'pre-wrap'}}>
+                      {isLoading && i === messages.length - 1 && !msg.content ? (
+                        <span style={{animation: 'blink 1s infinite'}}>_</span>
+                      ) : (
+                        msg.content
+                      )}
                     </div>
                   )}
                 </>
@@ -262,30 +409,49 @@
             </React.Fragment>
           ))}
           <div ref={messagesEndRef} />
-        </main>
+        </div>
 
-        <form onSubmit={sendMessage} className="p-4 border-t-2" style={{borderColor: 'var(--cga-green)'}}>
-          <div className="flex gap-2">
-            <span className="py-2" style={{color: 'var(--cga-green)'}}>&gt;</span>
+        {/* Input area */}
+        <form onSubmit={sendMessage} style={{
+          display: 'flex',
+          gap: '1ch',
+          padding: '0 1ch',
+          marginBottom: 'var(--line-height)',
+        }}>
+          <div
+            className="box-inset"
+            style={{
+              flex: 1,
+              display: 'flex',
+              background: 'var(--cga-black)',
+            }}
+          >
+            <span style={{color: 'var(--cga-light-green)', padding: '0 0 0 1ch'}}>&gt;</span>
             <input
               ref={inputRef}
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Enter command..."
-              className="flex-1 p-2 bg-transparent border-2 focus:outline-none"
-              style={{borderColor: 'var(--cga-green)', color: 'var(--cga-light-green)'}}
+              placeholder=""
               disabled={!isConnected || isLoading}
+              style={{
+                flex: 1,
+                background: 'transparent',
+                border: 'none',
+                outline: 'none',
+                color: 'var(--cga-light-green)',
+                padding: '0 1ch',
+                font: 'inherit',
+              }}
             />
-            <button
-              type="submit"
-              disabled={!isConnected || isLoading || !input.trim()}
-              className="px-4 py-2 border-2 disabled:opacity-30 disabled:cursor-not-allowed"
-              style={{borderColor: 'var(--cga-green)', color: 'var(--cga-light-green)'}}
-            >
-              SEND
-            </button>
           </div>
+          <button
+            type="submit"
+            disabled={!isConnected || isLoading || !input.trim()}
+            className="btn"
+          >
+            SEND
+          </button>
         </form>
       </div>
     );
