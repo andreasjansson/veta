@@ -6,7 +6,7 @@ A minimal example showing how to build a Cloudflare Agent with Veta as persisten
 
 - **Agent Worker** (`src/agent.ts`) - Chat agent using the Cloudflare Agents SDK with Veta tools
 - **Veta Worker** (`src/veta.ts`) - Re-exports the Veta npm package as a service binding
-- **D1 Database** - Stores Veta notes (configured in `wrangler.veta.jsonc`)
+- **D1 Database** - Stores Veta notes (auto-provisioned and auto-migrated)
 - **UI** (`public/index.html`) - Minimal React+Tailwind chat interface
 
 ## Local Development
@@ -17,20 +17,14 @@ A minimal example showing how to build a Cloudflare Agent with Veta as persisten
 npm install
 ```
 
-2. Run migrations locally:
-
-```bash
-npx wrangler d1 migrations apply VETA_DB -c wrangler.veta.jsonc --local
-```
-
-3. Create `.dev.vars` with your OpenAI API key:
+2. Create `.dev.vars` with your OpenAI API key:
 
 ```bash
 cp .dev.vars.example .dev.vars
 # Edit .dev.vars and add your OPENAI_API_KEY
 ```
 
-4. Start the dev server:
+3. Start the dev server:
 
 ```bash
 npm run dev
@@ -38,29 +32,23 @@ npm run dev
 
 Open http://localhost:8787
 
+The D1 database is created automatically on first request, and migrations run automatically.
+
 ## Deployment
 
-1. Create a D1 database:
-
-```bash
-npx wrangler d1 create veta-example-db
-```
-
-2. Copy the `database_id` from the output and update `wrangler.veta.jsonc`.
-
-3. Set your OpenAI API key as a secret:
+1. Set your OpenAI API key as a secret:
 
 ```bash
 npx wrangler secret put OPENAI_API_KEY -c wrangler.agent.jsonc
 ```
 
-4. Deploy both workers (migrations run automatically):
+2. Deploy both workers:
 
 ```bash
 npm run deploy
 ```
 
-This deploys the Veta worker first (with migrations), then the agent worker.
+The D1 database is auto-provisioned on first deploy, and migrations run automatically on first request.
 
 ## How It Works
 
