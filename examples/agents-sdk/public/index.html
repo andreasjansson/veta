@@ -190,9 +190,9 @@
     return (
       <div className="w-full h-full bg-cga-light-gray flex flex-col">
         {/* Title bar */}
-        <div className="bg-cga-blue text-cga-white px-4 py-2 flex justify-between items-center">
+        <div className="bg-cga-blue text-cga-white px-4 py-1 flex justify-between items-center">
           <span>VETA AGENT {isConnected ? "[CONNECTED]" : "[DISCONNECTED]"}</span>
-          <button className="btn px-4 py-2" onClick={() => { wsRef.current?.close(); setMessages([]); agentId.current = crypto.randomUUID(); connectWebSocket(); }}>
+          <button className="btn px-4 py-1" onClick={() => { wsRef.current?.close(); setMessages([]); agentId.current = crypto.randomUUID(); connectWebSocket(); }}>
             NEW CHAT
           </button>
         </div>
