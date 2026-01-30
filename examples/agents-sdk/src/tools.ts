@@ -97,14 +97,18 @@ export const tools = {
     },
   }),
 
-  deleteNote: tool({
-    description: "Delete a note from the Veta knowledge base",
+  rmNotes: tool({
+    description: "Delete one or more notes from the Veta knowledge base",
     inputSchema: z.object({
-      id: z.number().describe("Note ID to delete"),
+      ids: z.array(z.number()).describe("Note IDs to delete"),
     }),
-    execute: async ({ id }) => {
-      const res = await veta().fetch(`http://veta/notes/${id}`, { method: "DELETE" });
-      return res.ok ? `Deleted note ${id}.` : `Failed to delete note ${id}.`;
+    execute: async ({ ids }) => {
+      const results: string[] = [];
+      for (const id of ids) {
+        const res = await veta().fetch(`http://veta/notes/${id}`, { method: "DELETE" });
+        results.push(res.ok ? `Deleted note ${id}.` : `Note ${id} not found.`);
+      }
+      return results.join("\n");
     },
   }),
 } satisfies ToolSet;
