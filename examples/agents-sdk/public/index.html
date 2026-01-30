@@ -72,7 +72,7 @@
   <script type="text/babel">
   const { useState, useEffect, useRef } = React;
 
-  function ToolCall({ toolCall, result }) {
+  function ToolCall({ toolCall }) {
     const [expanded, setExpanded] = useState(false);
     return (
       <div className="box-raised bg-cga-brown text-cga-yellow px-4 py-2 mb-4">
@@ -92,10 +92,10 @@
                 ))}
               </div>
             )}
-            {result !== undefined && (
+            {toolCall.result !== undefined && (
               <div>
                 <div className="text-cga-light-gray">OUTPUT:</div>
-                <div className="ml-8 text-cga-light-green whitespace-pre-wrap">{result}</div>
+                <div className="ml-8 text-cga-light-green whitespace-pre-wrap">{toolCall.result}</div>
               </div>
             )}
           </div>
