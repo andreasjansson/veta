@@ -80,9 +80,9 @@ export const tools = {
         const error = await res.text();
         return `Search error: ${error}`;
       }
-      const notes = (await res.json()) as { id: number; title: string; body?: string }[];
+      const notes = (await res.json()) as { id: number; title: string; body_preview: string; tags: string[] }[];
       if (!notes.length) return "No matching notes found.";
-      return notes.map((n) => `[${n.id}] ${n.title}: ${(n.body || "").slice(0, 100)}...`).join("\n\n");
+      return notes.map((n) => `[${n.id}] ${n.title} (${n.tags.join(", ")})\n${n.body_preview}`).join("\n\n");
     },
   }),
 
