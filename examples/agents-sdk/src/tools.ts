@@ -82,7 +82,7 @@ export const tools = {
       }
       const notes = (await res.json()) as { id: number; title: string; body_preview: string; tags: string[] }[];
       if (!notes.length) return "No matching notes found.";
-      return notes.map((n) => `[${n.id}] ${n.title} (${n.tags.join(", ")})\n${n.body_preview}`).join("\n\n");
+      return notes.map((n) => `[${n.id}] ${n.title} -- ${n.body_preview}`).join("\n");
     },
   }),
 
