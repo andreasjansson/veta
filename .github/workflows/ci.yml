@@ -263,7 +263,7 @@ jobs:
           brew install andreasjansson/tap/veta
 
           # Via Cargo
-          cargo install veta-cli
+          cargo install veta
           ```
 
           ### Worker
