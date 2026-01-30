@@ -37,6 +37,12 @@
     }, [messages]);
 
     useEffect(() => {
+      if (!isLoading && isConnected) {
+        inputRef.current?.focus();
+      }
+    }, [isLoading, isConnected]);
+
+    useEffect(() => {
       connectWebSocket();
       return () => wsRef.current?.close();
     }, []);
