@@ -141,7 +141,10 @@ veta edit 42 --references "src/new_location.rs:100,https://new-docs.example.com"
 ### Delete outdated notes
 
 ```bash
-veta delete 42
+veta rm 42
+
+# Delete multiple notes
+veta rm 1,2,3
 ```
 
 ## Best Practices
