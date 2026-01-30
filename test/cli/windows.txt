@@ -66,7 +66,7 @@ cmd /C "mkdir subdir\nested & cd subdir\nested & veta ls"
 =====
 delete note on Windows
 =====
-veta delete 1
+veta rm 1
 veta ls
 -----
 Deleted note 1
