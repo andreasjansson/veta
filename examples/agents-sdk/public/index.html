@@ -57,18 +57,16 @@
     .btn {
       background: #AAAAAA;
       color: #000000;
-      border: none;
-      box-shadow:
-        inset 3px 3px 0 #FFFFFF,
-        inset -2px -2px 0 #FFFFFF,
-        1px 1px 0 #000000;
+      border-style: solid;
+      border-color: #FFFFFF;
+      border-width: 3px 2px 2px 3px;
+      box-shadow: 2px 2px 0 #000000;
       cursor: pointer;
     }
     .btn:hover { background: #CCCCCC; }
     .btn:active {
-      box-shadow:
-        inset 2px 2px 0 #555555,
-        inset -3px -3px 0 #FFFFFF;
+      border-color: #555555;
+      box-shadow: none;
     }
     .btn:disabled { color: #555555; cursor: not-allowed; }
   </style>
