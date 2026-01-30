@@ -60,18 +60,25 @@ pub struct UpdateNote {
 }
 
 impl Note {
-    /// Convert to summary with truncated first line of body.
+    /// Convert to summary with truncated body preview.
     pub fn to_summary(&self, max_len: usize) -> NoteSummary {
-        // Take only the first line
-        let first_line = self.body.lines().next().unwrap_or("");
-        let body_preview = if first_line.len() > max_len {
-            format!("{}...", &first_line[..max_len])
-        } else if first_line.len() < self.body.len() {
-            // There are more lines, indicate truncation
-            format!("{}...", first_line)
+        // Convert newlines to spaces and take first max_len characters
+        let normalized: String = self
+            .body
+            .chars()
+            .map(|c| if c == '\n' || c == '\r' { ' ' } else { c })
+            .collect();
+        let trimmed = normalized.trim();
+
+        let body_preview = if trimmed.len() > max_len {
+            format!("{}...", &trimmed[..max_len])
+        } else if trimmed.len() < self.body.trim().len() {
+            // Content was truncated due to newline normalization showing less
+            trimmed.to_string()
         } else {
-            first_line.to_string()
+            trimmed.to_string()
         };
+
         NoteSummary {
             id: self.id,
             title: self.title.clone(),
