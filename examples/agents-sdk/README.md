@@ -50,6 +50,14 @@ npm run deploy
 
 The D1 database is auto-provisioned on first deploy, and migrations run automatically on first request.
 
+## Cleanup
+
+To completely remove all deployed resources (workers, D1 database, Durable Objects):
+
+```bash
+npm run undeploy
+```
+
 ## How It Works
 
 The agent has access to these Veta tools:
