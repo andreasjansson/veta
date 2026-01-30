@@ -248,7 +248,7 @@ For projects with multiple workers (like a monorepo with UI, API, and agent work
 
 Create `src/veta/index.ts`:
 ```typescript
-export { default } from 'veta';
+export { default } from 'veta/worker';
 ```
 
 Create `wrangler.veta.toml`:
