@@ -57,12 +57,18 @@
     .btn {
       background: #AAAAAA;
       color: #000000;
-      border: 1px solid #FFFFFF;
-      box-shadow: inset 1px 1px 0 #FFFFFF, inset -1px -1px 0 #555555, 1px 1px 0 #000000;
+      border-style: solid;
+      border-color: #FFFFFF #000000 #000000 #FFFFFF;
+      border-width: 3px 1px 1px 3px;
+      outline: 2px solid #FFFFFF;
+      outline-offset: -3px;
       cursor: pointer;
     }
-    .btn:hover { background: #FFFFFF; }
-    .btn:active { box-shadow: inset 1px 1px 0 #555555, inset -1px -1px 0 #FFFFFF; }
+    .btn:hover { background: #CCCCCC; }
+    .btn:active {
+      border-color: #000000 #FFFFFF #FFFFFF #000000;
+      outline-color: #000000;
+    }
     .btn:disabled { color: #555555; cursor: not-allowed; }
   </style>
 </head>
