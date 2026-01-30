@@ -8,6 +8,10 @@
     "deploy:veta": "wrangler deploy -c wrangler.veta.jsonc",
     "deploy:agent": "wrangler deploy -c wrangler.agent.jsonc",
     "deploy": "npm run deploy:veta && npm run deploy:agent",
+    "undeploy:agent": "wrangler delete -c wrangler.agent.jsonc --force",
+    "undeploy:veta": "wrangler delete -c wrangler.veta.jsonc --force",
+    "undeploy:d1": "wrangler d1 delete veta-example-db -y",
+    "undeploy": "npm run undeploy:agent; npm run undeploy:veta; npm run undeploy:d1; echo 'Cleanup complete'",
     "types": "wrangler types"
   },
   "dependencies": {
