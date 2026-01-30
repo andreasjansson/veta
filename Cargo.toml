@@ -3,7 +3,7 @@ members = [
     "crates/veta-core",
     "crates/veta-sqlite",
     "crates/veta-d1",
-    "crates/veta-cli",
+    "crates/veta",
     "crates/veta-worker",
 ]
 resolver = "2"
