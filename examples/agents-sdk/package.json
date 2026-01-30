@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev -c wrangler.agent.jsonc -c wrangler.veta.jsonc",
-    "deploy:veta": "wrangler deploy -c wrangler.veta.jsonc",
+    "deploy:veta": "wrangler d1 migrations apply VETA_DB -c wrangler.veta.jsonc --remote && wrangler deploy -c wrangler.veta.jsonc",
     "deploy:agent": "wrangler deploy -c wrangler.agent.jsonc",
     "deploy": "npm run deploy:veta && npm run deploy:agent",
     "types": "wrangler types"
