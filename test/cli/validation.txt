@@ -62,6 +62,16 @@ veta ls
 -----
 
 =====
+reinitialize for remaining tests
+=====
+veta init --reinitialize
+-----
+Reinitialized veta database in {{ path }}
+-----
+where
+* path matches /\.veta[\/\\]db\.sqlite/
+
+=====
 edit non-existent note fails
 =====
 veta edit 999 --title "new" --body "" 2>&1 ; echo "exit: $?"
