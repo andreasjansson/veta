@@ -188,9 +188,9 @@
     return (
       <div className="h-full flex flex-col">
         <header className="border-b-2 border-green-500 p-4 flex justify-between items-center">
-          <div>
+          <div className="flex items-center gap-4">
             <h1 className="text-green-400">VETA AGENT</h1>
-            <p>{isConnected ? "[CONNECTED]" : "[DISCONNECTED]"}</p>
+            <span>{isConnected ? "[CONNECTED]" : "[DISCONNECTED]"}</span>
           </div>
           <button
             onClick={() => {
