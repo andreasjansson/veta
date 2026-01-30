@@ -245,3 +245,28 @@ newtag (1 note)
 test (1 note)
 updated (1 note)
 
+=====
+add two more notes for multi-delete test
+=====
+veta add --title "Note A" --tags "temp" --body "A"
+veta add --title "Note B" --tags "temp" --body "B"
+-----
+Added note 4
+Added note 5
+
+=====
+delete multiple notes at once
+=====
+veta rm 4,5
+-----
+Deleted note 4
+Deleted note 5
+
+=====
+verify both notes were deleted
+=====
+veta ls
+-----
+1: Updated title ({{ modified1 }}) -- New body content
+2: Second note ({{ modified2 }}) -- Goodbye world
+
