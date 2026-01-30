@@ -4,7 +4,10 @@ use regex::Regex;
 use rusqlite::{params, Connection, OptionalExtension};
 use std::path::Path;
 use std::sync::Mutex;
-use veta_core::{CreateNote, Database, Error, Note, NoteQuery, TagCount, UpdateNote};
+use veta_core::{
+    get_pending_migrations, CreateNote, Database, Error, Note, NoteQuery, TagCount, UpdateNote,
+    SCHEMA_VERSION,
+};
 
 /// SQLite-backed database implementation.
 pub struct SqliteDatabase {
@@ -12,35 +15,85 @@ pub struct SqliteDatabase {
 }
 
 impl SqliteDatabase {
-    /// Open a database at the given path.
+    /// Open a database at the given path and run any pending migrations.
     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self, Error> {
         let conn = Connection::open(path).map_err(|e| Error::Database(e.to_string()))?;
         conn.execute_batch("PRAGMA foreign_keys = ON;")
             .map_err(|e| Error::Database(e.to_string()))?;
-        Ok(Self {
+        let db = Self {
             conn: Mutex::new(conn),
-        })
+        };
+        db.run_migrations()?;
+        Ok(db)
     }
 
-    /// Open an in-memory database.
+    /// Open an in-memory database and run migrations.
     pub fn open_in_memory() -> Result<Self, Error> {
         let conn = Connection::open_in_memory().map_err(|e| Error::Database(e.to_string()))?;
         conn.execute_batch("PRAGMA foreign_keys = ON;")
             .map_err(|e| Error::Database(e.to_string()))?;
-        Ok(Self {
+        let db = Self {
             conn: Mutex::new(conn),
-        })
+        };
+        db.run_migrations()?;
+        Ok(db)
     }
 
-    /// Run database migrations.
-    pub fn run_migrations(&self) -> Result<(), Error> {
+    /// Run any pending database migrations.
+    fn run_migrations(&self) -> Result<(), Error> {
         let conn = self.conn.lock().unwrap();
-        conn.execute_batch(include_str!("../../../schema/migrations/0001_initial.sql"))
-            .map_err(|e| Error::Database(e.to_string()))?;
-        // Migration 0002: Add references column (ignore error if column already exists)
-        let _ = conn.execute_batch(include_str!(
-            "../../../schema/migrations/0002_add_references.sql"
-        ));
+
+        // Ensure _veta_meta table exists
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS _veta_meta (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            )",
+            [],
+        )
+        .map_err(|e| Error::Database(e.to_string()))?;
+
+        // Get current schema version
+        let current_version: i64 = conn
+            .query_row(
+                "SELECT value FROM _veta_meta WHERE key = 'schema_version'",
+                [],
+                |row| {
+                    let val: String = row.get(0)?;
+                    Ok(val.parse().unwrap_or(0))
+                },
+            )
+            .unwrap_or(0);
+
+        // Already up to date
+        if current_version >= SCHEMA_VERSION {
+            return Ok(());
+        }
+
+        // Run pending migrations
+        for migration in get_pending_migrations(current_version) {
+            for statement in migration.statements {
+                // Skip _veta_meta creation (already done above)
+                if statement.contains("_veta_meta") {
+                    continue;
+                }
+                // ALTER TABLE doesn't support IF NOT EXISTS, so ignore errors for those
+                if statement.starts_with("ALTER TABLE") {
+                    let _ = conn.execute(statement, []);
+                } else {
+                    conn.execute(statement, [])
+                        .map_err(|e| Error::Database(format!("Migration {} failed: {}", migration.name, e)))?;
+                }
+            }
+        }
+
+        // Update schema version
+        conn.execute(
+            "INSERT OR REPLACE INTO _veta_meta (key, value) VALUES ('schema_version', ?1)",
+            params![SCHEMA_VERSION.to_string()],
+        )
+        .map_err(|e| Error::Database(e.to_string()))?;
+
         Ok(())
     }
 
