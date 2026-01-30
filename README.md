@@ -342,7 +342,7 @@ veta/
 │   ├── veta-core/        # Shared: types, validation, business logic
 │   ├── veta-sqlite/      # Native: rusqlite Database implementation
 │   ├── veta-d1/          # WASM: D1 Database implementation
-│   ├── veta-cli/         # Native: CLI binary
+│   ├── veta/             # Native: CLI binary
 │   └── veta-worker/      # WASM: Cloudflare Worker
 └── schema/
     └── migrations/       # Shared SQL migrations
