@@ -117,7 +117,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     Router::new()
         // POST /notes - Create note
         .post_async("/notes", |mut req, ctx| async move {
-            let service = get_service(&ctx.env).await?;
+            let service = get_service_or_return!(&ctx.env);
 
             let body: CreateNoteRequest = match req.json().await {
                 Ok(b) => b,
@@ -134,7 +134,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         })
         // GET /notes - List notes
         .get_async("/notes", |req, ctx| async move {
-            let service = get_service(&ctx.env).await?;
+            let service = get_service_or_return!(&ctx.env);
             let url = req.url()?;
 
             let query = NoteQuery {
@@ -151,7 +151,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         })
         // GET /notes/:id - Get single note
         .get_async("/notes/:id", |_, ctx| async move {
-            let service = get_service(&ctx.env).await?;
+            let service = get_service_or_return!(&ctx.env);
 
             let id: i64 = ctx.param("id").and_then(|s| s.parse().ok()).unwrap_or(0);
 
@@ -163,7 +163,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         })
         // PATCH /notes/:id - Update note
         .patch_async("/notes/:id", |mut req, ctx| async move {
-            let service = get_service(&ctx.env).await?;
+            let service = get_service_or_return!(&ctx.env);
 
             let id: i64 = ctx.param("id").and_then(|s| s.parse().ok()).unwrap_or(0);
 
@@ -187,7 +187,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         })
         // DELETE /notes/:id - Delete note
         .delete_async("/notes/:id", |_, ctx| async move {
-            let service = get_service(&ctx.env).await?;
+            let service = get_service_or_return!(&ctx.env);
 
             let id: i64 = ctx.param("id").and_then(|s| s.parse().ok()).unwrap_or(0);
 
