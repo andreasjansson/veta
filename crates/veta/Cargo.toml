@@ -1,5 +1,5 @@
 [package]
-name = "veta-cli"
+name = "veta"
 description = "Memory and knowledge base for agents"
 version.workspace = true
 edition.workspace = true
