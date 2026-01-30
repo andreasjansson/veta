@@ -211,7 +211,7 @@
         </div>
 
         {/* Message area */}
-        <div className="box-inset flex-1 m-4 p-4 bg-cga-black text-cga-light-green overflow-y-auto">
+        <div ref={messagesContainerRef} onScroll={handleScroll} className="box-inset flex-1 m-4 p-4 bg-cga-black text-cga-light-green overflow-y-auto">
           {messages.map((msg, i) => (
             <React.Fragment key={i}>
               {msg.role === "user" ? (
