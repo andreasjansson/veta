@@ -260,7 +260,7 @@
                 </div>
               ) : (
                 <>
-                  {msg.toolCalls?.map((tc, j) => <ToolCall key={`${i}-tool-${j}`} toolCall={tc} result={msg.toolResults?.[j]} />)}
+                  {msg.toolCalls?.map((tc, j) => <ToolCall key={`${i}-tool-${j}`} toolCall={tc} />)}
                   {(msg.content || (isLoading && i === messages.length - 1 && !msg.toolCalls?.length)) && (
                     <div className={`mb-4 whitespace-pre-wrap ${msg.isError ? "text-cga-light-red" : ""}`}>
                       {isLoading && i === messages.length - 1 && !msg.content ? "_" : msg.content}
