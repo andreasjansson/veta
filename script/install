@@ -56,7 +56,7 @@ main() {
     fi
 
     echo "Building veta (release mode)..."
-    cargo build --release --package veta-cli
+    cargo build --release --package veta
 
     mkdir -p "$install_dir"
 
