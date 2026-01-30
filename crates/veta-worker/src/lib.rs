@@ -60,9 +60,7 @@ fn json_error(msg: &str, status: u16) -> Result<Response> {
 async fn get_service(env: &Env) -> std::result::Result<VetaService<D1DatabaseWrapper>, Response> {
     let db = match env.d1("VETA_DB") {
         Ok(db) => db,
-        Err(e) => {
-            return Err(json_error(&format!("Database binding error: {}", e), 500).unwrap())
-        }
+        Err(e) => return Err(json_error(&format!("Database binding error: {}", e), 500).unwrap()),
     };
     let mut wrapper = D1DatabaseWrapper::new(db);
 

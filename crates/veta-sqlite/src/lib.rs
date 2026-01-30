@@ -81,8 +81,9 @@ impl SqliteDatabase {
                 if statement.starts_with("ALTER TABLE") {
                     let _ = conn.execute(statement, []);
                 } else {
-                    conn.execute(statement, [])
-                        .map_err(|e| Error::Database(format!("Migration {} failed: {}", migration.name, e)))?;
+                    conn.execute(statement, []).map_err(|e| {
+                        Error::Database(format!("Migration {} failed: {}", migration.name, e))
+                    })?;
                 }
             }
         }
