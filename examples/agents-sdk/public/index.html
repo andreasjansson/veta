@@ -151,9 +151,36 @@
     const handleMessage = (data) => {
       if (data.type === "cf_agent_mcp_servers") return;
       if (data.type === "cf_agent_use_chat_response") {
+        // Handle error responses
+        if (data.error) {
+          setMessages(prev => {
+            const updated = [...prev];
+            const lastMsg = updated[updated.length - 1];
+            if (lastMsg?.role === "assistant") {
+              lastMsg.content = `ERROR: ${data.body}`;
+              lastMsg.isError = true;
+            }
+            return [...updated];
+          });
+          setIsLoading(false);
+          return;
+        }
+
         try {
           const body = JSON.parse(data.body);
-          if (body.type === "tool-input-available") {
+          if (body.type === "error") {
+            setMessages(prev => {
+              const updated = [...prev];
+              const lastMsg = updated[updated.length - 1];
+              if (lastMsg?.role === "assistant") {
+                lastMsg.content = `ERROR: ${body.errorText || body.message || "Unknown error"}`;
+                lastMsg.isError = true;
+              }
+              return [...updated];
+            });
+            setIsLoading(false);
+            return;
+          } else if (body.type === "tool-input-available") {
             setMessages(prev => {
               const updated = [...prev];
               const lastMsg = updated[updated.length - 1];
