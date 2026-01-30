@@ -38,7 +38,7 @@ exit: 1
 =====
 delete non-existent note fails
 =====
-veta delete 999 2>&1 ; echo "exit: $?"
+veta rm 999 2>&1 ; echo "exit: $?"
 -----
 Note 999 not found
 exit: 1
