@@ -389,5 +389,5 @@ All business logic in `VetaService` is generic over this trait, meaning it works
 | `veta-core` | ✓ | ✓ |
 | `veta-sqlite` | ✓ | ✗ |
 | `veta-d1` | ✗ | ✓ |
-| `veta-cli` | ✓ | ✗ |
+| `veta` | ✓ | ✗ |
 | `veta-worker` | ✗ | ✓ |
