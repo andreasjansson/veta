@@ -7,7 +7,7 @@
     {
       "binding": "VETA_DB",
       "database_name": "veta-example-db",
-      "database_id": "b60803b1-f7b8-4cc0-8619-4d8c70ef20a8",
+      "database_id": "",
       "migrations_dir": "../../schema/migrations"
     }
   ]
