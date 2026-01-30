@@ -57,9 +57,18 @@ fn json_error(msg: &str, status: u16) -> Result<Response> {
     )
 }
 
-fn get_service(env: &Env) -> Result<VetaService<D1DatabaseWrapper>> {
-    let db = env.d1("VETA_DB")?;
-    Ok(VetaService::new(D1DatabaseWrapper::new(db)))
+async fn get_service(env: &Env) -> std::result::Result<VetaService<D1DatabaseWrapper>, Response> {
+    let db = env.d1("VETA_DB").map_err(|e| {
+        json_error(&format!("Database binding error: {}", e), 500).unwrap()
+    })?;
+    let mut wrapper = D1DatabaseWrapper::new(db);
+
+    // Ensure migrations have been run (fast no-op after first check)
+    wrapper.ensure_initialized().await.map_err(|e| {
+        json_error(&format!("Database initialization error: {}", e), 500).unwrap()
+    })?;
+
+    Ok(VetaService::new(wrapper))
 }
 
 fn parse_query_tags(url: &Url) -> Option<Vec<String>> {
