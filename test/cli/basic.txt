@@ -223,7 +223,7 @@ Tags: newtag,updated
 =====
 delete a note
 =====
-veta delete 3
+veta rm 3
 -----
 Deleted note 3
 
