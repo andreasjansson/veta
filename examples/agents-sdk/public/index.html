@@ -112,6 +112,7 @@
     const messagesContainerRef = useRef(null);
     const inputRef = useRef(null);
     const wsRef = useRef(null);
+    const reconnectTimeoutRef = useRef(null);
     const agentId = useRef(crypto.randomUUID());
     const shouldAutoScroll = useRef(true);
 
@@ -128,13 +129,20 @@
       shouldAutoScroll.current = atBottom;
     };
     useEffect(() => { if (!isLoading && isConnected) inputRef.current?.focus(); }, [isLoading, isConnected]);
-    useEffect(() => { connectWebSocket(); return () => wsRef.current?.close(); }, []);
+    useEffect(() => { connectWebSocket(); return () => { clearTimeout(reconnectTimeoutRef.current); wsRef.current?.close(); }; }, []);
 
     const connectWebSocket = () => {
+      // Clean up any existing connection
+      if (wsRef.current) {
+        wsRef.current.onclose = null; // Prevent reconnection loop
+        wsRef.current.close();
+      }
+      clearTimeout(reconnectTimeoutRef.current);
+
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       const ws = new WebSocket(`${protocol}//${window.location.host}/agents/chat/${agentId.current}`);
       ws.onopen = () => setIsConnected(true);
-      ws.onclose = () => { setIsConnected(false); setTimeout(connectWebSocket, 2000); };
+      ws.onclose = () => { setIsConnected(false); reconnectTimeoutRef.current = setTimeout(connectWebSocket, 2000); };
       ws.onerror = (e) => console.error("WebSocket error:", e);
       ws.onmessage = (event) => { try { handleMessage(JSON.parse(event.data)); } catch (e) {} };
       wsRef.current = ws;
