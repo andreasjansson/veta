@@ -179,7 +179,7 @@ jobs:
         with:
           bin: veta
           target: ${{ matrix.target }}
-          manifest-path: crates/veta-cli/Cargo.toml
+          manifest-path: crates/veta/Cargo.toml
           archive: veta-v${{ needs.check-release.outputs.version }}-${{ matrix.target }}
           ref: refs/tags/v${{ needs.check-release.outputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
