@@ -135,6 +135,6 @@ impl<D: Database> VetaService<D> {
             .db
             .grep(pattern, tags.as_deref(), case_sensitive)
             .await?;
-        Ok(notes.into_iter().map(|n| n.to_summary(60)).collect())
+        Ok(notes.into_iter().map(|n| n.to_summary(140)).collect())
     }
 }
