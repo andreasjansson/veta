@@ -359,7 +359,7 @@ veta/
 
 **`veta-d1`** — Implements `Database` trait using Cloudflare's D1 via `workers-rs`. Only compiled for `wasm32-unknown-unknown`.
 
-**`veta-cli`** — The `veta` command-line tool. Uses `veta-core` + `veta-sqlite`.
+**`veta`** — The `veta` command-line tool. Uses `veta-core` + `veta-sqlite`.
 
 **`veta-worker`** — The Cloudflare Worker entry point. Uses `veta-core` + `veta-d1`. Exposes the HTTP API via `workers-rs` Router.
 
