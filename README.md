@@ -30,7 +30,7 @@ brew install andreasjansson/tap/veta
 ### Via Cargo
 
 ```bash
-cargo install veta-cli
+cargo install veta
 ```
 
 ### Pre-built binaries
