@@ -69,7 +69,7 @@ impl<D: Database> VetaService<D> {
             ..query
         };
         let notes = self.db.list_notes(query).await?;
-        Ok(notes.into_iter().map(|n| n.to_summary(60)).collect())
+        Ok(notes.into_iter().map(|n| n.to_summary(140)).collect())
     }
 
     /// Count notes matching the query (ignores limit).
