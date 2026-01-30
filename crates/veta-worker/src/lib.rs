@@ -104,7 +104,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     Router::new()
         // POST /notes - Create note
         .post_async("/notes", |mut req, ctx| async move {
-            let service = get_service(&ctx.env)?;
+            let service = get_service(&ctx.env).await?;
 
             let body: CreateNoteRequest = match req.json().await {
                 Ok(b) => b,
@@ -121,7 +121,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         })
         // GET /notes - List notes
         .get_async("/notes", |req, ctx| async move {
-            let service = get_service(&ctx.env)?;
+            let service = get_service(&ctx.env).await?;
             let url = req.url()?;
 
             let query = NoteQuery {
@@ -138,7 +138,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         })
         // GET /notes/:id - Get single note
         .get_async("/notes/:id", |_, ctx| async move {
-            let service = get_service(&ctx.env)?;
+            let service = get_service(&ctx.env).await?;
 
             let id: i64 = ctx.param("id").and_then(|s| s.parse().ok()).unwrap_or(0);
 
@@ -150,7 +150,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         })
         // PATCH /notes/:id - Update note
         .patch_async("/notes/:id", |mut req, ctx| async move {
-            let service = get_service(&ctx.env)?;
+            let service = get_service(&ctx.env).await?;
 
             let id: i64 = ctx.param("id").and_then(|s| s.parse().ok()).unwrap_or(0);
 
@@ -174,7 +174,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         })
         // DELETE /notes/:id - Delete note
         .delete_async("/notes/:id", |_, ctx| async move {
-            let service = get_service(&ctx.env)?;
+            let service = get_service(&ctx.env).await?;
 
             let id: i64 = ctx.param("id").and_then(|s| s.parse().ok()).unwrap_or(0);
 
@@ -186,7 +186,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         })
         // GET /tags - List all tags
         .get_async("/tags", |_, ctx| async move {
-            let service = get_service(&ctx.env)?;
+            let service = get_service(&ctx.env).await?;
 
             match service.list_tags().await {
                 Ok(tags) => json_response(&tags, 200),
@@ -195,7 +195,7 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         })
         // GET /grep - Search notes
         .get_async("/grep", |req, ctx| async move {
-            let service = get_service(&ctx.env)?;
+            let service = get_service(&ctx.env).await?;
             let url = req.url()?;
 
             let pattern = parse_query_string(&url, "q").unwrap_or_default();
@@ -205,16 +205,6 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
             match service.grep(&pattern, tags, case_sensitive).await {
                 Ok(notes) => json_response(&notes, 200),
                 Err(e) => json_error(&e.to_string(), 400),
-            }
-        })
-        // POST /migrate - Run migrations
-        .post_async("/migrate", |_, ctx| async move {
-            let db = ctx.env.d1("VETA_DB")?;
-            let wrapper = D1DatabaseWrapper::new(db);
-
-            match wrapper.run_migrations().await {
-                Ok(()) => json_response(&OkResponse { ok: true }, 200),
-                Err(e) => json_error(&e.to_string(), 500),
             }
         })
         // Health check
