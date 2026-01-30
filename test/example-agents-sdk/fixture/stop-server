@@ -1,0 +1,10 @@
+#!/bin/bash
+# Stop the agents-sdk example workers
+pkill -f "server.mjs.*agents-sdk" 2>/dev/null || true
+pkill -f "wrangler.*veta-agent-example" 2>/dev/null || true
+pkill -f "wrangler.*veta-example" 2>/dev/null || true
+if [ -f /tmp/agents-sdk-test.pid ]; then
+    kill $(cat /tmp/agents-sdk-test.pid) 2>/dev/null || true
+    rm -f /tmp/agents-sdk-test.pid
+fi
+rm -f /tmp/agents-sdk-test.log

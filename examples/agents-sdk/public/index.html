@@ -22,6 +22,53 @@
   <script type="text/babel">
   const { useState, useEffect, useRef } = React;
 
+  function ToolCall({ toolCall, result }) {
+    const [expanded, setExpanded] = useState(false);
+
+    const formatInput = (input) => {
+      if (!input || typeof input !== 'object') return null;
+      return Object.entries(input).map(([key, value]) => {
+        const displayValue = typeof value === 'string' ? value : JSON.stringify(value);
+        return (
+          <div key={key} className="pl-4 text-sm">
+            <span className="text-cyan-600">{key}:</span>{" "}
+            <span className="text-cyan-400 whitespace-pre-wrap">{displayValue}</span>
+          </div>
+        );
+      });
+    };
+
+    return (
+      <div className="flex justify-start">
+        <div className="max-w-[80%] p-3 border-2 border-yellow-600 bg-yellow-950/20">
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="flex items-center gap-2 text-yellow-500 hover:text-yellow-400 cursor-pointer text-left w-full"
+          >
+            <span className="text-yellow-700">{expanded ? "[-]" : "[+]"}</span>
+            <span>{toolCall.name}</span>
+          </button>
+          {expanded && (
+            <div className="mt-2 pt-2 border-t border-yellow-800">
+              {toolCall.input && Object.keys(toolCall.input).length > 0 && (
+                <div className="mb-2">
+                  <div className="text-yellow-700 text-sm">INPUT:</div>
+                  {formatInput(toolCall.input)}
+                </div>
+              )}
+              {result !== undefined && (
+                <div>
+                  <div className="text-yellow-700 text-sm">OUTPUT:</div>
+                  <div className="pl-4 text-emerald-400 text-sm whitespace-pre-wrap">{result}</div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   function App() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
@@ -160,35 +207,36 @@
 
         <main className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
           {messages.map((msg, i) => (
-            <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[80%] p-3 border-2 ${
-                msg.role === "user" 
-                  ? "border-cyan-500 text-cyan-400 bg-cyan-950/30" 
-                  : "border-green-500 text-green-400 bg-green-950/30"
-              }`}>
-                {msg.role === "assistant" && msg.toolCalls?.length > 0 && (
-                  <div className="mb-2 pb-2 border-b border-green-700">
-                    {msg.toolCalls.map((tc, j) => (
-                      <div key={j} className="text-yellow-500 text-sm">
-                        &gt; {tc.name}({JSON.stringify(tc.input)})
+            <React.Fragment key={i}>
+              {msg.role === "user" ? (
+                <div className="flex justify-end">
+                  <div className="max-w-[80%] p-3 border-2 border-cyan-500 text-cyan-400 bg-cyan-950/30">
+                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {msg.toolCalls?.map((tc, j) => (
+                    <ToolCall 
+                      key={`${i}-tool-${j}`} 
+                      toolCall={tc} 
+                      result={msg.toolResults?.[j]}
+                    />
+                  ))}
+                  {(msg.content || (isLoading && i === messages.length - 1 && !msg.toolCalls?.length)) && (
+                    <div className="flex justify-start">
+                      <div className="max-w-[80%] p-3 border-2 border-green-500 text-green-400 bg-green-950/30">
+                        {isLoading && i === messages.length - 1 && !msg.content ? (
+                          <span className="animate-pulse">_</span>
+                        ) : (
+                          <p className="whitespace-pre-wrap">{msg.content}</p>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                )}
-                {msg.role === "assistant" && msg.toolResults?.length > 0 && (
-                  <div className="mb-2 pb-2 border-b border-green-700">
-                    {msg.toolResults.map((result, j) => (
-                      <div key={j} className="text-emerald-400 text-sm">{result}</div>
-                    ))}
-                  </div>
-                )}
-                {msg.role === "assistant" && isLoading && !msg.content && !msg.toolCalls?.length ? (
-                  <span className="animate-pulse">_</span>
-                ) : (
-                  <p className="whitespace-pre-wrap">{msg.content}</p>
-                )}
-              </div>
-            </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </React.Fragment>
           ))}
           <div ref={messagesEndRef} />
         </main>

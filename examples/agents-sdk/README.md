@@ -1,4 +1,4 @@
-# Veta Agent SDK Example
+# Veta Agents SDK Example
 
 A minimal example showing how to build a Cloudflare Agent with Veta as persistent memory.
 
