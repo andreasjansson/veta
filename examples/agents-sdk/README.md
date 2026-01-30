@@ -77,7 +77,7 @@ The agent has access to these Veta tools:
 - `showNote` - Read a specific note
 - `searchNotes` - Search with regex patterns
 - `listTags` - See all available tags
-- `deleteNote` - Remove a note
+- `rmNotes` - Remove one or more notes
 
 The Veta worker runs as a separate service, and the agent calls it via service bindings (the `VETA` binding in `wrangler.agent.jsonc`).
 
