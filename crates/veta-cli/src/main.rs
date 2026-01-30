@@ -457,11 +457,32 @@ async fn main() -> Result<()> {
             }
         }
 
-        Commands::Delete { id } => {
-            if service.delete_note(id).await? {
+        Commands::Rm { ids } => {
+            let ids = parse_ids(&ids)?;
+            if ids.is_empty() {
+                eprintln!("No note IDs provided");
+                std::process::exit(1);
+            }
+
+            let mut deleted = Vec::new();
+            let mut not_found = Vec::new();
+
+            for id in &ids {
+                if service.delete_note(*id).await? {
+                    deleted.push(*id);
+                } else {
+                    not_found.push(*id);
+                }
+            }
+
+            for id in &deleted {
                 println!("Deleted note {}", id);
-            } else {
-                eprintln!("Note {} not found", id);
+            }
+
+            if !not_found.is_empty() {
+                for id in &not_found {
+                    eprintln!("Note {} not found", id);
+                }
                 std::process::exit(1);
             }
         }
