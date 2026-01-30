@@ -30,7 +30,7 @@
       return Object.entries(input).map(([key, value]) => {
         const displayValue = typeof value === 'string' ? value : JSON.stringify(value);
         return (
-          <div key={key} className="pl-4 text-sm">
+          <div key={key} className="pl-4">
             <span className="text-cyan-600">{key}:</span>{" "}
             <span className="text-cyan-400 whitespace-pre-wrap">{displayValue}</span>
           </div>
@@ -52,14 +52,14 @@
             <div className="mt-2 pt-2 border-t border-yellow-800">
               {toolCall.input && Object.keys(toolCall.input).length > 0 && (
                 <div className="mb-2">
-                  <div className="text-yellow-700 text-sm">INPUT:</div>
+                  <div className="text-yellow-700">INPUT:</div>
                   {formatInput(toolCall.input)}
                 </div>
               )}
               {result !== undefined && (
                 <div>
-                  <div className="text-yellow-700 text-sm">OUTPUT:</div>
-                  <div className="pl-4 text-emerald-400 text-sm whitespace-pre-wrap">{result}</div>
+                  <div className="text-yellow-700">OUTPUT:</div>
+                  <div className="pl-4 text-emerald-400 whitespace-pre-wrap">{result}</div>
                 </div>
               )}
             </div>
