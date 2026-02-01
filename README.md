@@ -70,10 +70,24 @@ Before using Veta, initialize a database in your project directory:
 
 ```
 $ veta init
-Initialized veta database in .veta/db.sqlite
+Initialized veta database in .veta
 ```
 
-This creates a `.veta` directory with the SQLite database. Veta commands work from this directory and any subdirectory (it searches up the tree for `.veta`).
+This creates a `.veta` directory with notes stored as JSON files and tags organized via symlinks:
+
+```
+.veta/
+  notes/
+    1.json
+    2.json
+  tags/
+    architecture/
+      1.json → ../notes/1.json
+    debugging/
+      2.json → ../notes/2.json
+```
+
+Veta commands work from this directory and any subdirectory (it searches up the tree for `.veta`).
 
 ### Add note
 
