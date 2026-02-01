@@ -122,7 +122,7 @@ fn get_veta_dir() -> Result<PathBuf> {
 }
 
 /// Check if there's a legacy SQLite database that needs migration
-fn has_legacy_sqlite(veta_dir: &PathBuf) -> bool {
+fn has_legacy_sqlite(veta_dir: &Path) -> bool {
     veta_dir.join(LEGACY_DB_FILE).exists()
 }
 
@@ -131,17 +131,15 @@ async fn migrate_from_sqlite(veta_dir: &PathBuf) -> Result<()> {
     use veta_sqlite::SqliteDatabase;
 
     let sqlite_path = veta_dir.join(LEGACY_DB_FILE);
-    eprintln!(
-        "Migrating from SQLite database to file-based storage..."
-    );
+    eprintln!("Migrating from SQLite database to file-based storage...");
 
     // Open the SQLite database
-    let sqlite_db = SqliteDatabase::open(&sqlite_path)
-        .context("Failed to open legacy SQLite database")?;
+    let sqlite_db =
+        SqliteDatabase::open(&sqlite_path).context("Failed to open legacy SQLite database")?;
 
     // Create the new file-based database
-    let _files_db = FilesDatabase::open(veta_dir)
-        .context("Failed to create file-based database")?;
+    let _files_db =
+        FilesDatabase::open(veta_dir).context("Failed to create file-based database")?;
 
     // Get all notes from SQLite
     let notes = sqlite_db
@@ -157,53 +155,56 @@ async fn migrate_from_sqlite(veta_dir: &PathBuf) -> Result<()> {
     // We need to preserve the original IDs, but FilesDatabase.add_note generates new IDs.
     // So we'll directly write the note files with the correct IDs.
     // This is a bit of a hack, but it's only for migration.
-    
+
     for note in notes {
         // Create the note file directly to preserve the ID
         let note_path = veta_dir.join("notes").join(format!("{}.json", note.id));
-        
+
         let note_file = serde_json::json!({
             "title": note.title,
             "body": note.body,
             "references": note.references,
             "modified": note.updated_at,
         });
-        
-        let contents = serde_json::to_string_pretty(&note_file)
-            .context("Failed to serialize note")?;
-        
+
+        let contents =
+            serde_json::to_string_pretty(&note_file).context("Failed to serialize note")?;
+
         std::fs::write(&note_path, contents)
             .context(format!("Failed to write note {}", note.id))?;
-        
+
         // Create tag symlinks
         for tag in &note.tags {
             let tag_dir = veta_dir.join("tags").join(tag);
             std::fs::create_dir_all(&tag_dir)
                 .context(format!("Failed to create tag directory: {}", tag))?;
-            
+
             let symlink_path = tag_dir.join(format!("{}.json", note.id));
             let relative_target = format!("../../notes/{}.json", note.id);
-            
+
             #[cfg(unix)]
             {
-                std::os::unix::fs::symlink(&relative_target, &symlink_path)
-                    .context(format!("Failed to create symlink for note {} tag {}", note.id, tag))?;
+                std::os::unix::fs::symlink(&relative_target, &symlink_path).context(format!(
+                    "Failed to create symlink for note {} tag {}",
+                    note.id, tag
+                ))?;
             }
-            
+
             #[cfg(windows)]
             {
                 // Try real symlink first, fall back to text file
                 if std::os::windows::fs::symlink_file(&relative_target, &symlink_path).is_err() {
-                    std::fs::write(&symlink_path, &relative_target)
-                        .context(format!("Failed to create link file for note {} tag {}", note.id, tag))?;
+                    std::fs::write(&symlink_path, &relative_target).context(format!(
+                        "Failed to create link file for note {} tag {}",
+                        note.id, tag
+                    ))?;
                 }
             }
         }
     }
 
     // Remove the old SQLite database
-    std::fs::remove_file(&sqlite_path)
-        .context("Failed to remove old SQLite database")?;
+    std::fs::remove_file(&sqlite_path).context("Failed to remove old SQLite database")?;
 
     eprintln!("Migration complete! SQLite database has been removed.");
 
