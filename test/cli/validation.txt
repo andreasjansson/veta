@@ -9,7 +9,7 @@ veta init --reinitialize
 Reinitialized veta database in {{ path }}
 -----
 where
-* path matches /\.veta[\/\\]db\.sqlite/
+* path matches /\.veta/
 
 =====
 reject empty title
