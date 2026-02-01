@@ -3,7 +3,7 @@
 use anyhow::{bail, Context, Result};
 use clap::{Parser, Subcommand};
 use std::io::{self, Read};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use veta_core::{parse_human_date, Database, NoteQuery, UpdateNote, VetaService};
 use veta_files::FilesDatabase;
 
