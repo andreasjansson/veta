@@ -354,12 +354,12 @@ Veta is written in Rust and compiles to both native (CLI) and WASM (Worker) targ
 veta/
 ├── crates/
 │   ├── veta-core/        # Shared: types, validation, business logic
-│   ├── veta-sqlite/      # Native: rusqlite Database implementation
+│   ├── veta-files/       # Native: file-based storage with symlinks
 │   ├── veta-d1/          # WASM: D1 Database implementation
 │   ├── veta/             # Native: CLI binary
 │   └── veta-worker/      # WASM: Cloudflare Worker
 └── schema/
-    └── migrations/       # Shared SQL migrations
+    └── migrations/       # SQL migrations for D1
 ```
 
 ### Crates
@@ -369,11 +369,11 @@ veta/
 - The `Database` trait (async, `?Send` for WASM compatibility)
 - `VetaService<D: Database>` containing all business logic
 
-**`veta-sqlite`** — Implements `Database` trait using `rusqlite`. Only compiled for native targets.
+**`veta-files`** — Implements `Database` trait using local files. Notes are stored as JSON files in `.veta/notes/`, with tags organized via symlinks in `.veta/tags/`. Uses file locking for safe concurrent access.
 
 **`veta-d1`** — Implements `Database` trait using Cloudflare's D1 via `workers-rs`. Only compiled for `wasm32-unknown-unknown`.
 
-**`veta`** — The `veta` command-line tool. Uses `veta-core` + `veta-sqlite`.
+**`veta`** — The `veta` command-line tool. Uses `veta-core` + `veta-files`.
 
 **`veta-worker`** — The Cloudflare Worker entry point. Uses `veta-core` + `veta-d1`. Exposes the HTTP API via `workers-rs` Router.
 
@@ -394,14 +394,14 @@ pub trait Database {
 }
 ```
 
-All business logic in `VetaService` is generic over this trait, meaning it works identically whether backed by SQLite or D1.
+All business logic in `VetaService` is generic over this trait, meaning it works identically whether backed by files or D1.
 
 ### Build Targets
 
 | Crate | Native | WASM |
 |-------|--------|------|
 | `veta-core` | ✓ | ✓ |
-| `veta-sqlite` | ✓ | ✗ |
+| `veta-files` | ✓ | ✗ |
 | `veta-d1` | ✗ | ✓ |
 | `veta` | ✓ | ✗ |
 | `veta-worker` | ✗ | ✓ |
