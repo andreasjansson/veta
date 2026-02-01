@@ -17,6 +17,7 @@ veta-core.workspace = true
 veta-files = { workspace = true }
 # Keep veta-sqlite for migration from old databases (temporary)
 veta-sqlite.workspace = true
+serde_json.workspace = true
 clap.workspace = true
 tokio.workspace = true
 anyhow.workspace = true
