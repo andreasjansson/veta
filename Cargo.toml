@@ -2,6 +2,7 @@
 members = [
     "crates/veta-core",
     "crates/veta-sqlite",
+    "crates/veta-files",
     "crates/veta-d1",
     "crates/veta",
     "crates/veta-worker",
