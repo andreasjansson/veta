@@ -6,51 +6,45 @@ reinitialize and add a note first
 veta init --reinitialize
 veta add --title "Test note" --tags "test" --body "Test content"
 -----
-Reinitialized veta database in .veta/db.sqlite
+Reinitialized veta database in .veta
 Added note 1
 
 =====
-corrupt the database
+corrupt a note file
 =====
-echo "garbage data that is definitely not sqlite" > .veta/db.sqlite
+echo "garbage data that is not json" > .veta/notes/1.json
 echo "corrupted"
 -----
 corrupted
 
 =====
-detect corruption and backup corrupted file
+detect corruption when showing note
 =====
-veta ls 2>&1 ; echo "exit: $?"
+veta show 1 2>&1 ; echo "exit: $?"
 -----
-Warning: Database corruption detected. Attempting recovery...
-Error: Database is corrupted and could not be recovered.
-The corrupted file has been moved to: {{ path }}
-Run 'veta init' to create a new database.
+Error: database error: Failed to parse note: {{ msg }}
 exit: 1
 -----
 where
-* path endswith "db.sqlite.corrupted"
+* msg contains "expected"
 
 =====
-verify corrupted file was backed up
+can still list notes (shows nothing since note is corrupt)
 =====
-test -f .veta/db.sqlite.corrupted && echo "backup exists"
+veta ls 2>&1 ; echo "exit: $?"
 -----
-backup exists
-
-=====
-verify original db was removed
-=====
-test ! -f .veta/db.sqlite && echo "original removed"
+Error: database error: Failed to parse note: {{ msg }}
+exit: 1
 -----
-original removed
+where
+* msg contains "expected"
 
 =====
 can reinitialize after corruption
 =====
-veta init
+veta init --reinitialize
 -----
-Initialized veta database in .veta/db.sqlite
+Reinitialized veta database in .veta
 
 =====
 verify new database works
