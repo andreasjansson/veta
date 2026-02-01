@@ -140,7 +140,7 @@ async fn migrate_from_sqlite(veta_dir: &PathBuf) -> Result<()> {
         .context("Failed to open legacy SQLite database")?;
 
     // Create the new file-based database
-    let files_db = FilesDatabase::open(veta_dir)
+    let _files_db = FilesDatabase::open(veta_dir)
         .context("Failed to create file-based database")?;
 
     // Get all notes from SQLite
