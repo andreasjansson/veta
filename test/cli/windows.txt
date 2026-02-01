@@ -8,7 +8,7 @@ veta init --reinitialize
 Reinitialized veta database in {{ path }}
 -----
 where
-* path matches /\.veta[\/\\]db\.sqlite/
+* path matches /\.veta/
 
 =====
 add and list notes on Windows
