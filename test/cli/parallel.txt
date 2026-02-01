@@ -20,11 +20,11 @@ unique_count=$(echo "$ids" | sort -u | wc -l | tr -d ' ')
 echo "count: $count, unique: $unique_count"
 -----
 {{ output: string }}
-count: {{ count }}, unique: {{ unique }}
+count: {{ count }}, unique: {{ uniq }}
 -----
 where
 * count == 10
-* unique == 10
+* uniq == 10
 
 =====
 parallel edits do not corrupt data
