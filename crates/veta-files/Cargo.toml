@@ -1,0 +1,18 @@
+[package]
+name = "veta-files"
+description = "File-based storage for Veta"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
+[dependencies]
+veta-core.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+regex = "1"
+fs2 = "0.4"
