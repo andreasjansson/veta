@@ -12,7 +12,7 @@ Added note 1
 1: Test note ({{ modified }}) -- Test body
 -----
 where
-* path matches /\.veta[\/\\]db\.sqlite/
+* path matches /\.veta/
 
 =====
 veta commands fail without init
