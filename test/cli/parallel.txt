@@ -27,7 +27,7 @@ where
 * unique == 10
 
 =====
-parallel edits dont corrupt data
+parallel edits do not corrupt data
 =====
 veta add --title "Edit target" --tags "editable" --body "Original content"
 note_id=$(veta ls editable -n 1 | head -1 | cut -d: -f1)
