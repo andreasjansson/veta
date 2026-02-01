@@ -20,6 +20,7 @@ repository = "https://github.com/andreasjansson/veta"
 [workspace.dependencies]
 veta-core = { version = "0.4.0", path = "crates/veta-core" }
 veta-sqlite = { version = "0.4.0", path = "crates/veta-sqlite" }
+veta-files = { version = "0.4.0", path = "crates/veta-files" }
 veta-d1 = { version = "0.4.0", path = "crates/veta-d1" }
 
 async-trait = "0.1"
