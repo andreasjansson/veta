@@ -1,0 +1,118 @@
+%platform unix
+
+=====
+reinitialize for parallel tests
+=====
+veta init --reinitialize
+-----
+Reinitialized veta database in .veta
+
+=====
+parallel adds create unique IDs
+=====
+# Run 10 parallel add commands
+for i in $(seq 1 10); do
+  veta add --title "Note $i" --tags "parallel" --body "Body $i" &
+done
+wait
+
+# Check we have 10 notes with unique IDs
+count=$(veta ls parallel -n 0 | wc -l)
+echo "count: $count"
+
+# Get all IDs and check they're unique
+ids=$(veta ls parallel -n 0 | cut -d: -f1 | sort -n)
+unique_count=$(echo "$ids" | sort -u | wc -l)
+echo "unique: $unique_count"
+-----
+count: {{ count }}
+unique: {{ unique }}
+-----
+where
+* count == 10
+* unique == 10
+
+=====
+parallel edits don't corrupt data
+=====
+# Add a note to edit
+veta add --title "Edit target" --tags "editable" --body "Original content"
+note_id=$(veta ls editable -n 1 | head -1 | cut -d: -f1)
+
+# Run parallel edits - each updates the body
+for i in $(seq 1 5); do
+  veta edit $note_id --body "Edit from process $i" &
+done
+wait
+
+# The note should still be valid and readable
+veta show $note_id | grep "Edit target" > /dev/null && echo "note still valid"
+-----
+Added note {{ id }}
+note still valid
+-----
+where
+* id > 10
+
+=====
+parallel delete and add don't interfere
+=====
+# Add some notes
+for i in $(seq 1 5); do
+  veta add --title "Del test $i" --tags "deltest" --body "Body $i"
+done
+
+# Get the IDs
+ids=$(veta ls deltest -n 0 | cut -d: -f1 | tr '\n' ' ')
+
+# Parallel: delete these notes while adding new ones
+for id in $ids; do
+  veta rm $id &
+done
+for i in $(seq 1 5); do
+  veta add --title "New note $i" --tags "newtest" --body "New body $i" &
+done
+wait
+
+# Old notes should be gone
+old_count=$(veta ls deltest -n 0 | wc -l)
+# New notes should exist
+new_count=$(veta ls newtest -n 0 | wc -l)
+echo "old: $old_count new: $new_count"
+-----
+Added note {{ n1 }}
+Added note {{ n2 }}
+Added note {{ n3 }}
+Added note {{ n4 }}
+Added note {{ n5 }}
+Deleted note {{ d1 }}
+Deleted note {{ d2 }}
+Deleted note {{ d3 }}
+Deleted note {{ d4 }}
+Deleted note {{ d5 }}
+Added note {{ a1 }}
+Added note {{ a2 }}
+Added note {{ a3 }}
+Added note {{ a4 }}
+Added note {{ a5 }}
+old: {{ old }} new: {{ new }}
+-----
+where
+* old == 0
+* new == 5
+
+=====
+sequential test to verify database integrity
+=====
+# Add a note, edit it, then show it
+veta add --title "Integrity test" --tags "integrity" --body "Original"
+id=$(veta ls integrity -n 1 | head -1 | cut -d: -f1)
+veta edit $id --body "Edited"
+veta show $id | grep "Edited" > /dev/null && echo "integrity: ok"
+-----
+Added note {{ id }}
+Edited note {{ edited_id }}: Updated body
+integrity: ok
+-----
+where
+* id == edited_id
