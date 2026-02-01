@@ -3,12 +3,12 @@
 use anyhow::{bail, Context, Result};
 use clap::{Parser, Subcommand};
 use std::io::{self, Read};
-use std::path::{Path, PathBuf};
-use veta_core::{parse_human_date, NoteQuery, UpdateNote, VetaService};
-use veta_sqlite::SqliteDatabase;
+use std::path::PathBuf;
+use veta_core::{parse_human_date, CreateNote, Database, NoteQuery, UpdateNote, VetaService};
+use veta_files::FilesDatabase;
 
 const VETA_DIR: &str = ".veta";
-const DB_FILE: &str = "db.sqlite";
+const LEGACY_DB_FILE: &str = "db.sqlite";
 
 #[derive(Parser)]
 #[command(name = "veta", about = "Memory and knowledge base for agents", version)]
@@ -113,95 +113,111 @@ fn find_veta_dir() -> Option<PathBuf> {
     }
 }
 
-/// Get the database path, or error if not initialized
-fn get_db_path() -> Result<PathBuf> {
+/// Get the veta directory path, or error if not initialized
+fn get_veta_dir() -> Result<PathBuf> {
     match find_veta_dir() {
-        Some(veta_dir) => Ok(veta_dir.join(DB_FILE)),
+        Some(veta_dir) => Ok(veta_dir),
         None => bail!("No .veta directory found. Run 'veta init' to initialize a new database."),
     }
 }
 
-/// Check if the database is valid/uncorrupted
-fn check_database_integrity(path: &Path) -> Result<bool> {
-    use rusqlite::Connection;
-
-    let conn = match Connection::open(path) {
-        Ok(c) => c,
-        Err(_) => return Ok(false),
-    };
-
-    // Run SQLite integrity check
-    let result: Result<String, _> = conn.query_row("PRAGMA integrity_check", [], |row| row.get(0));
-
-    match result {
-        Ok(status) => Ok(status == "ok"),
-        Err(_) => Ok(false),
-    }
+/// Check if there's a legacy SQLite database that needs migration
+fn has_legacy_sqlite(veta_dir: &PathBuf) -> bool {
+    veta_dir.join(LEGACY_DB_FILE).exists()
 }
 
-/// Attempt to recover a corrupted database
-fn attempt_recovery(path: &Path) -> Result<bool> {
-    use rusqlite::Connection;
+/// Migrate from SQLite to file-based storage
+async fn migrate_from_sqlite(veta_dir: &PathBuf) -> Result<()> {
+    use veta_sqlite::SqliteDatabase;
 
-    // Try to open and run recovery
-    let conn = match Connection::open(path) {
-        Ok(c) => c,
-        Err(_) => return Ok(false),
-    };
+    let sqlite_path = veta_dir.join(LEGACY_DB_FILE);
+    eprintln!(
+        "Migrating from SQLite database to file-based storage..."
+    );
 
-    // Try to recover using VACUUM (can fix some issues)
-    if conn.execute("VACUUM", []).is_ok() {
-        // Re-check integrity
-        let result: Result<String, _> =
-            conn.query_row("PRAGMA integrity_check", [], |row| row.get(0));
-        if let Ok(status) = result {
-            if status == "ok" {
-                return Ok(true);
+    // Open the SQLite database
+    let sqlite_db = SqliteDatabase::open(&sqlite_path)
+        .context("Failed to open legacy SQLite database")?;
+
+    // Create the new file-based database
+    let files_db = FilesDatabase::open(veta_dir)
+        .context("Failed to create file-based database")?;
+
+    // Get all notes from SQLite
+    let notes = sqlite_db
+        .list_notes(NoteQuery {
+            limit: None,
+            ..Default::default()
+        })
+        .await
+        .context("Failed to list notes from SQLite")?;
+
+    eprintln!("Migrating {} notes...", notes.len());
+
+    // We need to preserve the original IDs, but FilesDatabase.add_note generates new IDs.
+    // So we'll directly write the note files with the correct IDs.
+    // This is a bit of a hack, but it's only for migration.
+    
+    for note in notes {
+        // Create the note file directly to preserve the ID
+        let note_path = veta_dir.join("notes").join(format!("{}.json", note.id));
+        
+        let note_file = serde_json::json!({
+            "title": note.title,
+            "body": note.body,
+            "references": note.references,
+            "modified": note.updated_at,
+        });
+        
+        let contents = serde_json::to_string_pretty(&note_file)
+            .context("Failed to serialize note")?;
+        
+        std::fs::write(&note_path, contents)
+            .context(format!("Failed to write note {}", note.id))?;
+        
+        // Create tag symlinks
+        for tag in &note.tags {
+            let tag_dir = veta_dir.join("tags").join(tag);
+            std::fs::create_dir_all(&tag_dir)
+                .context(format!("Failed to create tag directory: {}", tag))?;
+            
+            let symlink_path = tag_dir.join(format!("{}.json", note.id));
+            let relative_target = format!("../../notes/{}.json", note.id);
+            
+            #[cfg(unix)]
+            {
+                std::os::unix::fs::symlink(&relative_target, &symlink_path)
+                    .context(format!("Failed to create symlink for note {} tag {}", note.id, tag))?;
+            }
+            
+            #[cfg(windows)]
+            {
+                // Try real symlink first, fall back to text file
+                if std::os::windows::fs::symlink_file(&relative_target, &symlink_path).is_err() {
+                    std::fs::write(&symlink_path, &relative_target)
+                        .context(format!("Failed to create link file for note {} tag {}", note.id, tag))?;
+                }
             }
         }
     }
 
-    Ok(false)
+    // Remove the old SQLite database
+    std::fs::remove_file(&sqlite_path)
+        .context("Failed to remove old SQLite database")?;
+
+    eprintln!("Migration complete! SQLite database has been removed.");
+
+    Ok(())
 }
 
-/// Open the database, checking for corruption
-fn open_database(path: &Path) -> Result<SqliteDatabase> {
-    // Check if file exists
-    if !path.exists() {
-        bail!(
-            "Database file not found at {}. Run 'veta init' to create a new database.",
-            path.display()
-        );
+/// Open the file-based database, migrating from SQLite if needed
+async fn open_database(veta_dir: &PathBuf) -> Result<FilesDatabase> {
+    // Check for legacy SQLite and migrate if needed
+    if has_legacy_sqlite(veta_dir) {
+        migrate_from_sqlite(veta_dir).await?;
     }
 
-    // Check integrity
-    if !check_database_integrity(path)? {
-        eprintln!("Warning: Database corruption detected. Attempting recovery...");
-
-        if attempt_recovery(path)? {
-            eprintln!("Recovery successful!");
-        } else {
-            // Backup the corrupted file
-            let backup_path = path.with_extension("sqlite.corrupted");
-            if std::fs::rename(path, &backup_path).is_ok() {
-                bail!(
-                    "Database is corrupted and could not be recovered.\n\
-                     The corrupted file has been moved to: {}\n\
-                     Run 'veta init' to create a new database.",
-                    backup_path.display()
-                );
-            } else {
-                bail!(
-                    "Database is corrupted and could not be recovered.\n\
-                     Please remove {} and run 'veta init' to create a new database.",
-                    path.display()
-                );
-            }
-        }
-    }
-
-    // Migrations run automatically in SqliteDatabase::open()
-    let db = SqliteDatabase::open(path).context("Failed to open database")?;
+    let db = FilesDatabase::open(veta_dir).context("Failed to open database")?;
     Ok(db)
 }
 
@@ -238,34 +254,36 @@ async fn main() -> Result<()> {
 
     if let Commands::Init { reinitialize } = cli.command {
         let veta_dir = PathBuf::from(VETA_DIR);
-        let db_path = veta_dir.join(DB_FILE);
 
         if veta_dir.exists() {
-            if db_path.exists() {
-                if reinitialize {
-                    std::fs::remove_file(&db_path).context("Failed to remove existing database")?;
-                } else {
+            if reinitialize {
+                // Remove everything in .veta directory
+                std::fs::remove_dir_all(&veta_dir)
+                    .context("Failed to remove existing .veta directory")?;
+            } else {
+                // Check if already initialized (has notes dir or sqlite db)
+                let has_notes = veta_dir.join("notes").exists();
+                let has_sqlite = veta_dir.join(LEGACY_DB_FILE).exists();
+                if has_notes || has_sqlite {
                     bail!("Veta is already initialized in this directory. Use --reinitialize to delete and recreate.");
                 }
             }
-        } else {
-            std::fs::create_dir_all(&veta_dir).context("Failed to create .veta directory")?;
         }
 
-        // Migrations run automatically in SqliteDatabase::open()
-        let _db = SqliteDatabase::open(&db_path).context("Failed to create database")?;
+        // Create the file-based database structure
+        let _db = FilesDatabase::open(&veta_dir).context("Failed to create database")?;
 
         if reinitialize {
-            println!("Reinitialized veta database in {}", db_path.display());
+            println!("Reinitialized veta database in {}", veta_dir.display());
         } else {
-            println!("Initialized veta database in {}", db_path.display());
+            println!("Initialized veta database in {}", veta_dir.display());
         }
         return Ok(());
     }
 
     // All other commands need the database
-    let db_path = get_db_path()?;
-    let db = open_database(&db_path)?;
+    let veta_dir = get_veta_dir()?;
+    let db = open_database(&veta_dir).await?;
     let service = VetaService::new(db);
 
     match cli.command {
