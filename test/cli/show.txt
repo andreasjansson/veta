@@ -19,7 +19,7 @@ Added note 2
 Added note 3
 ---------------------------------------------
 where
-* path matches /\.veta[\/\\]db\.sqlite/
+* path matches /\.veta/
 
 =============================================
 show single note
