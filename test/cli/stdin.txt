@@ -11,7 +11,7 @@ Reinitialized veta database in {{ path }}
 Added note 1
 -----
 where
-* path matches /\.veta[\/\\]db\.sqlite/
+* path matches /\.veta/
 
 =====
 verify stdin content was saved
