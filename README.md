@@ -413,25 +413,6 @@ veta/
 
 **`veta-worker`** — The Cloudflare Worker entry point. Uses `veta-core` + `veta-d1`. Exposes the HTTP API via `workers-rs` Router.
 
-### Database trait
-
-The key abstraction enabling code sharing:
-
-```rust
-#[async_trait(?Send)]  // ?Send required for WASM compatibility
-pub trait Database {
-    async fn add_note(&self, note: CreateNote) -> Result<i64, Error>;
-    async fn get_note(&self, id: i64) -> Result<Option<Note>, Error>;
-    async fn list_notes(&self, query: NoteQuery) -> Result<Vec<Note>, Error>;
-    async fn update_note(&self, id: i64, update: UpdateNote) -> Result<(), Error>;
-    async fn delete_note(&self, id: i64) -> Result<bool, Error>;
-    async fn list_tags(&self) -> Result<Vec<TagCount>, Error>;
-    async fn grep(&self, pattern: &str, tags: Option<&[String]>, case_sensitive: bool) -> Result<Vec<Note>, Error>;
-}
-```
-
-All business logic in `VetaService` is generic over this trait, meaning it works identically whether backed by files or D1.
-
 ### Build targets
 
 | Crate | Native | WASM |
