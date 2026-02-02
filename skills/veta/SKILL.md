@@ -16,7 +16,7 @@ description: >
 
 Veta is a note database that survives conversation compaction. Notes have titles, bodies, tags for organization, and optional references to external resources (source code paths, URLs, documentation links). **Write notes proactively** - if something is worth remembering, write it NOW.
 
-## ⚠️ CRITICAL: Write Memory Proactively
+## ⚠️ CRITICAL: Write memory proactively
 
 **Don't wait to be asked.** If you learn something important, write it immediately:
 
@@ -31,7 +31,7 @@ Veta is a note database that survives conversation compaction. Notes have titles
 
 **The test:** "Will this be useful context in 2 weeks?" → YES = write it now.
 
-## ⚠️ ALWAYS Include References
+## ⚠️ ALWAYS include references
 
 **References are how future-you finds the code again.** When writing notes about code, bugs, or technical decisions, ALWAYS include `--references` pointing to:
 
@@ -59,7 +59,7 @@ veta add --title "Fixed auth bug" --tags "debugging" \
 - API behaviors → URL to the documentation
 - Stack Overflow solutions → URL to the answer
 
-## When to Use Veta
+## When to use Veta
 
 **Use veta when:**
 - User says "remember this" or asks you to note something
@@ -74,7 +74,7 @@ veta add --title "Fixed auth bug" --tags "debugging" \
 - Things already documented in README/code comments
 - Transient session state
 
-## CLI Reference
+## CLI reference
 
 ### Initialize (one-time setup)
 
@@ -147,9 +147,9 @@ veta rm 42
 veta rm 1,2,3
 ```
 
-## Best Practices
+## Best practices
 
-### Tag Conventions
+### Tag conventions
 
 Use consistent, descriptive tags:
 
@@ -162,7 +162,7 @@ Use consistent, descriptive tags:
 | `<project-name>` | Project-specific knowledge |
 | `api` | API behaviors, rate limits, authentication patterns |
 
-### Writing Good Notes
+### Writing good notes
 
 **Title:** Make it searchable. Ask "what would I search for to find this?"
 
@@ -187,9 +187,9 @@ Fixed by adding select_related('author') to book queryset." \
   --references "myapp/views.py:45,myapp/models.py:12"
 ```
 
-## Session Protocol
+## Session protocol
 
-### Session Start
+### Session start
 ```bash
 # Check what you remember about this project
 veta tags
@@ -197,12 +197,12 @@ veta ls "$(basename $PWD)"
 veta ls --from "3 days ago"
 ```
 
-### During Work
+### During work
 - Learn something? Write it immediately
 - Make a decision? Document the WHY
 - Hit a bug? Note the fix
 
-### Session End
+### Session end
 ```bash
 # Review what you learned this session
 veta ls --from "today"
@@ -215,9 +215,9 @@ Key decision: 15-min session timeout based on security audit." \
   --references "src/auth/session.rs,src/middleware/auth.rs,docs/security-audit.md"
 ```
 
-## Common Workflows
+## Common workflows
 
-### Recall Project Context
+### Recall project context
 
 ```bash
 # What do I know about this project?
@@ -231,7 +231,7 @@ veta ls gotchas
 veta ls --from "1 week ago"
 ```
 
-### Document a Decision
+### Document a decision
 
 ```bash
 veta add --title "Chose SQLite over Postgres for local dev" \
@@ -245,7 +245,7 @@ Tradeoff: Some Postgres-specific features unavailable locally" \
   --references "docker-compose.yml,src/db/connection.rs,docs/local-setup.md"
 ```
 
-### Remember User Preferences
+### Remember user preferences
 
 ```bash
 veta add --title "Code review preferences" \
