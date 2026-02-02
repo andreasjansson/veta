@@ -346,6 +346,25 @@ The worker exposes a RESTful HTTP API:
 | `GET` | `/tags` | List all tags with note counts |
 | `GET` | `/grep` | Search notes. Query: `?q=pattern&tags=a,b&case_sensitive=true` |
 
+## Example: Agents SDK Chat App
+
+The `examples/agents-sdk/` directory contains a complete example of an AI chat agent with persistent memory using Veta and Cloudflare's Agents SDK.
+
+https://github.com/user-attachments/assets/example-app-video.mov
+
+To run it locally:
+
+```bash
+cd examples/agents-sdk
+npm install
+echo "OPENAI_API_KEY=your-key-here" > .dev.vars
+npm run dev
+```
+
+Then open http://localhost:8787. The agent remembers information across conversations - try telling it your name, starting a new chat, and asking "what's my name?"
+
+See `examples/agents-sdk/README.md` for more details.
+
 ## Architecture
 
 Veta is written in Rust and compiles to both native (CLI) and WASM (Worker) targets. The architecture maximizes code sharing between the two.
