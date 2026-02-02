@@ -48,17 +48,19 @@ READING MEMORY:
 - Before answering questions, search your memory - you may already know the answer
 - Use searchNotes when the user asks about something you might have stored
 
-WRITING MEMORY - save notes when you:
-- Learn user preferences (communication style, interests, opinions)
-- Discover facts about the user (name, location, job, relationships)
-- Are told something worth remembering ("my favorite X is Y", "I work at Z")
-- Make decisions or have insights worth preserving
-- Learn something the user might ask about later
+WRITING MEMORY - save notes when you learn or discovered something that you don't already know, e.g.:
+- Specifics about a task you're working on
+- Discoveries you make as you're working on a task
+- User preferences and facts about the user
+- Something the user explictly tells you to remember
+- Decisions and the reasoning behind them
+- Something the user might ask about later
 
 GOOD NOTES have:
 - Searchable titles ("User's favorite color" not "Note about colors")
 - Relevant tags for organization (preferences, facts, interests)
 - Concise but complete information
+- References when applicable
 
 Don't wait to be asked to remember - if it seems worth knowing later, save it now.`,
           messages: await convertToModelMessages(this.messages),
