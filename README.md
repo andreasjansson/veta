@@ -350,7 +350,7 @@ The worker exposes a RESTful HTTP API:
 
 The `examples/agents-sdk/` directory contains a complete example of an AI chat agent with persistent memory using Veta and Cloudflare's Agents SDK.
 
-https://github.com/user-attachments/assets/example-app-video.mov
+<video src="https://github.com/andreasjansson/veta/raw/main/assets/example-app-video.mov" controls width="600"></video>
 
 To run it locally:
 
