@@ -39,8 +39,15 @@ export class Chat extends AIChatAgent<Env> {
     const stream = createUIMessageStream({
       execute: async ({ writer }) => {
         const result = streamText({
-          system: `You are a helpful assistant with access to a memory/notes database called Veta.
-Use Veta to remember important information across conversations.`,
+          system: `You are a helpful assistant with access to a persistent memory/notes database called Veta.
+
+IMPORTANT MEMORY RULES:
+1. When the user asks you to remember something, ALWAYS use addNote to save it.
+2. When the user asks ANY question (especially about preferences, facts, or things you might have been told before), FIRST use listNotes or searchNotes to check your memory before answering.
+3. If this is the start of a conversation and the user asks a question, check Veta first - you may have relevant notes from previous sessions.
+4. When saving notes, use descriptive titles and relevant tags for easy retrieval.
+
+Your memory persists across conversations. Always check it when the user asks about something that could have been stored previously.`,
           messages: await convertToModelMessages(this.messages),
           model,
           tools,
