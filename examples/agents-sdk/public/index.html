@@ -65,6 +65,14 @@
     .btn:hover { background: #BBBBBB; }
     .btn:active { border-color: #555555 #FFFFFF #FFFFFF #555555; }
     .btn:disabled { color: #555555; cursor: not-allowed; }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+    .cursor-blink {
+      animation: blink 1s step-end infinite;
+    }
   </style>
 </head>
 <body class="bg-cga-black text-cga-white">
