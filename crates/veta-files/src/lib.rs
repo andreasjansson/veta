@@ -124,8 +124,8 @@ impl FilesDatabase {
             return Ok(None);
         }
 
-        let mut file =
-            File::open(&path).map_err(|e| Error::Database(format!("Failed to open note: {}", e)))?;
+        let mut file = File::open(&path)
+            .map_err(|e| Error::Database(format!("Failed to open note: {}", e)))?;
 
         let mut contents = String::new();
         file.read_to_string(&mut contents)
@@ -209,13 +209,13 @@ impl FilesDatabase {
         let _ = fs::remove_file(link);
 
         // Calculate relative path from link to target
-        let link_parent = link.parent().ok_or_else(|| {
-            Error::Database("Symlink path has no parent".to_string())
-        })?;
-        
+        let link_parent = link
+            .parent()
+            .ok_or_else(|| Error::Database("Symlink path has no parent".to_string()))?;
+
         // We want a relative path like "../notes/1.json"
-        let relative_target = pathdiff::diff_paths(target, link_parent)
-            .unwrap_or_else(|| target.to_path_buf());
+        let relative_target =
+            pathdiff::diff_paths(target, link_parent).unwrap_or_else(|| target.to_path_buf());
 
         #[cfg(unix)]
         {
@@ -230,12 +230,14 @@ impl FilesDatabase {
                 Ok(()) => {}
                 Err(_) => {
                     // Fall back to text file containing the path
-                    let mut file = File::create(link)
-                        .map_err(|e| Error::Database(format!("Failed to create link file: {}", e)))?;
+                    let mut file = File::create(link).map_err(|e| {
+                        Error::Database(format!("Failed to create link file: {}", e))
+                    })?;
                     // Use forward slashes for consistency
                     let path_str = relative_target.to_string_lossy().replace('\\', "/");
-                    file.write_all(path_str.as_bytes())
-                        .map_err(|e| Error::Database(format!("Failed to write link file: {}", e)))?;
+                    file.write_all(path_str.as_bytes()).map_err(|e| {
+                        Error::Database(format!("Failed to write link file: {}", e))
+                    })?;
                 }
             }
         }
@@ -249,9 +251,9 @@ impl FilesDatabase {
         // Try to read as a real symlink first
         if let Ok(target) = fs::read_link(link) {
             // Resolve relative to the link's parent directory
-            let link_parent = link.parent().ok_or_else(|| {
-                Error::Database("Symlink path has no parent".to_string())
-            })?;
+            let link_parent = link
+                .parent()
+                .ok_or_else(|| Error::Database("Symlink path has no parent".to_string()))?;
             return Ok(link_parent.join(target));
         }
 
@@ -263,9 +265,9 @@ impl FilesDatabase {
         file.read_to_string(&mut contents)
             .map_err(|e| Error::Database(format!("Failed to read link file: {}", e)))?;
 
-        let link_parent = link.parent().ok_or_else(|| {
-            Error::Database("Symlink path has no parent".to_string())
-        })?;
+        let link_parent = link
+            .parent()
+            .ok_or_else(|| Error::Database("Symlink path has no parent".to_string()))?;
 
         Ok(link_parent.join(contents.trim()))
     }
@@ -882,10 +884,7 @@ mod tests {
 
         // All notes should exist
         let db = FilesDatabase::open(&root).unwrap();
-        let notes = db
-            .list_notes(NoteQuery::default())
-            .await
-            .unwrap();
+        let notes = db.list_notes(NoteQuery::default()).await.unwrap();
         assert_eq!(notes.len(), 10);
     }
 
