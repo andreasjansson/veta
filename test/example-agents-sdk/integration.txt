@@ -3,7 +3,7 @@
 ===
 agent adds a note with unique content
 ===
-cd "$CCTR_TEST_PATH/../../examples/agents-sdk" && TEST_PORT=8788 TEST_AGENT_ID=cctr-integration node test-ws-chat.mjs "Add a note with title 'Banana Smoothie Recipe' and body 'Blend 2 bananas with ice and milk' and tag 'recipes'. Use the addNote tool and confirm it was added."
+cd "$CCTR_TEST_PATH/../../examples/agents-sdk" && TEST_PORT=8788 TEST_AGENT_ID=cctr-integration node test-ws-chat.mjs "Add a note with title 'Banana Smoothie Recipe' and body 'Blend 2 bananas with ice and milk' and tag 'recipes'. Use the veta tool with command 'add' and confirm it was added."
 ---
 {{ response }}
 ---
