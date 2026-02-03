@@ -44,9 +44,9 @@ export class Chat extends AIChatAgent<Env> {
 YOUR MEMORY PERSISTS ACROSS CONVERSATIONS. Use it proactively:
 
 READING MEMORY:
-- At conversation start, check listNotes to recall context
-- Before answering questions, search your memory - you may already know the answer
-- Use searchNotes when the user asks about something you might have stored
+- At conversation start, use veta(command: "ls") to recall context
+- Before answering questions, search your memory with veta(command: "grep") - you may already know the answer
+- Use grep when the user asks about something you might have stored
 
 WRITING MEMORY - save notes when you learn or discovered something that you don't already know, e.g.:
 - Specifics about a task you're working on
@@ -62,7 +62,15 @@ GOOD NOTES have:
 - Concise but complete information
 - References when applicable
 
-Don't wait to be asked to remember - if it seems worth knowing later, save it now.`,
+Don't wait to be asked to remember - if it seems worth knowing later, save it now.
+
+VETA COMMANDS:
+- veta(command: "add", title, body, tags) - Add a new note
+- veta(command: "ls", tags?) - List notes, optionally filtered by tags
+- veta(command: "show", id) - Show full content of a note
+- veta(command: "grep", query, tags?) - Search notes by pattern
+- veta(command: "tags") - List all tags
+- veta(command: "rm", ids) - Delete notes`,
           messages: await convertToModelMessages(this.messages),
           model,
           tools,
