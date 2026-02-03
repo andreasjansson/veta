@@ -60,14 +60,14 @@ npm run undeploy
 
 ## How It Works
 
-The agent has access to these Veta tools:
+The agent has access to a unified `veta` tool with these commands:
 
-- `addNote` - Store information with tags
-- `listNotes` - Browse notes, optionally filtered by tag
-- `showNote` - Read a specific note
-- `searchNotes` - Search with regex patterns
-- `listTags` - See all available tags
-- `rmNotes` - Remove one or more notes
+- `veta add` - Store information with tags
+- `veta ls` - Browse notes, optionally filtered by tag
+- `veta show` - Read a specific note
+- `veta grep` - Search with regex patterns
+- `veta tags` - See all available tags
+- `veta rm` - Remove one or more notes
 
 The Veta worker runs as a separate service, and the agent calls it via service bindings (the `VETA` binding in `wrangler.agent.jsonc`).
 
