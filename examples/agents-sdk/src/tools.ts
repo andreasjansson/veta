@@ -16,42 +16,39 @@ function getVetaFetcher() {
   return fetcher;
 }
 
-const VetaCommand = z.discriminatedUnion("command", [
-  z.object({
-    command: z.literal("add").describe("Add a new note"),
-    title: z.string().describe("Note title"),
-    body: z.string().describe("Note content"),
-    tags: z.array(z.string()).describe("Tags for organization"),
-  }),
-  z.object({
-    command: z.literal("ls").describe("List notes, optionally filtered by tags"),
-    tags: z.array(z.string()).optional().describe("Filter by these tags"),
-  }),
-  z.object({
-    command: z.literal("show").describe("Show the full content of a specific note"),
-    id: z.number().describe("Note ID"),
-  }),
-  z.object({
-    command: z.literal("grep").describe("Search notes by pattern (regex supported)"),
-    query: z.string().describe("Search pattern"),
-    tags: z.array(z.string()).optional().describe("Filter by these tags"),
-  }),
-  z.object({
-    command: z.literal("tags").describe("List all tags"),
-  }),
-  z.object({
-    command: z.literal("rm").describe("Delete one or more notes"),
-    ids: z.array(z.number()).describe("Note IDs to delete"),
-  }),
-]);
+const VetaInput = z.object({
+  command: z
+    .enum(["add", "ls", "show", "grep", "tags", "rm"])
+    .describe("Command: add, ls, show, grep, tags, rm"),
+  // For 'add' command
+  title: z.string().optional().describe("Note title (required for 'add')"),
+  body: z.string().optional().describe("Note content (required for 'add')"),
+  // For 'add', 'ls', 'grep' commands
+  tags: z
+    .array(z.string())
+    .optional()
+    .describe("Tags (required for 'add', optional filter for 'ls'/'grep')"),
+  // For 'show' command
+  id: z.number().optional().describe("Note ID (required for 'show')"),
+  // For 'grep' command
+  query: z.string().optional().describe("Search pattern (required for 'grep')"),
+  // For 'rm' command
+  ids: z
+    .array(z.number())
+    .optional()
+    .describe("Note IDs to delete (required for 'rm')"),
+});
 
-type VetaInput = z.infer<typeof VetaCommand>;
+type VetaInput = z.infer<typeof VetaInput>;
 
 async function executeVetaCommand(input: VetaInput): Promise<string> {
   const veta = getVetaFetcher();
 
   switch (input.command) {
     case "add": {
+      if (!input.title || !input.body || !input.tags) {
+        return "Error: 'add' requires title, body, and tags";
+      }
       const res = await veta.fetch("http://veta/notes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -85,6 +82,9 @@ async function executeVetaCommand(input: VetaInput): Promise<string> {
     }
 
     case "show": {
+      if (input.id === undefined) {
+        return "Error: 'show' requires id";
+      }
       const res = await veta.fetch(`http://veta/notes/${input.id}`);
       if (!res.ok) return `Note ${input.id} not found.`;
       const note = (await res.json()) as {
@@ -96,6 +96,9 @@ async function executeVetaCommand(input: VetaInput): Promise<string> {
     }
 
     case "grep": {
+      if (!input.query) {
+        return "Error: 'grep' requires query";
+      }
       const params = new URLSearchParams({ q: input.query });
       if (input.tags?.length) params.set("tags", input.tags.join(","));
       const res = await veta.fetch(`http://veta/grep?${params}`);
@@ -123,6 +126,9 @@ async function executeVetaCommand(input: VetaInput): Promise<string> {
     }
 
     case "rm": {
+      if (!input.ids?.length) {
+        return "Error: 'rm' requires ids";
+      }
       const results: string[] = [];
       for (const id of input.ids) {
         const res = await veta.fetch(`http://veta/notes/${id}`, {
@@ -139,7 +145,7 @@ export const tools = {
   veta: tool({
     description:
       "Interact with the Veta knowledge base. Commands: add (create note), ls (list notes), show (view note), grep (search), tags (list tags), rm (delete notes)",
-    inputSchema: VetaCommand,
+    inputSchema: VetaInput,
     execute: executeVetaCommand,
   }),
 } satisfies ToolSet;
