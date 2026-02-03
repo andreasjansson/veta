@@ -82,10 +82,14 @@
 
   function ToolCall({ toolCall }) {
     const [expanded, setExpanded] = useState(false);
+    // For veta tool, show the command in the header
+    const displayName = toolCall.name === "veta" && toolCall.input?.command
+      ? `veta ${toolCall.input.command}`
+      : toolCall.name;
     return (
       <div className="box-raised bg-cga-brown text-cga-yellow px-4 py-2 mb-4">
         <div onClick={() => setExpanded(!expanded)} className="cursor-pointer">
-          <span>{expanded ? "[-]" : "[+]"}</span> {toolCall.name}
+          <span>{expanded ? "[-]" : "[+]"}</span> {displayName}
         </div>
         {expanded && (
           <div className="mt-2 pt-2 border-t border-cga-yellow">
