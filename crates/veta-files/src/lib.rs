@@ -121,7 +121,7 @@ impl FilesDatabase {
         Ok(next_id)
     }
 
-    /// Read a note file from disk.
+    /// Read a note file from disk. Auto-repairs files missing the `modified` field.
     fn read_note_file(&self, id: i64) -> Result<Option<NoteFile>, Error> {
         let path = self.note_path(id);
 
@@ -136,8 +136,16 @@ impl FilesDatabase {
         file.read_to_string(&mut contents)
             .map_err(|e| Error::Database(format!("Failed to read note: {}", e)))?;
 
+        // Check if the file is missing the `modified` field so we can repair it
+        let needs_repair = !contents.contains("\"modified\"");
+
         let note: NoteFile = serde_json::from_str(&contents)
             .map_err(|e| Error::Database(format!("Failed to parse note: {}", e)))?;
+
+        if needs_repair {
+            // Re-write the file with the defaulted `modified` timestamp
+            self.write_note_file(id, &note)?;
+        }
 
         Ok(Some(note))
     }
