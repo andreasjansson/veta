@@ -1,0 +1,111 @@
+%platform unix
+
+=====
+reinitialize for repair tests
+=====
+veta init --reinitialize
+veta add --title "Existing note" --tags "test" --body "This note was created normally"
+-----
+Reinitialized veta database in {{ path }}
+Added note 1
+
+=====
+repair note missing modified field on ls
+=====
+printf '{\n  "title": "No modified",\n  "body": "Manually written note"\n}' > .veta/notes/1.json
+veta ls 2>&1
+-----
+Warning: note 1 is missing the `modified` field. Repairing.
+Only use the `veta` command to add notes.
+1: No modified ({{ modified }}) -- Manually written note
+-----
+where
+* modified matches /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/
+
+=====
+verify repaired note has modified field in json
+=====
+cat .veta/notes/1.json | grep '"modified"' | wc -l | tr -d ' '
+-----
+1
+
+=====
+no warning on second read after repair
+=====
+veta ls 2>&1
+-----
+1: No modified ({{ modified }}) -- Manually written note
+-----
+where
+* modified matches /^\d{4}-\d{2}-\d{2}/
+
+=====
+repair note missing modified field on show
+=====
+printf '{\n  "title": "Also broken",\n  "body": "Another manually written note"\n}' > .veta/notes/1.json
+veta show 1 2>&1
+-----
+Warning: note 1 is missing the `modified` field. Repairing.
+Only use the `veta` command to add notes.
+# Also broken
+
+Another manually written note
+
+---
+
+Last modified: {{ modified }}
+Tags: test
+
+=====
+repair note missing modified but having extra fields (id, tags)
+=====
+printf '{\n  "id": 1,\n  "title": "Wrong struct",\n  "body": "Written with Note instead of NoteFile",\n  "tags": ["test"],\n  "references": []\n}' > .veta/notes/1.json
+veta show 1 2>&1
+-----
+Warning: note 1 is missing the `modified` field. Repairing.
+Only use the `veta` command to add notes.
+# Wrong struct
+
+Written with Note instead of NoteFile
+
+---
+
+Last modified: {{ modified }}
+Tags: test
+
+=====
+reinitialize for counter repair tests
+=====
+veta init --reinitialize
+veta add --title "Note one" --tags "test" --body "First"
+-----
+Reinitialized veta database in {{ path }}
+Added note 1
+
+=====
+counter repaired when manually created note has higher id
+=====
+printf '{\n  "title": "Manual note",\n  "body": "Created outside veta",\n  "references": [],\n  "modified": "2026-01-01 00:00:00"\n}' > .veta/notes/5.json
+mkdir -p .veta/tags/manual
+ln -sf ../../notes/5.json .veta/tags/manual/5.json
+veta add --title "After manual" --tags "test" --body "Should get ID 6" 2>&1
+-----
+Warning: counter (1) is behind the highest note ID (5). Repairing counter.
+Only use the `veta` command to add notes.
+Added note 6
+
+=====
+next note gets sequential id after repair
+=====
+veta add --title "Next note" --tags "test" --body "Should get ID 7"
+-----
+Added note 7
+
+=====
+all notes visible after counter repair
+=====
+veta ls test
+-----
+7: Next note ({{ m1 }}) -- Should get ID 7
+6: After manual ({{ m2 }}) -- Should get ID 6
+1: Note one ({{ m3 }}) -- First
