@@ -82,34 +82,52 @@ impl FilesDatabase {
         self.root.join("notes").join(format!("{}.json", id))
     }
 
-    /// Get the next available note ID.
-    /// Uses a counter file to ensure IDs always increase, even after deletions.
-    fn next_id(&self) -> Result<i64, Error> {
-        let counter_path = self.root.join("counter");
+    /// Scan the notes directory for the highest note ID.
+    fn max_note_id(&self) -> i64 {
+        let notes_dir = self.root.join("notes");
+        let mut max_id: i64 = 0;
 
-        // Read existing counter, or scan notes dir if counter doesn't exist
-        let current_max = if counter_path.exists() {
-            let contents = fs::read_to_string(&counter_path)
-                .map_err(|e| Error::Database(format!("Failed to read counter: {}", e)))?;
-            contents.trim().parse::<i64>().unwrap_or(0)
-        } else {
-            // Initial setup: scan notes directory for max ID
-            let notes_dir = self.root.join("notes");
-            let mut max_id: i64 = 0;
-
-            if let Ok(entries) = fs::read_dir(&notes_dir) {
-                for entry in entries.flatten() {
-                    let path = entry.path();
-                    if let Some(stem) = path.file_stem() {
-                        if let Some(stem_str) = stem.to_str() {
-                            if let Ok(id) = stem_str.parse::<i64>() {
-                                max_id = max_id.max(id);
-                            }
+        if let Ok(entries) = fs::read_dir(&notes_dir) {
+            for entry in entries.flatten() {
+                let path = entry.path();
+                if let Some(stem) = path.file_stem() {
+                    if let Some(stem_str) = stem.to_str() {
+                        if let Ok(id) = stem_str.parse::<i64>() {
+                            max_id = max_id.max(id);
                         }
                     }
                 }
             }
-            max_id
+        }
+        max_id
+    }
+
+    /// Get the next available note ID.
+    /// Uses a counter file to ensure IDs always increase, even after deletions.
+    /// Also validates against actual note files to detect manually created notes.
+    fn next_id(&self) -> Result<i64, Error> {
+        let counter_path = self.root.join("counter");
+
+        let counter_value = if counter_path.exists() {
+            let contents = fs::read_to_string(&counter_path)
+                .map_err(|e| Error::Database(format!("Failed to read counter: {}", e)))?;
+            contents.trim().parse::<i64>().unwrap_or(0)
+        } else {
+            0
+        };
+
+        // Always check actual note files to detect manually created notes
+        let max_note = self.max_note_id();
+
+        let current_max = if max_note > counter_value {
+            eprintln!(
+                "Warning: counter ({}) is behind the highest note ID ({}). Repairing counter.",
+                counter_value, max_note
+            );
+            eprintln!("Only use the `veta` command to add notes.");
+            max_note
+        } else {
+            counter_value
         };
 
         let next_id = current_max + 1;
