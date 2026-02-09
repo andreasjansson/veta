@@ -24,6 +24,10 @@ use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use veta_core::{CreateNote, Database, Error, Note, NoteQuery, TagCount, UpdateNote};
 
+fn default_modified() -> String {
+    Utc::now().format("%Y-%m-%d %H:%M:%S").to_string()
+}
+
 /// A note as stored on disk (without ID or tags - tags come from symlinks).
 #[derive(Debug, Serialize, Deserialize)]
 struct NoteFile {
@@ -31,6 +35,7 @@ struct NoteFile {
     body: String,
     #[serde(default)]
     references: Vec<String>,
+    #[serde(default = "default_modified")]
     modified: String,
 }
 
