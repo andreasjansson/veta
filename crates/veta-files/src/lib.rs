@@ -161,6 +161,11 @@ impl FilesDatabase {
             .map_err(|e| Error::Database(format!("Failed to parse note: {}", e)))?;
 
         if needs_repair {
+            eprintln!(
+                "Warning: note {} is missing the `modified` field. Repairing.",
+                id
+            );
+            eprintln!("Only use the `veta` command to add notes.");
             // Re-write the file with the defaulted `modified` timestamp
             self.write_note_file(id, &note)?;
         }
