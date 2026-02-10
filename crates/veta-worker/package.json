@@ -1,6 +1,6 @@
 {
   "name": "veta",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Veta knowledge base - Cloudflare Worker",
   "repository": {
     "type": "git",
