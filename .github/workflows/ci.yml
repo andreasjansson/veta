@@ -237,6 +237,8 @@ jobs:
         run: |
           cargo publish -p veta-core --no-verify
           sleep 30  # Wait for crates.io to index
+          cargo publish -p veta-files --no-verify
+          sleep 30
           cargo publish -p veta-sqlite --no-verify
           sleep 30
           cargo publish -p veta --no-verify
