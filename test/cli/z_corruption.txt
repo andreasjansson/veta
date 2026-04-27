@@ -20,7 +20,7 @@ corrupted
 =====
 detect corruption when showing note
 =====
-veta show 1 2>&1 ; echo "exit: $?"
+veta show 1 2>&1 || echo "exit: $?"
 -----
 Error: database error: Failed to parse note: {{ msg }}
 exit: 1
@@ -31,7 +31,7 @@ where
 =====
 can still list notes (shows nothing since note is corrupt)
 =====
-veta ls 2>&1 ; echo "exit: $?"
+veta ls 2>&1 || echo "exit: $?"
 -----
 Error: database error: Failed to parse note: {{ msg }}
 exit: 1

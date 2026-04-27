@@ -14,7 +14,7 @@ where
 =====
 reject empty title
 =====
-veta add --title "  " --tags "test" --body "body" 2>&1 ; echo "exit: $?"
+veta add --title "  " --tags "test" --body "body" 2>&1 || echo "exit: $?"
 -----
 Error: validation error: title cannot be empty
 exit: 1
@@ -22,7 +22,7 @@ exit: 1
 =====
 reject whitespace-only title
 =====
-veta add --title "   	  " --tags "test" --body "body" 2>&1 ; echo "exit: $?"
+veta add --title "   	  " --tags "test" --body "body" 2>&1 || echo "exit: $?"
 -----
 Error: validation error: title cannot be empty
 exit: 1
@@ -30,7 +30,7 @@ exit: 1
 =====
 show non-existent note fails
 =====
-veta show 999 2>&1 ; echo "exit: $?"
+veta show 999 2>&1 || echo "exit: $?"
 -----
 Note 999 not found
 exit: 1
@@ -38,7 +38,7 @@ exit: 1
 =====
 delete non-existent note fails
 =====
-veta rm 999 2>&1 ; echo "exit: $?"
+veta rm 999 2>&1 || echo "exit: $?"
 -----
 Note 999 not found
 exit: 1
@@ -47,7 +47,7 @@ exit: 1
 delete multiple with some not found still deletes existing ones
 =====
 veta add --title "Temp note" --tags "temp" --body "temp"
-veta rm 1,888,999 2>&1 ; echo "exit: $?"
+veta rm 1,888,999 2>&1 || echo "exit: $?"
 -----
 Added note 1
 Deleted note 1
@@ -74,7 +74,7 @@ where
 =====
 edit non-existent note fails
 =====
-veta edit 999 --title "new" --body "" 2>&1 ; echo "exit: $?"
+veta edit 999 --title "new" --body "" 2>&1 || echo "exit: $?"
 -----
 Note 999 not found
 exit: 1
@@ -166,7 +166,7 @@ Tags: padded,spaced
 =====
 edit with empty title fails
 =====
-veta edit 1 --title "  " --body "body" 2>&1 ; echo "exit: $?"
+veta edit 1 --title "  " --body "body" 2>&1 || echo "exit: $?"
 -----
 Error: validation error: title cannot be empty
 exit: 1
@@ -188,7 +188,7 @@ Tags: lower,mixed,upper
 =====
 grep with invalid regex fails gracefully
 =====
-veta grep "[invalid" 2>&1 ; echo "exit: $?"
+veta grep "[invalid" 2>&1 || echo "exit: $?"
 -----
 Error: validation error: invalid regex: regex parse error:
     (?i)[invalid
@@ -199,7 +199,7 @@ exit: 1
 =====
 veta init fails if already initialized
 =====
-veta init 2>&1 ; echo "exit: $?"
+veta init 2>&1 || echo "exit: $?"
 -----
 Error: Veta is already initialized in this directory. Use --reinitialize to delete and recreate.
 exit: 1
