@@ -125,7 +125,7 @@ Tags: test
 =============================================
 show with not found note shows error
 =============================================
-veta show 1,999 2>&1 ; echo "exit: $?"
+veta show 1,999 2>&1 || echo "exit: $?"
 ---------------------------------------------
 # First note
 
@@ -142,7 +142,7 @@ exit: 1
 =============================================
 show no ids provided
 =============================================
-veta show 2>&1 ; echo "exit: $?"
+veta show 2>&1 || echo "exit: $?"
 ---------------------------------------------
 error: the following required arguments were not provided:
   <IDS>

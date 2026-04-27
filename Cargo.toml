@@ -10,7 +10,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "0.6.1"
+version = "0.6.2"
 edition = "2021"
 authors = ["Andreas Jansson"]
 license = "MIT"
@@ -18,10 +18,10 @@ homepage = "https://github.com/andreasjansson/veta"
 repository = "https://github.com/andreasjansson/veta"
 
 [workspace.dependencies]
-veta-core = { version = "0.6.1", path = "crates/veta-core" }
-veta-sqlite = { version = "0.6.1", path = "crates/veta-sqlite" }
-veta-files = { version = "0.6.1", path = "crates/veta-files" }
-veta-d1 = { version = "0.6.1", path = "crates/veta-d1" }
+veta-core = { version = "0.6.2", path = "crates/veta-core" }
+veta-sqlite = { version = "0.6.2", path = "crates/veta-sqlite" }
+veta-files = { version = "0.6.2", path = "crates/veta-files" }
+veta-d1 = { version = "0.6.2", path = "crates/veta-d1" }
 
 async-trait = "0.1"
 serde = { version = "1", features = ["derive"] }
@@ -37,8 +37,8 @@ rusqlite = { version = "0.32", features = ["bundled"] }
 anyhow = "1"
 
 # Worker dependencies
-worker = { version = "0.7", features = ["d1", "http"] }
-worker-macros = { version = "0.7", features = ["http"] }
+worker = { version = "0.8", features = ["d1", "http"] }
+worker-macros = { version = "0.8", features = ["http"] }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 http = "1"

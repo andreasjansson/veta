@@ -62,7 +62,6 @@ pub struct UpdateNote {
 impl Note {
     /// Convert to summary with truncated body preview.
     pub fn to_summary(&self, max_len: usize) -> NoteSummary {
-        // Convert newlines to spaces and take first max_len characters
         let normalized: String = self
             .body
             .chars()
@@ -70,13 +69,12 @@ impl Note {
             .collect();
         let trimmed = normalized.trim();
 
-        let body_preview = if trimmed.len() > max_len {
-            format!("{}...", &trimmed[..max_len])
-        } else if trimmed.len() < self.body.trim().len() {
-            // Content was truncated due to newline normalization showing less
-            trimmed.to_string()
+        let mut chars = trimmed.chars();
+        let preview: String = chars.by_ref().take(max_len).collect();
+        let body_preview = if chars.next().is_some() {
+            format!("{}...", preview)
         } else {
-            trimmed.to_string()
+            preview
         };
 
         NoteSummary {
@@ -86,5 +84,73 @@ impl Note {
             tags: self.tags.clone(),
             updated_at: self.updated_at.clone(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn note(body: &str) -> Note {
+        Note {
+            id: 1,
+            title: "t".into(),
+            body: body.into(),
+            tags: vec![],
+            references: vec![],
+            updated_at: "2026-01-01 00:00:00".into(),
+        }
+    }
+
+    #[test]
+    fn short_body_no_ellipsis() {
+        let s = note("hello").to_summary(140);
+        assert_eq!(s.body_preview, "hello");
+    }
+
+    #[test]
+    fn long_ascii_truncated_with_ellipsis() {
+        let body = "a".repeat(200);
+        let s = note(&body).to_summary(140);
+        assert_eq!(s.body_preview, format!("{}...", "a".repeat(140)));
+    }
+
+    #[test]
+    fn newlines_normalized_to_spaces() {
+        let s = note("foo\nbar\rbaz").to_summary(140);
+        assert_eq!(s.body_preview, "foo bar baz");
+    }
+
+    #[test]
+    fn truncates_on_char_boundary_with_multibyte() {
+        // Regression: previously panicked with "byte index N is not a char boundary"
+        // when max_len fell inside a multibyte UTF-8 character.
+        let body = format!("{} ×× tail", "a".repeat(138));
+        let s = note(&body).to_summary(140);
+        assert!(s.body_preview.ends_with("..."));
+        let preview_chars = s.body_preview.trim_end_matches("...").chars().count();
+        assert_eq!(preview_chars, 140);
+    }
+
+    #[test]
+    fn max_len_at_exact_multibyte_boundary() {
+        // 4-byte char (emoji) right after the truncation point
+        let body = format!("{}🎉 tail", "a".repeat(140));
+        let s = note(&body).to_summary(140);
+        assert_eq!(s.body_preview, format!("{}...", "a".repeat(140)));
+    }
+
+    #[test]
+    fn empty_body() {
+        let s = note("").to_summary(140);
+        assert_eq!(s.body_preview, "");
+    }
+
+    #[test]
+    fn body_exactly_max_len_chars() {
+        let body = "a".repeat(140);
+        let s = note(&body).to_summary(140);
+        assert_eq!(s.body_preview, "a".repeat(140));
+        assert!(!s.body_preview.ends_with("..."));
     }
 }
