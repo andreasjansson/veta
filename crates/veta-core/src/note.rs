@@ -62,7 +62,6 @@ pub struct UpdateNote {
 impl Note {
     /// Convert to summary with truncated body preview.
     pub fn to_summary(&self, max_len: usize) -> NoteSummary {
-        // Convert newlines to spaces and take first max_len characters
         let normalized: String = self
             .body
             .chars()
@@ -70,13 +69,12 @@ impl Note {
             .collect();
         let trimmed = normalized.trim();
 
-        let body_preview = if trimmed.len() > max_len {
-            format!("{}...", &trimmed[..max_len])
-        } else if trimmed.len() < self.body.trim().len() {
-            // Content was truncated due to newline normalization showing less
-            trimmed.to_string()
+        let mut chars = trimmed.chars();
+        let preview: String = chars.by_ref().take(max_len).collect();
+        let body_preview = if chars.next().is_some() {
+            format!("{}...", preview)
         } else {
-            trimmed.to_string()
+            preview
         };
 
         NoteSummary {
